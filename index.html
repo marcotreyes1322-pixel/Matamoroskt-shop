@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Matamoros Skateshop — Cuauhtémoc, Chihuahua</title>
 <meta name="description" content="Skateshop móvil en Cuauhtémoc, Chihuahua. Tablas, ruedas, trucks, lijas y ceras. Envíos a domicilio.">
+<meta name="theme-color" content="#0D0B0A">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Matamoros Skateshop">
+<meta property="og:title" content="Matamoros Skateshop — Cuauhtémoc, Chihuahua">
+<meta property="og:description" content="Skateshop móvil en Cuauhtémoc, Chihuahua. Tablas, ruedas, trucks, lijas y ceras. Envíos a domicilio.">
+<meta property="og:locale" content="es_MX">
+<meta name="twitter:card" content="summary">
+<!-- Cuando tengas dominio y foto propios: agrega aquí og:url y og:image -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='47' fill='%23F2534E' stroke='%230D0B0A' stroke-width='6'/%3E%3Ctext x='50' y='42' font-family='Arial Black,Arial,sans-serif' font-size='21' fill='%23E6E2D6' text-anchor='middle' font-weight='900'%3EMATA%3C/text%3E%3Ctext x='50' y='66' font-family='Arial Black,Arial,sans-serif' font-size='21' fill='%23E6E2D6' text-anchor='middle' font-weight='900'%3EMOROS%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
@@ -362,7 +371,6 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
 .ficha-nota{font-family:var(--maquina); font-size:11px; color:var(--toner); text-transform:uppercase; margin:0}
 .ficha-pie{display:flex; align-items:center; gap:10px; margin-top:auto; padding-top:6px}
 .precio{font-family:var(--display); font-size:20px}
-.precio sup{font-size:.5em; vertical-align:super}
 .agregar{
   margin-left:auto; padding:9px 13px; background:var(--tinta); color:var(--papel);
   font-family:var(--maquina); font-weight:700; font-size:11px;
@@ -955,6 +963,7 @@ button{font:inherit; cursor:pointer; border:none; background:none; color:inherit
     <a class="boton" id="carrito-wa" href="#" target="_blank" rel="noopener">Enviar pedido</a>
   </div>
 </div>
+<p class="solo-lectores" id="carrito-anuncio" role="status" aria-live="polite"></p>
 
 <!-- ── Modal de vista rápida ── -->
 <div class="modal-overlay" id="modal-overlay" hidden>
@@ -1040,7 +1049,7 @@ function pintarProductos(){
         <span class="etiqueta ${p.stock}">${p.stock === "tienda" ? "En tienda" : "Bajo pedido"}</span>
         <button class="favorito" data-fav="${p.id}" aria-pressed="${favoritos.has(p.id)}" aria-label="Marcar favorito">${favoritos.has(p.id) ? "♥" : "♡"}</button>
         ${p.img
-          ? `<img src="${p.img}" alt="${p.nombre}">`
+          ? `<img src="${p.img}" alt="${p.nombre}" loading="lazy" decoding="async">`
           : `<div class="cartel"><span>${p.nombre}</span></div>`}
       </div>
       <div class="ficha-cuerpo">
@@ -1070,10 +1079,14 @@ $("#filtros").addEventListener("click", e => {
   pintarProductos();
 });
 
-$("#buscador").addEventListener("input", e => {
+function debounce(fn, ms){
+  let manija;
+  return (...args) => { clearTimeout(manija); manija = setTimeout(() => fn(...args), ms); };
+}
+$("#buscador").addEventListener("input", debounce(e => {
   busqueda = e.target.value;
   pintarProductos();
-});
+}, 180));
 $("#orden").addEventListener("change", e => {
   orden = e.target.value;
   pintarProductos();
@@ -1108,7 +1121,7 @@ function abrirModal(id){
   if(!p) return;
   modalId = id; modalCant = 1;
   $("#modal-foto").innerHTML = p.img
-    ? `<img src="${p.img}" alt="${p.nombre}">`
+    ? `<img src="${p.img}" alt="${p.nombre}" decoding="async">`
     : `<div class="cartel"><span>${p.nombre}</span></div>`;
   $("#modal-etiqueta").textContent = p.stock === "tienda" ? "En tienda" : "Bajo pedido";
   $("#modal-etiqueta").className = "etiqueta " + p.stock;
@@ -1155,11 +1168,13 @@ function pintarCarrito(){
   });
 
   $("#barra-carrito").classList.toggle("visible", piezas > 0);
-  $("#carrito-cuenta").textContent = piezas === 1 ? "1 artículo" : `${piezas} artículos`;
+  const cuentaTexto = piezas === 1 ? "1 artículo" : `${piezas} artículos`;
+  $("#carrito-cuenta").textContent = cuentaTexto;
   $("#carrito-suma").textContent = pesos(suma);
   $("#carrito-wa").href = wa(
     "Hola Matamoros, quiero pedir:\n\n" + renglones.join("\n") + `\n\nTotal: ${pesos(suma)}`
   );
+  $("#carrito-anuncio").textContent = piezas > 0 ? `${cuentaTexto} en tu pedido, total ${pesos(suma)}` : "Carrito vacío";
 }
 $("#carrito-wa").addEventListener("click", lanzarConfetti);
 
@@ -1224,7 +1239,7 @@ $("#riders-lista").innerHTML = RIDERS.map(r => `
   <article class="rider">
     <div class="rider-foto">
       ${r.foto
-        ? `<img src="${r.foto}" alt="${r.alias}">`
+        ? `<img src="${r.foto}" alt="${r.alias}" loading="lazy" decoding="async">`
         : `<div class="cartel"><span>${r.alias}</span></div>`}
     </div>
     <div class="rider-cuerpo">
@@ -1287,12 +1302,27 @@ document.querySelectorAll(".truco-hotspot").forEach(h => {
 
 let usarVideo = false;
 if(TRUCO_VIDEO){
-  trucoVideo.src = TRUCO_VIDEO;
   trucoLienzo.classList.add("con-video");
   usarVideo = true;
   trucoVideo.addEventListener("loadedmetadata", () => {
     trucoVideo.play().then(() => trucoVideo.pause()).catch(() => {});
   });
+  /* El video solo se descarga cuando el usuario está por llegar a la
+     sección, para no gastar datos de quien nunca hace scroll hasta ahí. */
+  if("IntersectionObserver" in window){
+    const cargaTruco = new IntersectionObserver((entradas, obs) => {
+      entradas.forEach(en => {
+        if(en.isIntersecting){
+          trucoVideo.src = TRUCO_VIDEO;
+          trucoVideo.load();
+          obs.disconnect();
+        }
+      });
+    }, { rootMargin:"800px 0px" });
+    cargaTruco.observe($("#truco-riel"));
+  } else {
+    trucoVideo.src = TRUCO_VIDEO;
+  }
 }
 
 const CAMARA_KF = [
@@ -1352,33 +1382,30 @@ function actualizarTruco(p){
   ZONAS.forEach(z => $(`#hotspot-${z}`).classList.toggle("activo", z === zona && p > 0.02 && p < 0.99));
 }
 
-let tickeandoTruco = false;
-function alScrollTruco(){
-  if(tickeandoTruco) return;
-  tickeandoTruco = true;
-  requestAnimationFrame(() => {
-    actualizarTruco(progresoTruco());
-    tickeandoTruco = false;
-  });
-}
-addEventListener("scroll", alScrollTruco, { passive:true });
-addEventListener("resize", alScrollTruco);
-
-/* ── Parallax suave de portada ─────────────────────────── */
+/* Un solo listener de scroll, un solo rAF por cuadro: evita que dos
+   handlers independientes disparen dos vueltas de layout por scroll. */
 const portadaHalftone = $("#portada-halftone");
 const portadaCorte = $("#portada-corte");
-let tickeandoParallax = false;
-function alScrollParallax(){
-  if(reducido || tickeandoParallax) return;
-  tickeandoParallax = true;
+
+function actualizarParallax(){
+  if(reducido) return;
+  const y = scrollY;
+  portadaHalftone.style.transform = `translateY(${y * 0.12}px)`;
+  portadaCorte.style.transform = `translate(-50%, ${y * 0.22}px)`;
+}
+
+let tickeandoScroll = false;
+function alScroll(){
+  if(tickeandoScroll) return;
+  tickeandoScroll = true;
   requestAnimationFrame(() => {
-    const y = scrollY;
-    portadaHalftone.style.transform = `translateY(${y * 0.12}px)`;
-    portadaCorte.style.transform = `translate(-50%, ${y * 0.22}px)`;
-    tickeandoParallax = false;
+    actualizarTruco(progresoTruco());
+    actualizarParallax();
+    tickeandoScroll = false;
   });
 }
-addEventListener("scroll", alScrollParallax, { passive:true });
+addEventListener("scroll", alScroll, { passive:true });
+addEventListener("resize", alScroll);
 
 /* ── Revelado al hacer scroll ───────────────────────────── */
 if("IntersectionObserver" in window){
@@ -1429,6 +1456,23 @@ pintarTicket();
 pintarCarrito();
 pintarHotspots();
 actualizarTruco(0);
+
+/* ── Datos estructurados para buscadores (SEO local) ───── */
+try{
+  const ld = document.createElement("script");
+  ld.type = "application/ld+json";
+  ld.textContent = JSON.stringify({
+    "@context":"https://schema.org",
+    "@type":"SportingGoodsStore",
+    "name":"Matamoros Skateshop",
+    "description":"Skateshop móvil en Cuauhtémoc, Chihuahua. Tablas, ruedas, trucks, lijas y ceras. Envíos a domicilio.",
+    "address":{ "@type":"PostalAddress", "addressLocality":"Cuauhtémoc", "addressRegion":"Chihuahua", "addressCountry":"MX" },
+    "telephone":"+" + WHATSAPP,
+    "sameAs":[IG, TT],
+    "priceRange":"$$"
+  });
+  document.head.appendChild(ld);
+}catch(e){}
 </script>
 </body>
 </html>
