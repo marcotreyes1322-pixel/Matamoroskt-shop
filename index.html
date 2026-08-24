@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matamoros Skateshop — Cuauhtémoc, Chihuahua</title>
+<meta name="description" content="Skateshop móvil en Cuauhtémoc, Chihuahua. Tablas, ruedas, trucks, lijas y ceras. Envíos a domicilio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   EDITA AQUÍ — TODO LO QUE CAMBIA ESTÁ EN ESTE BLOQUE
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1. Tu número de WhatsApp. Formato: 52 + LADA + NÚMERO, sin espacios ni +. */
+const WHATSAPP = "521625XXXXXXX";
+
+/* 2. Productos de la tienda.
+      stock: "tienda"  = lo tienes físico, entrega inmediata
+      stock: "pedido"  = dropshipping / bajo pedido
+      img: pega la URL de la foto. Si lo dejas vacío ("") se dibuja
+           un cartel con el nombre, y se ve bien igual.            */
+const PRODUCTOS = [
+  { id:"t1", nombre:'Tabla Matamoros 8.0"', cat:"Tablas",      precio:850,  stock:"tienda", nota:"Maple canadiense, 7 capas", img:"" },
+  { id:"t2", nombre:'Tabla Matamoros 8.25"', cat:"Tablas",     precio:850,  stock:"tienda", nota:"Cóncavo medio", img:"" },
+  { id:"t3", nombre:'Tabla Skull Yellow 8.0"', cat:"Tablas",   precio:990,  stock:"pedido", nota:"Gráfico serigrafiado", img:"" },
+  { id:"r1", nombre:"Ruedas Catrina's Pizza 53mm", cat:"Ruedas", precio:750, stock:"tienda", nota:"Juego de 4 · 99A", img:"" },
+  { id:"r2", nombre:"Ruedas Catrina's Pizza 55mm", cat:"Ruedas", precio:780, stock:"tienda", nota:"Juego de 4 · 101A", img:"" },
+  { id:"k1", nombre:'Trucks 5.25" par', cat:"Trucks",          precio:1100, stock:"pedido", nota:"Para tablas 8.0", img:"" },
+  { id:"k2", nombre:'Trucks 5.5" par', cat:"Trucks",           precio:1150, stock:"pedido", nota:"Para tablas 8.25", img:"" },
+  { id:"b1", nombre:"Baleros ABEC 7", cat:"Baleros",           precio:320,  stock:"tienda", nota:"Juego de 8", img:"" },
+  { id:"b2", nombre:"Baleros cerámicos", cat:"Baleros",        precio:890,  stock:"pedido", nota:"Juego de 8", img:"" },
+  { id:"l1", nombre:"Lija negra grano 80", cat:"Lijas",        precio:180,  stock:"tienda", nota:"Hoja 9x33", img:"" },
+  { id:"l2", nombre:"Lija perforada", cat:"Lijas",             precio:220,  stock:"tienda", nota:"Sin burbujas", img:"" },
+  { id:"c1", nombre:"Cera Catrina", cat:"Ceras",               precio:150,  stock:"tienda", nota:"Para filos y barandales", img:"" },
+  { id:"a1", nombre:"Tornillería 1\"", cat:"Accesorios",       precio:120,  stock:"tienda", nota:"Juego de 8", img:"" },
+  { id:"a2", nombre:"Rodamientos de repuesto", cat:"Accesorios", precio:90,  stock:"tienda", nota:"Bujes y rondanas", img:"" },
+  { id:"p1", nombre:"Pantalón baggy negro", cat:"Ropa",        precio:790,  stock:"pedido", nota:"Tallas 28 a 38", img:"" },
+  { id:"p2", nombre:"Playera Matamoros", cat:"Ropa",           precio:390,  stock:"tienda", nota:"Serigrafía a 1 tinta", img:"" },
+];
+
+/* 3. Piezas del configurador ("Arma tu setup" y "Arma tu truco" usan
+      las mismas tres primeras: tabla, trucks, ruedas). */
+const SETUP = {
+  tabla:  [ {n:'Matamoros 8.0"', p:850, s:"tienda"}, {n:'Matamoros 8.25"', p:850, s:"tienda"}, {n:'Skull Yellow 8.0"', p:990, s:"pedido"} ],
+  trucks: [ {n:'5.25" par', p:1100, s:"pedido"}, {n:'5.5" par', p:1150, s:"pedido"} ],
+  ruedas: [ {n:"Catrina's Pizza 53mm", p:750, s:"tienda"}, {n:"Catrina's Pizza 55mm", p:780, s:"tienda"} ],
+  baleros:[ {n:"ABEC 7", p:320, s:"tienda"}, {n:"Cerámicos", p:890, s:"pedido"} ],
+  lija:   [ {n:"Grano 80", p:180, s:"tienda"}, {n:"Perforada", p:220, s:"tienda"} ],
+};
+
+/* 4. Textos que quizá quieras cambiar. */
+const TICKER = "ENVÍOS A DOMICILIO ✱ CUAUHTÉMOC, CHIHUAHUA ✱ SKATESHOP MÓVIL ✱ ARMAMOS TU PATINETA ✱ PEDIDOS POR WHATSAPP ✱";
+const IG = "https://instagram.com/matamoros_sk8";
+const TT = "https://tiktok.com/@matamoros.sk8";
+
+/* 5. "Arma tu truco" — sección con scroll.
+      Pega aquí la URL de un video corto (mp4, sin audio, de alguien
+      tirando un kickflip o similar). Al deslizar la página, el video
+      se "reproduce" cuadro por cuadro según cuánto scrolleas — igual
+      que en las páginas de producto de Apple. Si lo dejas vacío
+      ("") se dibuja una patineta animada en su lugar, así que
+      puedes publicar el sitio antes de tener el video listo. */
+const TRUCO_VIDEO = "";
+
+/* 6. Riders / equipo. foto vacía = se dibuja un cartel con el alias. */
+const RIDERS = [
+  { alias:"El Matamoros", nombre:"Fundador", especialidad:"Street · Fundador de la tienda", foto:"" },
+  { alias:"La Catrina", nombre:"Rider oficial", especialidad:"Transición · Bowl", foto:"" },
+  { alias:"Huesos", nombre:"Rider oficial", especialidad:"Street · Rieles", foto:"" },
+  { alias:"Comandante", nombre:"Rider oficial", especialidad:"Vert · Rampa", foto:"" },
+];
+
+/* 7. Crónicas — recorte de periódico con lo último que ha pasado. */
+const CRONICAS = [
+  { fecha:"Jun 2026", titulo:"Go Skate Day rompió récord", texto:"Más de 80 patinadores en el Polideportivo. Se repartieron patinetas completas entre los primeros lugares.", img:"" },
+  { fecha:"Abr 2026", titulo:"Nueva tanda de Catrina's Pizza", texto:"Llegaron las ruedas 53 y 55mm a la tienda. Se acabaron en dos semanas.", img:"" },
+  { fecha:"Feb 2026", titulo:"Sesión nocturna en la plaza", texto:"Grabamos el clip que anda circulando en TikTok con más de 34 mil vistas.", img:"" },
+];
+
+/* 8. Preguntas frecuentes. */
+const FAQS = [
+  { p:"¿Cómo pido algo si no tienen tienda física fija?", r:"Todo se arma y se paga por WhatsApp. Le das \"Agregar\" a lo que quieras, revisas tu ticket abajo y le picas a \"Enviar pedido\": se abre WhatsApp con todo ya escrito." },
+  { p:"¿Cuánto tarda lo que está \"bajo pedido\"?", r:"Entre 5 y 10 días hábiles. Te avisamos por WhatsApp en cuanto llega." },
+  { p:"¿Hacen envíos a domicilio en Cuauhtémoc?", r:"Sí, sin costo dentro de la ciudad. Fuera de Cuauhtémoc cotizamos según la zona." },
+  { p:"¿Arman la patineta completa?", r:"Sí, el armado y el lijado van sin costo cuando compras el setup completo (tabla + trucks + ruedas + baleros)." },
+  { p:"¿Aceptan cambios o garantía?", r:"Cambios por defecto de fábrica dentro de los primeros 15 días, con tu comprobante de WhatsApp." },
+];
+
+/* 9. Ubicación. Si tienes el link de "insertar mapa" de OpenStreetMap
+      o Google Maps, pégalo en mapaSrc. Si lo dejas vacío se muestra
+      un cartel con la dirección en vez del mapa. */
+const UBICACION = { direccion:"Cuauhtémoc, Chihuahua · punto de entrega y recolección se confirma por WhatsApp", mapaSrc:"" };
+
+/* ═══════════════ FIN DE LA ZONA EDITABLE ═══════════════ */
+</script>
+
+<style>
+/* ── Tokens ─────────────────────────────────────────── */
+:root{
+  --tinta:#0D0B0A;        /* negro tóner, un poco cálido */
+  --papel:#E6E2D6;        /* papel de fotocopia reciclado */
+  --papel-2:#D8D3C4;
+  --rojo:#F2534E;         /* del sticker de Instagram */
+  --amarillo:#FFD400;     /* del logo de TikTok */
+  --toner:#8C8880;
+
+  --display:'Archivo Black', Impact, sans-serif;
+  --texto:'Archivo', system-ui, sans-serif;
+  --maquina:'Courier Prime', 'Courier New', monospace;
+
+  --marco:3px solid var(--tinta);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--papel); color:var(--tinta);
+  font-family:var(--texto); font-size:16px; line-height:1.5;
+  overflow-x:hidden;
+  cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%230D0B0A' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23F2534E'/%3E%3C/svg%3E") 16 16, auto;
+}
+
+/* Grano de fotocopia sobre todo el sitio */
+body::after{
+  content:""; position:fixed; inset:0; z-index:9999; pointer-events:none;
+  opacity:.16; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+a{color:inherit}
+img{max-width:100%; display:block}
+button{font:inherit; cursor:pointer; border:none; background:none; color:inherit}
+
+/* ── Utilidades de marca ────────────────────────────── */
+.halftone{
+  background-image:radial-gradient(circle, var(--tinta) .9px, transparent 1.4px);
+  background-size:5px 5px;
+}
+.cuadros{
+  background:repeating-conic-gradient(var(--tinta) 0% 25%, var(--papel) 0% 50%) 0 0/14px 14px;
+}
+.mono{font-family:var(--maquina); text-transform:uppercase; letter-spacing:.08em}
+
+/* Tipo mal registrada, como cuando la fotocopia se corre */
+.mis{
+  font-family:var(--display); text-transform:uppercase; line-height:.86;
+  color:var(--papel);
+  text-shadow:
+    3px 3px 0 var(--tinta),
+   -2px -2px 0 var(--rojo),
+    6px 6px 0 rgba(13,11,10,.28);
+}
+
+.envoltorio{width:min(1180px, 92vw); margin-inline:auto}
+
+/* Título con glitch al pasar el cursor */
+.glitch{position:relative; display:inline-block}
+.glitch:hover, .glitch:focus-visible{animation:glitch-mov .32s steps(2,end) 2}
+.glitch:hover::before, .glitch:hover::after,
+.glitch:focus-visible::before, .glitch:focus-visible::after{
+  content:attr(data-texto); position:absolute; inset:0; overflow:hidden;
+}
+.glitch:hover::before, .glitch:focus-visible::before{color:var(--rojo); animation:glitch-1 .34s steps(2,end) 2; clip-path:inset(0 0 55% 0)}
+.glitch:hover::after, .glitch:focus-visible::after{color:var(--amarillo); animation:glitch-2 .34s steps(2,end) 2; clip-path:inset(55% 0 0 0)}
+@keyframes glitch-mov{0%{transform:translate(0,0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,-1px)}80%{transform:translate(1px,1px)}100%{transform:translate(0,0)}}
+@keyframes glitch-1{0%{transform:translate(0,0)}25%{transform:translate(-4px,-1px)}50%{transform:translate(4px,1px)}75%{transform:translate(-3px,0)}100%{transform:translate(0,0)}}
+@keyframes glitch-2{0%{transform:translate(0,0)}25%{transform:translate(4px,1px)}50%{transform:translate(-4px,-1px)}75%{transform:translate(3px,0)}100%{transform:translate(0,0)}}
+
+/* Estampas decorativas repartidas por el sitio */
+.estampa{
+  position:absolute; z-index:3; pointer-events:none; user-select:none;
+  font-family:var(--maquina); font-size:11px; text-transform:uppercase;
+  letter-spacing:.08em; text-align:center; line-height:1.15;
+  border:2px solid currentColor; border-radius:50%;
+  width:78px; height:78px; display:flex; align-items:center; justify-content:center;
+  padding:8px; opacity:.9; mix-blend-mode:multiply;
+}
+.estampa.rojo{color:var(--rojo); border-color:var(--rojo)}
+.estampa.amarillo{color:var(--tinta); background:var(--amarillo); border-color:var(--tinta)}
+.estampa.girada-i{transform:rotate(-11deg)}
+.estampa.girada-d{transform:rotate(9deg)}
+
+/* Revelado al hacer scroll */
+.reveal{opacity:0; transform:translateY(28px); transition:opacity .6s ease, transform .6s ease}
+.reveal.visible{opacity:1; transform:none}
+.reveal.retraso1{transition-delay:.08s}
+.reveal.retraso2{transition-delay:.16s}
+.reveal.retraso3{transition-delay:.24s}
+
+/* ── Barra superior ─────────────────────────────────── */
+.barra{
+  position:sticky; top:0; z-index:100;
+  background:var(--tinta); color:var(--papel);
+  border-bottom:3px solid var(--rojo);
+}
+.barra-in{
+  display:flex; align-items:center; gap:14px;
+  padding:10px 0; width:min(1180px,92vw); margin-inline:auto;
+}
+.sello{
+  width:44px; height:44px; border-radius:50%; flex:0 0 auto;
+  background:var(--rojo); border:2px solid var(--papel);
+  display:grid; place-items:center; text-align:center;
+  font-family:var(--display); font-size:8px; line-height:1; color:var(--papel);
+  text-transform:uppercase; letter-spacing:-.02em; padding:4px;
+  outline:1px dashed var(--papel); outline-offset:3px;
+  animation:girar-lento 18s linear infinite;
+}
+@keyframes girar-lento{to{transform:rotate(360deg)}}
+.barra nav{display:flex; gap:16px; margin-left:auto; overflow-x:auto; scrollbar-width:none}
+.barra nav::-webkit-scrollbar{display:none}
+.barra nav a{
+  font-family:var(--maquina); font-size:12px; text-transform:uppercase;
+  letter-spacing:.1em; text-decoration:none; white-space:nowrap; padding:4px 0;
+  border-bottom:2px solid transparent;
+}
+.barra nav a:hover,.barra nav a:focus-visible{border-bottom-color:var(--amarillo)}
+
+/* ── Portada ────────────────────────────────────────── */
+.portada{
+  position:relative; background:var(--tinta); color:var(--papel);
+  padding:clamp(48px,9vw,110px) 0 0; overflow:hidden;
+}
+.portada .halftone{
+  position:absolute; inset:0; opacity:.18;
+  background-image:radial-gradient(circle, var(--papel) 1px, transparent 1.5px);
+  background-size:6px 6px;
+}
+.corte{
+  position:absolute; top:-14%; left:50%; transform:translateX(-50%);
+  width:min(760px,120vw); aspect-ratio:1; border-radius:50%;
+  border:2px dashed rgba(230,226,214,.32);
+}
+.portada-in{position:relative}
+.antetitulo{
+  font-family:var(--maquina); font-size:clamp(11px,2.6vw,13px);
+  letter-spacing:.28em; text-transform:uppercase; color:var(--amarillo);
+  margin:0 0 18px;
+}
+.titulazo{margin:0; font-size:clamp(58px,15.5vw,168px)}
+.titulazo small{display:block; font-size:.34em; margin-top:.12em; letter-spacing:.02em}
+.bajada{
+  max-width:34ch; margin:26px 0 0;
+  font-size:clamp(16px,3.6vw,19px); color:var(--papel-2);
+}
+.acciones{display:flex; flex-wrap:wrap; gap:12px; margin:28px 0 clamp(40px,7vw,64px)}
+
+.boton{
+  display:inline-block; padding:14px 22px; text-decoration:none;
+  font-family:var(--display); text-transform:uppercase; font-size:14px;
+  letter-spacing:.03em; border:3px solid var(--tinta);
+  background:var(--amarillo); color:var(--tinta);
+  box-shadow:5px 5px 0 var(--rojo); transition:transform .12s, box-shadow .12s;
+}
+.boton:hover,.boton:focus-visible{transform:translate(3px,3px); box-shadow:2px 2px 0 var(--rojo)}
+.boton.fantasma{background:transparent; color:var(--papel); border-color:var(--papel); box-shadow:5px 5px 0 var(--rojo)}
+
+/* Cinta corrediza */
+.cinta{
+  background:var(--rojo); color:var(--tinta); border-block:3px solid var(--tinta);
+  overflow:hidden; padding:9px 0;
+}
+.cinta-pista{display:flex; width:max-content; animation:correr 26s linear infinite}
+.cinta span{
+  font-family:var(--display); text-transform:uppercase; font-size:15px;
+  letter-spacing:.04em; padding-right:26px; white-space:nowrap;
+}
+@keyframes correr{to{transform:translateX(-50%)}}
+
+/* ── Secciones ──────────────────────────────────────── */
+.seccion{padding:clamp(52px,8vw,92px) 0; position:relative}
+.seccion--oscura{background:var(--tinta); color:var(--papel)}
+.encabezado{display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:32px}
+.encabezado h2{
+  font-family:var(--display); text-transform:uppercase; margin:0;
+  font-size:clamp(30px,7vw,58px); line-height:.92; letter-spacing:-.01em;
+}
+.encabezado p{
+  font-family:var(--maquina); font-size:12px; text-transform:uppercase;
+  letter-spacing:.12em; margin:0 0 6px; color:var(--toner);
+}
+.seccion--oscura .encabezado p{color:var(--amarillo)}
+.regla{height:14px; margin-bottom:32px}
+
+/* ── Controles de tienda: buscador, orden, favoritos ─── */
+.controles-tienda{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px}
+.buscador,.orden{
+  font-family:var(--maquina); font-size:12px; text-transform:uppercase;
+  letter-spacing:.06em; padding:10px 14px; border:2px solid var(--tinta);
+  background:var(--papel); color:var(--tinta);
+}
+.buscador{flex:1 1 220px; min-width:0}
+.buscador::placeholder{color:var(--toner)}
+.orden{flex:0 0 auto}
+
+/* ── Filtros ────────────────────────────────────────── */
+.filtros{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px}
+.chip{
+  font-family:var(--maquina); font-size:12px; text-transform:uppercase;
+  letter-spacing:.08em; padding:8px 14px; border:2px solid var(--tinta);
+  background:var(--papel); transition:background .1s;
+}
+.chip[aria-pressed="true"]{background:var(--tinta); color:var(--papel)}
+.chip:hover{background:var(--amarillo)}
+.chip[aria-pressed="true"]:hover{background:var(--tinta)}
+
+/* ── Rejilla de productos ───────────────────────────── */
+.rejilla{
+  display:grid; gap:22px;
+  grid-template-columns:repeat(auto-fill, minmax(215px,1fr));
+}
+.vacio{
+  font-family:var(--maquina); text-transform:uppercase; font-size:13px;
+  letter-spacing:.08em; color:var(--toner); padding:30px 0;
+}
+.ficha{
+  background:var(--papel); border:var(--marco);
+  display:flex; flex-direction:column; position:relative;
+  box-shadow:6px 6px 0 var(--tinta); transition:transform .14s, box-shadow .14s;
+}
+.ficha:nth-child(3n){transform:rotate(-.5deg)}
+.ficha:nth-child(4n){transform:rotate(.6deg)}
+.ficha:hover{transform:translate(3px,3px) rotate(0deg); box-shadow:3px 3px 0 var(--rojo)}
+.ficha-foto{
+  aspect-ratio:4/5; border-bottom:3px solid var(--tinta); overflow:hidden;
+  position:relative; display:grid; place-items:center; background:var(--papel-2);
+  cursor:zoom-in;
+}
+.ficha-foto img{width:100%; height:100%; object-fit:cover; filter:grayscale(1) contrast(1.25)}
+.cartel{
+  position:absolute; inset:0; display:grid; place-items:center; padding:14px;
+  background-image:radial-gradient(circle, var(--tinta) 1px, transparent 1.5px);
+  background-size:6px 6px;
+}
+.cartel span{
+  font-family:var(--display); text-transform:uppercase; text-align:center;
+  font-size:clamp(15px,3.4vw,20px); line-height:.94; color:var(--papel);
+  background:var(--tinta); padding:8px 10px; transform:rotate(-3deg);
+}
+.etiqueta{
+  position:absolute; top:9px; left:9px; z-index:2;
+  font-family:var(--maquina); font-weight:700; font-size:10px;
+  text-transform:uppercase; letter-spacing:.08em;
+  padding:4px 8px; border:2px solid var(--tinta);
+}
+.etiqueta.tienda{background:var(--amarillo)}
+.etiqueta.pedido{background:var(--papel); color:var(--tinta)}
+.favorito{
+  position:absolute; top:7px; right:7px; z-index:2; width:30px; height:30px;
+  border:2px solid var(--tinta); background:var(--papel); border-radius:50%;
+  display:grid; place-items:center; font-size:15px; line-height:1;
+}
+.favorito[aria-pressed="true"]{background:var(--rojo); color:var(--papel)}
+.ficha-cuerpo{padding:14px; display:flex; flex-direction:column; gap:8px; flex:1}
+.ficha h3{
+  font-family:var(--display); text-transform:uppercase; margin:0;
+  font-size:16px; line-height:1.08;
+}
+.ficha-nota{font-family:var(--maquina); font-size:11px; color:var(--toner); text-transform:uppercase; margin:0}
+.ficha-pie{display:flex; align-items:center; gap:10px; margin-top:auto; padding-top:6px}
+.precio{font-family:var(--display); font-size:20px}
+.precio sup{font-size:.5em; vertical-align:super}
+.agregar{
+  margin-left:auto; padding:9px 13px; background:var(--tinta); color:var(--papel);
+  font-family:var(--maquina); font-weight:700; font-size:11px;
+  text-transform:uppercase; letter-spacing:.06em; border:2px solid var(--tinta);
+}
+.agregar:hover,.agregar:focus-visible{background:var(--rojo); color:var(--tinta)}
+
+/* ── Modal de vista rápida ───────────────────────────── */
+.modal-overlay{
+  position:fixed; inset:0; z-index:300; background:rgba(13,11,10,.78);
+  display:flex; align-items:center; justify-content:center; padding:22px;
+}
+.modal-overlay[hidden]{display:none}
+.modal{
+  background:var(--papel); border:var(--marco); max-width:560px; width:100%;
+  max-height:88vh; overflow:auto; position:relative;
+  box-shadow:9px 9px 0 var(--rojo);
+  display:grid; grid-template-columns:1fr;
+}
+@media(min-width:560px){ .modal{grid-template-columns:1fr 1fr} }
+.modal-cerrar{
+  position:absolute; top:10px; right:10px; z-index:2; width:34px; height:34px;
+  background:var(--tinta); color:var(--papel); border-radius:50%; font-size:16px;
+}
+.modal-foto{aspect-ratio:4/5; background:var(--papel-2); position:relative; border-bottom:3px solid var(--tinta)}
+@media(min-width:560px){ .modal-foto{border-bottom:none; border-right:3px solid var(--tinta)} }
+.modal-foto img{width:100%; height:100%; object-fit:cover; filter:grayscale(1) contrast(1.25)}
+.modal-cuerpo{padding:22px; display:flex; flex-direction:column; gap:10px}
+.modal-cuerpo h3{font-family:var(--display); text-transform:uppercase; margin:6px 0 0; font-size:24px; line-height:1}
+.modal-cant{display:flex; align-items:center; gap:14px; margin-top:6px}
+.modal-cant button{
+  width:34px; height:34px; border:2px solid var(--tinta); font-family:var(--display); font-size:16px;
+}
+.modal-cant span{font-family:var(--maquina); font-size:15px; min-width:1.5ch; text-align:center}
+
+/* ── Configurador ───────────────────────────────────── */
+.taller{display:grid; gap:26px; grid-template-columns:1fr}
+@media(min-width:860px){ .taller{grid-template-columns:1.25fr .75fr; align-items:start} }
+
+.piezas{display:flex; flex-direction:column; gap:16px}
+.pieza{border:3px solid var(--papel); padding:14px}
+.pieza > p{
+  font-family:var(--maquina); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--amarillo); margin:0 0 10px;
+}
+.opciones{display:flex; flex-wrap:wrap; gap:8px}
+.opcion{
+  font-family:var(--texto); font-size:13px; padding:9px 13px;
+  border:2px solid var(--papel); background:transparent; color:var(--papel);
+  display:flex; align-items:center; gap:7px;
+}
+.opcion b{font-family:var(--maquina); font-size:11px; opacity:.7}
+.opcion[aria-pressed="true"]{background:var(--amarillo); color:var(--tinta); border-color:var(--amarillo)}
+.opcion[aria-pressed="true"] b{opacity:1}
+.opcion:hover{border-color:var(--rojo)}
+
+/* Ticket de caja */
+.ticket{
+  background:var(--papel); color:var(--tinta); padding:22px 20px 26px;
+  font-family:var(--maquina); position:relative; position:sticky; top:76px;
+  filter:drop-shadow(5px 5px 0 var(--rojo));
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 9px),
+    95% 100%,90% calc(100% - 9px),85% 100%,80% calc(100% - 9px),75% 100%,
+    70% calc(100% - 9px),65% 100%,60% calc(100% - 9px),55% 100%,50% calc(100% - 9px),
+    45% 100%,40% calc(100% - 9px),35% 100%,30% calc(100% - 9px),25% 100%,
+    20% calc(100% - 9px),15% 100%,10% calc(100% - 9px),5% 100%,0 calc(100% - 9px));
+}
+.ticket h3{
+  font-family:var(--display); font-size:17px; text-transform:uppercase;
+  margin:0 0 4px; text-align:center; letter-spacing:.02em;
+}
+.ticket .lugar{
+  font-size:10px; text-align:center; text-transform:uppercase;
+  letter-spacing:.14em; color:var(--toner); margin:0 0 16px;
+}
+.reng{
+  display:flex; justify-content:space-between; gap:10px;
+  font-size:12px; padding:7px 0; border-bottom:1px dashed var(--toner);
+  text-transform:uppercase;
+}
+.reng span:first-child{color:var(--toner); flex:0 0 62px}
+.reng span:nth-child(2){flex:1}
+.reng b{font-weight:700; white-space:nowrap}
+.total{
+  display:flex; justify-content:space-between; align-items:baseline;
+  margin-top:16px; padding-top:12px; border-top:3px solid var(--tinta);
+}
+.total span{font-size:12px; text-transform:uppercase; letter-spacing:.1em}
+.total b{font-family:var(--display); font-size:30px}
+.ticket .aviso{font-size:10px; text-transform:uppercase; color:var(--toner); margin:12px 0 0; text-align:center; line-height:1.5}
+.ticket .boton{width:100%; text-align:center; margin-top:16px; box-shadow:4px 4px 0 var(--rojo)}
+
+/* ── Arma tu truco (scrollytelling) ──────────────────── */
+.truco-intro{margin-bottom:0}
+.truco-riel{position:relative; height:400vh}
+.truco-pin{position:sticky; top:0; height:100vh; overflow:hidden}
+.truco-lienzo{
+  position:relative; width:100%; height:100%;
+  background:radial-gradient(ellipse at center, #17130f 0%, var(--tinta) 68%);
+  border-block:3px solid var(--amarillo);
+}
+.truco-video{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+}
+.truco-svg{position:absolute; inset:0; width:100%; height:100%}
+.truco-lienzo.con-video .truco-svg{display:none}
+.truco-lienzo:not(.con-video) .truco-video{display:none}
+
+.truco-etiqueta{
+  position:absolute; top:22px; left:50%; transform:translateX(-50%);
+  font-family:var(--maquina); font-size:12px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--amarillo); background:rgba(13,11,10,.7); padding:8px 16px; border:2px solid var(--amarillo);
+  pointer-events:none;
+}
+.truco-progreso{position:absolute; left:0; right:0; bottom:0; height:5px; background:rgba(230,226,214,.15)}
+.truco-progreso-barra{height:100%; width:0%; background:var(--rojo); transition:width .05s linear}
+
+.truco-hotspot{
+  position:absolute; width:min(280px,80vw);
+  background:var(--papel); color:var(--tinta); border:var(--marco);
+  padding:16px 16px 18px; box-shadow:6px 6px 0 var(--rojo);
+  opacity:0; transform:translateY(14px) scale(.96); pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease;
+}
+.truco-hotspot.activo{opacity:1; transform:none; pointer-events:auto}
+.truco-hotspot p{font-family:var(--maquina); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--rojo); margin:0 0 8px}
+.truco-hotspot .opciones{gap:6px}
+.truco-hotspot .opcion{color:var(--tinta); border-color:var(--tinta); font-size:12px; padding:7px 10px}
+.truco-hotspot .opcion[aria-pressed="true"]{background:var(--rojo); border-color:var(--rojo); color:var(--papel)}
+.truco-hotspot--tabla{left:6%; top:18%}
+.truco-hotspot--trucks{right:6%; top:38%}
+.truco-hotspot--ruedas{left:6%; bottom:12%}
+@media(max-width:700px){
+  .truco-hotspot--tabla{left:50%; top:16%; transform:translate(-50%,14px) scale(.96)}
+  .truco-hotspot--tabla.activo{transform:translate(-50%,0) scale(1)}
+  .truco-hotspot--trucks{right:auto; left:50%; top:44%; transform:translate(-50%,14px) scale(.96)}
+  .truco-hotspot--trucks.activo{transform:translate(-50%,0) scale(1)}
+  .truco-hotspot--ruedas{left:50%; bottom:10%; transform:translate(-50%,14px) scale(.96)}
+  .truco-hotspot--ruedas.activo{transform:translate(-50%,0) scale(1)}
+}
+
+/* ── Riders ─────────────────────────────────────────── */
+.riders{display:grid; gap:22px; grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.rider{
+  background:var(--papel); border:var(--marco); box-shadow:6px 6px 0 var(--tinta);
+  transition:transform .14s, box-shadow .14s;
+}
+.rider:nth-child(odd){transform:rotate(-.6deg)}
+.rider:nth-child(even){transform:rotate(.7deg)}
+.rider:hover{transform:translate(3px,3px) rotate(0); box-shadow:3px 3px 0 var(--rojo)}
+.rider-foto{aspect-ratio:1; border-bottom:3px solid var(--tinta); background:var(--papel-2); position:relative; display:grid; place-items:center}
+.rider-foto img{width:100%; height:100%; object-fit:cover; filter:grayscale(1) contrast(1.25)}
+.rider-cuerpo{padding:14px}
+.rider-cuerpo h3{font-family:var(--display); text-transform:uppercase; margin:0 0 4px; font-size:19px}
+.rider-cuerpo p{margin:0; font-family:var(--maquina); font-size:11px; text-transform:uppercase; color:var(--toner); letter-spacing:.04em}
+
+/* ── Crónicas (recorte de periódico) ─────────────────── */
+.cronicas{display:grid; gap:22px; grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.cronica{
+  background:var(--papel-2); border:2px solid var(--tinta); padding:18px;
+  position:relative; box-shadow:5px 5px 0 var(--tinta);
+}
+.cronica::before{
+  content:""; position:absolute; inset:6px; border:1px dashed var(--toner); pointer-events:none;
+}
+.cronica .fecha-mini{
+  font-family:var(--maquina); font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--rojo); display:block; margin-bottom:8px;
+}
+.cronica h3{font-family:var(--display); text-transform:uppercase; font-size:19px; line-height:1.02; margin:0 0 8px}
+.cronica p{margin:0; font-size:13.5px; color:var(--tinta)}
+
+/* ── FAQ ────────────────────────────────────────────── */
+.faqs{display:flex; flex-direction:column; gap:10px; max-width:760px}
+.faq{border:2px solid var(--tinta); background:var(--papel)}
+.faq summary{
+  list-style:none; cursor:pointer; padding:14px 44px 14px 16px; position:relative;
+  font-family:var(--display); text-transform:uppercase; font-size:15px; letter-spacing:.01em;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{
+  content:"+"; position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  font-family:var(--display); font-size:20px;
+}
+.faq[open] summary::after{content:"–"}
+.faq[open] summary{border-bottom:2px solid var(--tinta)}
+.faq p{margin:0; padding:14px 16px 18px; font-size:14px; color:#3a3733}
+
+/* ── Ubicación ────────────────────────────────────────── */
+.ubicacion{display:grid; gap:22px; grid-template-columns:1fr}
+@media(min-width:800px){ .ubicacion{grid-template-columns:1fr 1fr} }
+.mapa-caja{
+  border:3px solid var(--papel); min-height:280px; display:grid; place-items:center;
+  background:repeating-linear-gradient(135deg, rgba(230,226,214,.06) 0 10px, transparent 10px 20px);
+}
+.mapa-caja iframe{width:100%; height:100%; min-height:280px; border:0; filter:grayscale(.4) contrast(1.1)}
+.mapa-caja .pin{font-family:var(--display); text-align:center; color:var(--amarillo); text-transform:uppercase; padding:20px}
+.mapa-caja .pin span{display:block; font-size:34px; margin-bottom:8px}
+.ubicacion-datos p{color:var(--papel-2); max-width:44ch}
+
+/* ── Redes ──────────────────────────────────────────── */
+.redes{display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.red{
+  border:var(--marco); padding:24px 20px; background:var(--papel);
+  text-decoration:none; display:flex; flex-direction:column; gap:10px;
+  box-shadow:6px 6px 0 var(--tinta); transition:transform .14s, box-shadow .14s;
+}
+.red:hover,.red:focus-visible{transform:translate(3px,3px); box-shadow:3px 3px 0 var(--rojo)}
+.red .arroba{font-family:var(--maquina); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--toner)}
+.red h3{font-family:var(--display); text-transform:uppercase; font-size:26px; margin:0; line-height:.95}
+.red p{margin:0; font-size:14px}
+.red .dato{
+  font-family:var(--maquina); font-size:11px; text-transform:uppercase;
+  letter-spacing:.06em; margin-top:auto; padding-top:12px; border-top:2px solid var(--tinta);
+}
+
+/* ── Evento ─────────────────────────────────────────── */
+.evento{
+  border:3px solid var(--papel); padding:clamp(24px,5vw,40px);
+  display:grid; gap:22px; grid-template-columns:1fr;
+}
+@media(min-width:760px){ .evento{grid-template-columns:auto 1fr; align-items:center} }
+.fecha{
+  border:3px solid var(--amarillo); padding:16px 22px; text-align:center;
+  font-family:var(--display); text-transform:uppercase; color:var(--amarillo);
+  align-self:start; justify-self:start;
+}
+.fecha b{display:block; font-size:46px; line-height:.9}
+.fecha span{font-size:13px; letter-spacing:.1em}
+.evento h3{font-family:var(--display); text-transform:uppercase; font-size:clamp(24px,5vw,40px); margin:0 0 10px; line-height:.95}
+.evento p{margin:0; color:var(--papel-2); max-width:52ch}
+
+/* ── Carrito ────────────────────────────────────────── */
+.barra-carrito{
+  position:fixed; left:0; right:0; bottom:0; z-index:200;
+  background:var(--tinta); color:var(--papel); border-top:3px solid var(--amarillo);
+  transform:translateY(105%); transition:transform .22s ease;
+}
+.barra-carrito.visible{transform:none}
+.barra-carrito-in{
+  width:min(1180px,92vw); margin-inline:auto; padding:12px 0;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.barra-carrito .cuenta{font-family:var(--maquina); font-size:12px; text-transform:uppercase; letter-spacing:.08em}
+.barra-carrito .suma{font-family:var(--display); font-size:22px; margin-left:auto}
+.barra-carrito .boton{padding:11px 18px; font-size:13px}
+.vaciar{font-family:var(--maquina); font-size:11px; text-transform:uppercase; letter-spacing:.08em; text-decoration:underline; color:var(--papel-2)}
+
+/* ── Pie ────────────────────────────────────────────── */
+.pie{background:var(--tinta); color:var(--papel); padding:clamp(44px,7vw,72px) 0 130px}
+.pie-in{display:grid; gap:26px; grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.pie h4{font-family:var(--maquina); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--amarillo); margin:0 0 12px}
+.pie ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px}
+.pie a{font-size:14px; text-decoration:none; border-bottom:1px solid transparent}
+.pie a:hover,.pie a:focus-visible{border-bottom-color:var(--amarillo)}
+.pie .firma{
+  grid-column:1/-1; border-top:2px solid rgba(230,226,214,.24); padding-top:18px;
+  font-family:var(--maquina); font-size:10px; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--toner); display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+}
+
+/* ── Confetti ───────────────────────────────────────── */
+#confetti-lienzo{position:fixed; inset:0; z-index:400; pointer-events:none}
+
+/* ── Accesibilidad ──────────────────────────────────── */
+:focus-visible{outline:3px solid var(--rojo); outline-offset:3px}
+.solo-lectores{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1; transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="barra-in">
+    <a href="#arriba" class="sello" aria-label="Matamoros Skateshop, inicio">MATA<br>MOROS</a>
+    <nav aria-label="Principal">
+      <a href="#tienda">Tienda</a>
+      <a href="#truco">Arma tu truco</a>
+      <a href="#taller">Setup</a>
+      <a href="#riders">Riders</a>
+      <a href="#cronicas">Crónicas</a>
+      <a href="#faq">Dudas</a>
+      <a href="#redes">Redes</a>
+    </nav>
+  </div>
+</header>
+
+<main id="arriba">
+
+  <!-- ── Portada ── -->
+  <section class="portada">
+    <div class="halftone" id="portada-halftone" aria-hidden="true"></div>
+    <div class="corte" id="portada-corte" aria-hidden="true"></div>
+    <div class="estampa rojo girada-i" style="top:14%; right:4%">100%<br>CHIHUAHUA</div>
+    <div class="envoltorio portada-in">
+      <p class="antetitulo">Cuauhtémoc, Chihuahua · Skateshop móvil</p>
+      <h1 class="titulazo mis">Matamoros<small>Skateshop</small></h1>
+      <p class="bajada">Tablas, ruedas, trucks y refacciones. Te lo llevamos a domicilio, lo armamos completo antes de que lo recojas, o lo eliges tirando un truco.</p>
+      <div class="acciones">
+        <a class="boton" href="#tienda">Ver la tienda</a>
+        <a class="boton fantasma" href="#truco">Arma tu truco</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="cinta" aria-hidden="true">
+    <div class="cinta-pista" id="cinta"></div>
+  </div>
+
+  <!-- ── Tienda ── -->
+  <section class="seccion" id="tienda">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>01 · Catálogo</p>
+          <h2 class="glitch" data-texto="La tienda">La tienda</h2>
+        </div>
+      </div>
+      <div class="regla cuadros" aria-hidden="true"></div>
+
+      <div class="controles-tienda reveal">
+        <input type="search" id="buscador" class="buscador" placeholder="Buscar producto…" aria-label="Buscar producto">
+        <select id="orden" class="orden" aria-label="Ordenar por">
+          <option value="">Ordenar</option>
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="precio-desc">Precio: mayor a menor</option>
+          <option value="nombre">Nombre A–Z</option>
+        </select>
+      </div>
+
+      <div class="filtros" role="group" aria-label="Filtrar por categoría" id="filtros"></div>
+      <div class="rejilla" id="rejilla"></div>
+      <p class="mono" style="margin-top:26px; font-size:11px; color:var(--toner)">
+        Etiqueta amarilla = lo tenemos aquí · Etiqueta blanca = lo pedimos, llega en 5 a 10 días · ♡ = tus favoritos, se guardan en este navegador
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Arma tu truco (scrollytelling) ── -->
+  <section class="seccion seccion--oscura truco-intro" id="truco">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>02 · Interactivo</p>
+          <h2 class="glitch" data-texto="Arma tu truco">Arma tu truco</h2>
+        </div>
+      </div>
+      <p class="bajada reveal" style="color:var(--papel-2); margin-bottom:34px">Desliza para tirar el truco. En cada acercamiento —tabla, trucks y ruedas— elige tu pieza sin salir del clip; se va sumando directo a tu ticket de abajo.</p>
+    </div>
+
+    <div class="truco-riel" id="truco-riel">
+      <div class="truco-pin">
+        <div class="truco-lienzo" id="truco-lienzo">
+          <video class="truco-video" id="truco-video" muted playsinline preload="auto"></video>
+
+          <svg class="truco-svg" id="truco-svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <g id="truco-camara">
+              <g id="truco-grafica">
+                <rect x="118" y="196" width="164" height="20" rx="10" fill="var(--papel)" stroke="var(--tinta)" stroke-width="3"/>
+                <rect x="130" y="184" width="140" height="10" rx="5" fill="var(--rojo)" opacity=".85"/>
+                <g id="truco-trucks-g">
+                  <rect x="136" y="214" width="8" height="14" fill="var(--toner)"/>
+                  <rect x="256" y="214" width="8" height="14" fill="var(--toner)"/>
+                </g>
+                <g id="truco-ruedas-g">
+                  <circle cx="132" cy="236" r="15" fill="var(--amarillo)" stroke="var(--tinta)" stroke-width="3"/>
+                  <circle cx="150" cy="236" r="15" fill="var(--amarillo)" stroke="var(--tinta)" stroke-width="3"/>
+                  <circle cx="250" cy="236" r="15" fill="var(--amarillo)" stroke="var(--tinta)" stroke-width="3"/>
+                  <circle cx="268" cy="236" r="15" fill="var(--amarillo)" stroke="var(--tinta)" stroke-width="3"/>
+                </g>
+              </g>
+            </g>
+          </svg>
+
+          <p class="truco-etiqueta" id="truco-etiqueta">Deslízate hacia abajo ↓</p>
+
+          <div class="truco-hotspot truco-hotspot--tabla" id="hotspot-tabla" data-zona="tabla">
+            <p>Elige tu tabla</p>
+            <div class="opciones" id="hotspot-tabla-op"></div>
+          </div>
+          <div class="truco-hotspot truco-hotspot--trucks" id="hotspot-trucks" data-zona="trucks">
+            <p>Elige tus trucks</p>
+            <div class="opciones" id="hotspot-trucks-op"></div>
+          </div>
+          <div class="truco-hotspot truco-hotspot--ruedas" id="hotspot-ruedas" data-zona="ruedas">
+            <p>Elige tus ruedas</p>
+            <div class="opciones" id="hotspot-ruedas-op"></div>
+          </div>
+
+          <div class="truco-progreso"><div class="truco-progreso-barra" id="truco-barra"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Configurador ── -->
+  <section class="seccion seccion--oscura" id="taller">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>03 · Arma tu setup</p>
+          <h2 class="glitch" data-texto="Pieza por pieza">Pieza por pieza</h2>
+        </div>
+      </div>
+
+      <div class="taller">
+        <div class="piezas reveal" id="piezas"></div>
+
+        <div class="ticket reveal retraso1" id="ticket">
+          <h3>Matamoros Skateshop</h3>
+          <p class="lugar">Cuauhtémoc, Chih. · Setup completo</p>
+          <div id="ticket-renglones"></div>
+          <div class="total">
+            <span>Total</span>
+            <b id="ticket-total">$0</b>
+          </div>
+          <p class="aviso" id="ticket-aviso">Incluye armado y lijado sin costo</p>
+          <a class="boton" id="ticket-wa" href="#" target="_blank" rel="noopener">Pedirlo por WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Riders ── -->
+  <section class="seccion" id="riders">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>04 · Equipo</p>
+          <h2 class="glitch" data-texto="Los riders">Los riders</h2>
+        </div>
+      </div>
+      <div class="regla cuadros" aria-hidden="true"></div>
+      <div class="riders reveal" id="riders-lista"></div>
+    </div>
+  </section>
+
+  <!-- ── Redes ── -->
+  <section class="seccion" id="redes">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>05 · Dónde estamos</p>
+          <h2 class="glitch" data-texto="Las tres puertas">Las tres puertas</h2>
+        </div>
+      </div>
+      <div class="regla cuadros" aria-hidden="true"></div>
+
+      <div class="redes reveal">
+        <a class="red" href="" id="lnk-ig" target="_blank" rel="noopener">
+          <span class="arroba">Instagram</span>
+          <h3>@matamoros_sk8</h3>
+          <p>Drops, fotos de producto y los carteles de cada evento.</p>
+          <span class="dato">Aquí va lo que se vende</span>
+        </a>
+        <a class="red" href="" id="lnk-tt" target="_blank" rel="noopener">
+          <span class="arroba">TikTok</span>
+          <h3>@matamoros.sk8</h3>
+          <p>Los clips de la banda patinando en Cuauhtémoc.</p>
+          <span class="dato">5,880 me gusta · 34.1k en un solo video</span>
+        </a>
+        <a class="red" href="#tienda">
+          <span class="arroba">Este sitio</span>
+          <h3>La tienda</h3>
+          <p>Precios, existencias y pedidos sin esperar respuesta al DM.</p>
+          <span class="dato">Abierta las 24 horas</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Crónicas ── -->
+  <section class="seccion seccion--oscura" id="cronicas">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>06 · Crónicas</p>
+          <h2 class="glitch" data-texto="Lo último">Lo último</h2>
+        </div>
+      </div>
+      <div class="cronicas reveal" id="cronicas-lista"></div>
+    </div>
+  </section>
+
+  <!-- ── Evento ── -->
+  <section class="seccion" id="evento">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>07 · Lo que viene</p>
+          <h2 class="glitch" data-texto="Partidas de madre" style="color:var(--tinta)">Partidas de madre</h2>
+        </div>
+      </div>
+      <div class="evento reveal" style="border-color:var(--tinta); color:var(--tinta)">
+        <div class="fecha" style="border-color:var(--rojo); color:var(--rojo)"><b>21</b><span>Junio</span></div>
+        <div>
+          <h3>Go Skate Day</h3>
+          <p style="color:#3a3733">Polideportivo Cuauhtémoc, 5 PM. Distintas dinámicas, premios en efectivo, accesorios y patinetas. Llega con tu tabla.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section class="seccion" id="faq">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>08 · Dudas</p>
+          <h2 class="glitch" data-texto="Preguntas frecuentes">Preguntas frecuentes</h2>
+        </div>
+      </div>
+      <div class="faqs reveal" id="faqs-lista"></div>
+    </div>
+  </section>
+
+  <!-- ── Ubicación ── -->
+  <section class="seccion seccion--oscura" id="ubicacion">
+    <div class="envoltorio">
+      <div class="encabezado reveal">
+        <div>
+          <p>09 · Ubicación</p>
+          <h2 class="glitch" data-texto="Dónde encontrarnos">Dónde encontrarnos</h2>
+        </div>
+      </div>
+      <div class="ubicacion reveal">
+        <div class="mapa-caja" id="mapa-caja"></div>
+        <div class="ubicacion-datos">
+          <p id="ubicacion-texto"></p>
+          <p style="font-family:var(--maquina); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--amarillo)">Confirmamos punto exacto de entrega por WhatsApp antes de cada pedido.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="envoltorio pie-in">
+    <div>
+      <h4>Tienda</h4>
+      <ul>
+        <li><a href="#tienda">Catálogo completo</a></li>
+        <li><a href="#truco">Arma tu truco</a></li>
+        <li><a href="#taller">Arma tu setup</a></li>
+        <li><a href="#" id="pie-wa" target="_blank" rel="noopener">Pedir por WhatsApp</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Comunidad</h4>
+      <ul>
+        <li><a href="#riders">Riders</a></li>
+        <li><a href="#cronicas">Crónicas</a></li>
+        <li><a href="#evento">Próximo evento</a></li>
+        <li><a href="#faq">Preguntas frecuentes</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Redes</h4>
+      <ul>
+        <li><a href="" id="pie-ig" target="_blank" rel="noopener">Instagram</a></li>
+        <li><a href="" id="pie-tt" target="_blank" rel="noopener">TikTok</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Dónde</h4>
+      <ul>
+        <li>Cuauhtémoc, Chihuahua</li>
+        <li>Skateshop móvil</li>
+        <li>Envíos a domicilio</li>
+      </ul>
+    </div>
+    <p class="firma">
+      <span>Matamoros Skateshop</span>
+      <span>Hecho en Cuauhtémoc</span>
+    </p>
+  </div>
+</footer>
+
+<!-- ── Carrito ── -->
+<div class="barra-carrito" id="barra-carrito" role="region" aria-label="Tu pedido">
+  <div class="barra-carrito-in">
+    <span class="cuenta" id="carrito-cuenta">0 artículos</span>
+    <button class="vaciar" id="carrito-vaciar">Vaciar</button>
+    <span class="suma" id="carrito-suma">$0</span>
+    <a class="boton" id="carrito-wa" href="#" target="_blank" rel="noopener">Enviar pedido</a>
+  </div>
+</div>
+
+<!-- ── Modal de vista rápida ── -->
+<div class="modal-overlay" id="modal-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <button class="modal-cerrar" id="modal-cerrar" aria-label="Cerrar vista rápida">✕</button>
+    <div class="modal-foto" id="modal-foto"></div>
+    <div class="modal-cuerpo">
+      <span class="etiqueta" id="modal-etiqueta"></span>
+      <h3 id="modal-titulo"></h3>
+      <p class="ficha-nota" id="modal-nota"></p>
+      <p class="precio" id="modal-precio"></p>
+      <div class="modal-cant">
+        <button id="modal-menos" aria-label="Quitar uno">−</button>
+        <span id="modal-cant">1</span>
+        <button id="modal-mas" aria-label="Agregar uno">+</button>
+      </div>
+      <button class="boton" id="modal-agregar">Agregar al pedido</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="confetti-lienzo" aria-hidden="true"></canvas>
+
+<script>
+/* ── Helpers ─────────────────────────────────────────── */
+const $ = s => document.querySelector(s);
+const pesos = n => "$" + n.toLocaleString("es-MX");
+const wa = texto => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ── Enlaces de redes ────────────────────────────────── */
+$("#lnk-ig").href = $("#pie-ig").href = IG;
+$("#lnk-tt").href = $("#pie-tt").href = TT;
+$("#pie-wa").href = wa("Hola Matamoros, quiero hacer un pedido.");
+
+/* ── Cinta corrediza ─────────────────────────────────── */
+$("#cinta").innerHTML = Array.from({length:6}, () => `<span>${TICKER}</span>`).join("");
+
+/* ── Catálogo ────────────────────────────────────────── */
+const categorias = ["Todo", ...new Set(PRODUCTOS.map(p => p.cat))];
+let categoriaActiva = "Todo";
+let busqueda = "";
+let orden = "";
+let favoritos = new Set();
+try{ favoritos = new Set(JSON.parse(localStorage.getItem("mm_favoritos") || "[]")); }catch(e){}
+
+function guardarFavoritos(){
+  try{ localStorage.setItem("mm_favoritos", JSON.stringify([...favoritos])); }catch(e){}
+}
+
+function pintarFiltros(){
+  $("#filtros").innerHTML = categorias.map(c => `
+    <button class="chip" data-cat="${c}" aria-pressed="${c === categoriaActiva}">${c}</button>
+  `).join("") + `<button class="chip" id="chip-favoritos" aria-pressed="${favoritos.size ? "false" : "false"}">♡ Favoritos</button>`;
+}
+
+let soloFavoritos = false;
+
+function pintarProductos(){
+  let lista = categoriaActiva === "Todo"
+    ? PRODUCTOS.slice()
+    : PRODUCTOS.filter(p => p.cat === categoriaActiva);
+
+  if(soloFavoritos) lista = lista.filter(p => favoritos.has(p.id));
+
+  if(busqueda.trim()){
+    const q = busqueda.trim().toLowerCase();
+    lista = lista.filter(p => (p.nombre + " " + p.nota + " " + p.cat).toLowerCase().includes(q));
+  }
+
+  if(orden === "precio-asc") lista.sort((a,b) => a.precio - b.precio);
+  else if(orden === "precio-desc") lista.sort((a,b) => b.precio - a.precio);
+  else if(orden === "nombre") lista.sort((a,b) => a.nombre.localeCompare(b.nombre, "es"));
+
+  if(!lista.length){
+    $("#rejilla").innerHTML = `<p class="vacio">No hay productos con esos filtros. Prueba quitando alguno.</p>`;
+    return;
+  }
+
+  $("#rejilla").innerHTML = lista.map(p => `
+    <article class="ficha" data-id="${p.id}">
+      <div class="ficha-foto" data-abrir="${p.id}">
+        <span class="etiqueta ${p.stock}">${p.stock === "tienda" ? "En tienda" : "Bajo pedido"}</span>
+        <button class="favorito" data-fav="${p.id}" aria-pressed="${favoritos.has(p.id)}" aria-label="Marcar favorito">${favoritos.has(p.id) ? "♥" : "♡"}</button>
+        ${p.img
+          ? `<img src="${p.img}" alt="${p.nombre}">`
+          : `<div class="cartel"><span>${p.nombre}</span></div>`}
+      </div>
+      <div class="ficha-cuerpo">
+        <h3 data-abrir="${p.id}">${p.nombre}</h3>
+        <p class="ficha-nota">${p.nota}</p>
+        <div class="ficha-pie">
+          <span class="precio">${pesos(p.precio)}</span>
+          <button class="agregar" data-id="${p.id}">Agregar</button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+}
+
+$("#filtros").addEventListener("click", e => {
+  const favBtn = e.target.closest("#chip-favoritos");
+  if(favBtn){
+    soloFavoritos = !soloFavoritos;
+    favBtn.setAttribute("aria-pressed", String(soloFavoritos));
+    pintarProductos();
+    return;
+  }
+  const chip = e.target.closest(".chip[data-cat]");
+  if(!chip) return;
+  categoriaActiva = chip.dataset.cat;
+  pintarFiltros();
+  pintarProductos();
+});
+
+$("#buscador").addEventListener("input", e => {
+  busqueda = e.target.value;
+  pintarProductos();
+});
+$("#orden").addEventListener("change", e => {
+  orden = e.target.value;
+  pintarProductos();
+});
+
+$("#rejilla").addEventListener("click", e => {
+  const fav = e.target.closest("[data-fav]");
+  if(fav){
+    const id = fav.dataset.fav;
+    favoritos.has(id) ? favoritos.delete(id) : favoritos.add(id);
+    guardarFavoritos();
+    pintarProductos();
+    return;
+  }
+  const abrir = e.target.closest("[data-abrir]");
+  if(abrir){ abrirModal(abrir.dataset.abrir); return; }
+
+  const btn = e.target.closest(".agregar");
+  if(!btn) return;
+  const id = btn.dataset.id;
+  carrito.set(id, (carrito.get(id) || 0) + 1);
+  btn.textContent = "Agregado ✓";
+  setTimeout(() => btn.textContent = "Agregar", 900);
+  pintarCarrito();
+});
+
+/* ── Modal de vista rápida ────────────────────────────── */
+let modalId = null, modalCant = 1;
+
+function abrirModal(id){
+  const p = PRODUCTOS.find(x => x.id === id);
+  if(!p) return;
+  modalId = id; modalCant = 1;
+  $("#modal-foto").innerHTML = p.img
+    ? `<img src="${p.img}" alt="${p.nombre}">`
+    : `<div class="cartel"><span>${p.nombre}</span></div>`;
+  $("#modal-etiqueta").textContent = p.stock === "tienda" ? "En tienda" : "Bajo pedido";
+  $("#modal-etiqueta").className = "etiqueta " + p.stock;
+  $("#modal-titulo").textContent = p.nombre;
+  $("#modal-nota").textContent = p.nota;
+  $("#modal-precio").textContent = pesos(p.precio);
+  $("#modal-cant").textContent = modalCant;
+  $("#modal-overlay").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function cerrarModal(){
+  $("#modal-overlay").hidden = true;
+  document.body.style.overflow = "";
+  modalId = null;
+}
+$("#modal-cerrar").addEventListener("click", cerrarModal);
+$("#modal-overlay").addEventListener("click", e => { if(e.target.id === "modal-overlay") cerrarModal(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape") cerrarModal(); });
+$("#modal-menos").addEventListener("click", () => { modalCant = Math.max(1, modalCant - 1); $("#modal-cant").textContent = modalCant; });
+$("#modal-mas").addEventListener("click", () => { modalCant += 1; $("#modal-cant").textContent = modalCant; });
+$("#modal-agregar").addEventListener("click", () => {
+  if(!modalId) return;
+  carrito.set(modalId, (carrito.get(modalId) || 0) + modalCant);
+  pintarCarrito();
+  cerrarModal();
+});
+
+/* ── Carrito (en memoria + favoritos en localStorage) ─── */
+const carrito = new Map();
+
+$("#carrito-vaciar").addEventListener("click", () => {
+  carrito.clear();
+  pintarCarrito();
+});
+
+function pintarCarrito(){
+  let piezas = 0, suma = 0, renglones = [];
+  carrito.forEach((cant, id) => {
+    const p = PRODUCTOS.find(x => x.id === id);
+    if(!p) return;
+    piezas += cant;
+    suma += p.precio * cant;
+    renglones.push(`${cant} x ${p.nombre} — ${pesos(p.precio * cant)}`);
+  });
+
+  $("#barra-carrito").classList.toggle("visible", piezas > 0);
+  $("#carrito-cuenta").textContent = piezas === 1 ? "1 artículo" : `${piezas} artículos`;
+  $("#carrito-suma").textContent = pesos(suma);
+  $("#carrito-wa").href = wa(
+    "Hola Matamoros, quiero pedir:\n\n" + renglones.join("\n") + `\n\nTotal: ${pesos(suma)}`
+  );
+}
+$("#carrito-wa").addEventListener("click", lanzarConfetti);
+
+/* ── Configurador de setup (compartido con "Arma tu truco") ── */
+const NOMBRES = { tabla:"Tabla", trucks:"Trucks", ruedas:"Ruedas", baleros:"Baleros", lija:"Lija" };
+const eleccion = {};
+Object.keys(SETUP).forEach(k => eleccion[k] = 0);   // primera opción por defecto
+
+function pintarPiezas(){
+  $("#piezas").innerHTML = Object.entries(SETUP).map(([clave, opciones]) => `
+    <div class="pieza">
+      <p>${NOMBRES[clave]}</p>
+      <div class="opciones" role="group" aria-label="${NOMBRES[clave]}">
+        ${opciones.map((o, i) => `
+          <button class="opcion" data-clave="${clave}" data-i="${i}"
+                  aria-pressed="${eleccion[clave] === i}">
+            ${o.n} <b>${pesos(o.p)}</b>
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function pintarTicket(){
+  let total = 0, hayPedido = false, lineas = [];
+
+  const renglones = Object.entries(SETUP).map(([clave, opciones]) => {
+    const o = opciones[eleccion[clave]];
+    total += o.p;
+    if(o.s === "pedido") hayPedido = true;
+    lineas.push(`${NOMBRES[clave]}: ${o.n} — ${pesos(o.p)}`);
+    return `<div class="reng"><span>${NOMBRES[clave]}</span><span>${o.n}</span><b>${pesos(o.p)}</b></div>`;
+  }).join("");
+
+  $("#ticket-renglones").innerHTML = renglones;
+  $("#ticket-total").textContent = pesos(total);
+  $("#ticket-aviso").textContent = hayPedido
+    ? "Trae piezas bajo pedido · llega en 5 a 10 días"
+    : "Todo en existencia · armado y lijado sin costo";
+  $("#ticket-wa").href = wa(
+    "Hola Matamoros, quiero armar este setup:\n\n" + lineas.join("\n") + `\n\nTotal: ${pesos(total)}`
+  );
+}
+
+function elegirPieza(clave, i){
+  eleccion[clave] = i;
+  pintarPiezas();
+  pintarTicket();
+  pintarHotspots();
+}
+
+$("#piezas").addEventListener("click", e => {
+  const btn = e.target.closest(".opcion");
+  if(!btn) return;
+  elegirPieza(btn.dataset.clave, Number(btn.dataset.i));
+});
+$("#ticket-wa").addEventListener("click", lanzarConfetti);
+
+/* ── Riders ──────────────────────────────────────────── */
+$("#riders-lista").innerHTML = RIDERS.map(r => `
+  <article class="rider">
+    <div class="rider-foto">
+      ${r.foto
+        ? `<img src="${r.foto}" alt="${r.alias}">`
+        : `<div class="cartel"><span>${r.alias}</span></div>`}
+    </div>
+    <div class="rider-cuerpo">
+      <h3>${r.alias}</h3>
+      <p>${r.especialidad}</p>
+    </div>
+  </article>
+`).join("");
+
+/* ── Crónicas ────────────────────────────────────────── */
+$("#cronicas-lista").innerHTML = CRONICAS.map(c => `
+  <article class="cronica">
+    <span class="fecha-mini">${c.fecha}</span>
+    <h3>${c.titulo}</h3>
+    <p>${c.texto}</p>
+  </article>
+`).join("");
+
+/* ── FAQ ─────────────────────────────────────────────── */
+$("#faqs-lista").innerHTML = FAQS.map(f => `
+  <details class="faq">
+    <summary>${f.p}</summary>
+    <p>${f.r}</p>
+  </details>
+`).join("");
+
+/* ── Ubicación ───────────────────────────────────────── */
+$("#ubicacion-texto").textContent = UBICACION.direccion;
+$("#mapa-caja").innerHTML = UBICACION.mapaSrc
+  ? `<iframe src="${UBICACION.mapaSrc}" loading="lazy" title="Mapa de ubicación"></iframe>`
+  : `<div class="pin"><span>✱</span>${UBICACION.direccion}</div>`;
+
+/* ── Arma tu truco: scrollytelling ─────────────────────── */
+const trucoLienzo = $("#truco-lienzo");
+const trucoVideo = $("#truco-video");
+const trucoBarra = $("#truco-barra");
+const trucoEtiqueta = $("#truco-etiqueta");
+const trucoCamara = $("#truco-camara");
+const trucoGrafica = $("#truco-grafica");
+
+const ZONAS = ["tabla", "trucks", "ruedas"];
+const ETIQUETAS_ZONA = { tabla:"Elige tu tabla", trucks:"Elige tus trucks", ruedas:"Elige tus ruedas" };
+
+function pintarHotspots(){
+  ZONAS.forEach(z => {
+    $(`#hotspot-${z}-op`).innerHTML = SETUP[z].map((o, i) => `
+      <button class="opcion" data-clave="${z}" data-i="${i}" aria-pressed="${eleccion[z] === i}">
+        ${o.n} <b>${pesos(o.p)}</b>
+      </button>
+    `).join("");
+  });
+}
+document.querySelectorAll(".truco-hotspot").forEach(h => {
+  h.addEventListener("click", e => {
+    const btn = e.target.closest(".opcion");
+    if(!btn) return;
+    elegirPieza(btn.dataset.clave, Number(btn.dataset.i));
+  });
+});
+
+let usarVideo = false;
+if(TRUCO_VIDEO){
+  trucoVideo.src = TRUCO_VIDEO;
+  trucoLienzo.classList.add("con-video");
+  usarVideo = true;
+  trucoVideo.addEventListener("loadedmetadata", () => {
+    trucoVideo.play().then(() => trucoVideo.pause()).catch(() => {});
+  });
+}
+
+const CAMARA_KF = [
+  {t:0,    s:1,   x:200, y:210},
+  {t:.30,  s:1,   x:200, y:210},
+  {t:.50,  s:2.3, x:140, y:221},
+  {t:.66,  s:2.3, x:140, y:221},
+  {t:.84,  s:3.1, x:250, y:236},
+  {t:1,    s:3.1, x:250, y:236},
+];
+function suavizar(v){ return v*v*(3-2*v); }
+function camaraEn(p){
+  for(let i=0; i<CAMARA_KF.length-1; i++){
+    const a = CAMARA_KF[i], b = CAMARA_KF[i+1];
+    if(p >= a.t && p <= b.t){
+      const local = b.t === a.t ? 0 : (p - a.t) / (b.t - a.t);
+      const ease = suavizar(local);
+      return { s: a.s + (b.s - a.s) * ease, x: a.x + (b.x - a.x) * ease, y: a.y + (b.y - a.y) * ease };
+    }
+  }
+  return CAMARA_KF[CAMARA_KF.length - 1];
+}
+
+function zonaEn(p){
+  if(p < .34) return "tabla";
+  if(p < .67) return "trucks";
+  return "ruedas";
+}
+
+function trucoRiel(){ return $("#truco-riel"); }
+
+function progresoTruco(){
+  const riel = trucoRiel();
+  const rect = riel.getBoundingClientRect();
+  const alto = riel.offsetHeight - innerHeight;
+  if(alto <= 0) return 0;
+  return Math.min(1, Math.max(0, -rect.top / alto));
+}
+
+function actualizarTruco(p){
+  trucoBarra.style.width = (p * 100) + "%";
+
+  if(usarVideo && trucoVideo.duration){
+    trucoVideo.currentTime = p * trucoVideo.duration;
+  } else if(!usarVideo){
+    const cam = camaraEn(p);
+    trucoCamara.setAttribute("transform", `translate(200 200) scale(${cam.s}) translate(${-cam.x} ${-cam.y})`);
+    if(!reducido){
+      const dentroZona = zonaEn(p) === "tabla" ? p / .34 : zonaEn(p) === "trucks" ? (p - .34) / .33 : (p - .67) / .33;
+      const giro = Math.sin(Math.min(1, Math.max(0, dentroZona)) * Math.PI) * 170;
+      trucoGrafica.setAttribute("transform", `rotate(${giro} 200 210)`);
+    }
+  }
+
+  const zona = zonaEn(p);
+  trucoEtiqueta.textContent = p <= 0.01 ? "Deslízate hacia abajo ↓" : ETIQUETAS_ZONA[zona];
+  ZONAS.forEach(z => $(`#hotspot-${z}`).classList.toggle("activo", z === zona && p > 0.02 && p < 0.99));
+}
+
+let tickeandoTruco = false;
+function alScrollTruco(){
+  if(tickeandoTruco) return;
+  tickeandoTruco = true;
+  requestAnimationFrame(() => {
+    actualizarTruco(progresoTruco());
+    tickeandoTruco = false;
+  });
+}
+addEventListener("scroll", alScrollTruco, { passive:true });
+addEventListener("resize", alScrollTruco);
+
+/* ── Parallax suave de portada ─────────────────────────── */
+const portadaHalftone = $("#portada-halftone");
+const portadaCorte = $("#portada-corte");
+let tickeandoParallax = false;
+function alScrollParallax(){
+  if(reducido || tickeandoParallax) return;
+  tickeandoParallax = true;
+  requestAnimationFrame(() => {
+    const y = scrollY;
+    portadaHalftone.style.transform = `translateY(${y * 0.12}px)`;
+    portadaCorte.style.transform = `translate(-50%, ${y * 0.22}px)`;
+    tickeandoParallax = false;
+  });
+}
+addEventListener("scroll", alScrollParallax, { passive:true });
+
+/* ── Revelado al hacer scroll ───────────────────────────── */
+if("IntersectionObserver" in window){
+  const observador = new IntersectionObserver(entradas => {
+    entradas.forEach(en => { if(en.isIntersecting) en.target.classList.add("visible"); });
+  }, { threshold:.15 });
+  document.querySelectorAll(".reveal").forEach(el => observador.observe(el));
+} else {
+  document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+}
+
+/* ── Confetti al enviar pedido ──────────────────────────── */
+function lanzarConfetti(){
+  if(reducido) return;
+  const lienzo = $("#confetti-lienzo");
+  const ctx = lienzo.getContext("2d");
+  lienzo.width = innerWidth; lienzo.height = innerHeight;
+  const colores = ["#F2534E", "#FFD400", "#E6E2D6"];
+  const piezas = Array.from({length:80}, () => ({
+    x: innerWidth / 2, y: innerHeight * .35,
+    vx: (Math.random() - .5) * 14, vy: Math.random() * -10 - 4,
+    g: .35 + Math.random() * .15, tam: 4 + Math.random() * 5,
+    color: colores[Math.floor(Math.random() * colores.length)],
+    giro: Math.random() * Math.PI, vgiro: (Math.random() - .5) * .4,
+  }));
+  let cuadros = 0;
+  (function paso(){
+    ctx.clearRect(0, 0, lienzo.width, lienzo.height);
+    piezas.forEach(pz => {
+      pz.vy += pz.g; pz.x += pz.vx; pz.y += pz.vy; pz.giro += pz.vgiro;
+      ctx.save();
+      ctx.translate(pz.x, pz.y); ctx.rotate(pz.giro);
+      ctx.fillStyle = pz.color;
+      ctx.fillRect(-pz.tam/2, -pz.tam/2, pz.tam, pz.tam);
+      ctx.restore();
+    });
+    cuadros++;
+    if(cuadros < 90) requestAnimationFrame(paso);
+    else ctx.clearRect(0, 0, lienzo.width, lienzo.height);
+  })();
+}
+
+/* ── Arranque ────────────────────────────────────────── */
+pintarFiltros();
+pintarProductos();
+pintarPiezas();
+pintarTicket();
+pintarCarrito();
+pintarHotspots();
+actualizarTruco(0);
+</script>
+</body>
+</html>
