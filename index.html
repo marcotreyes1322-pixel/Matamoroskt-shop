@@ -153,6 +153,8 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 img{max-width:100%; display:block}
+/* El SVG de materiales solo carga los degradados: no ocupa espacio */
+.materiales{position:absolute; width:0; height:0; overflow:hidden}
 button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
 a{color:inherit; text-decoration:none}
 ::selection{background:var(--ember); color:var(--void)}
@@ -248,7 +250,16 @@ a{color:inherit; text-decoration:none}
   content:""; position:absolute; inset:0;
   background:linear-gradient(180deg, rgba(8,8,10,.72) 0%, rgba(8,8,10,.28) 42%, var(--void) 100%);
 }
-.portada-in{position:relative; width:var(--ancho); margin-inline:auto}
+/* Una luz suave sigue al cursor: la portada respira en vez de ser
+   una imagen fija. Aparece solo cuando hay un puntero de verdad. */
+.portada::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+  background:radial-gradient(360px circle at var(--px,50%) var(--py,42%),
+             rgba(255,94,26,.13), transparent 68%);
+  opacity:0; transition:opacity .8s ease;
+}
+.portada.viva::after{opacity:1}
+.portada-in{position:relative; z-index:2; width:var(--ancho); margin-inline:auto}
 .portada .rotulo{margin-bottom:20px}
 /* El wordmark llena el ancho de borde a borde: es el gesto de la
    portada. La escala está calibrada para que quepa completo —
@@ -439,11 +450,27 @@ a{color:inherit; text-decoration:none}
     radial-gradient(70% 50% at 50% 6%, rgba(150,175,255,.06) 0%, transparent 66%),
     linear-gradient(180deg,#0C0C10 0%,var(--void) 72%);
 }
-.escena{position:absolute; inset:0; perspective:1500px; perspective-origin:50% 45%}
+.escena{position:absolute; inset:0; perspective:1500px; perspective-origin:50% 45%;
+  cursor:grab; touch-action:pan-y; user-select:none}
+.escena.girando{cursor:grabbing}
 .camara{
   position:absolute; left:50%; top:60%; transform-style:preserve-3d;
   transform:translate(-50%,-50%) scale(var(--escala,1))
             rotateX(var(--camx,60deg)) rotateZ(var(--camz,-20deg));
+}
+/* Suelo: un plano real bajo la patineta. Sin él la tabla flota en
+   la nada; con él se entiende a qué altura va. */
+.suelo{
+  position:absolute; left:50%; top:50%;
+  width:1500px; height:1500px; margin:-750px 0 0 -750px;
+  transform:translateZ(var(--suelo,-64px));
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,94,26,.11) 0%, transparent 40%),
+    repeating-radial-gradient(circle at 50% 50%,
+      transparent 0 62px, rgba(237,234,228,.03) 62px 63px);
+  -webkit-mask-image:radial-gradient(circle at 50% 50%, #000 0%, transparent 60%);
+  mask-image:radial-gradient(circle at 50% 50%, #000 0%, transparent 60%);
+  pointer-events:none;
 }
 /* Sombra proyectada en el suelo: se abre y aclara cuando despega */
 .piso{
@@ -451,7 +478,7 @@ a{color:inherit; text-decoration:none}
   width:var(--dl); height:calc(var(--dw) * 1.5);
   margin:calc(var(--dw) * -0.75) 0 0 calc(var(--dl) / -2);
   border-radius:50%; background:#000; filter:blur(14px);
-  transform:translateZ(var(--suelo,-64px)) rotateZ(90deg) scale(var(--sesc,1));
+  transform:translateX(var(--desx,0px)) translateZ(var(--suelo,-64px)) rotateZ(90deg) scale(var(--sesc,1));
   opacity:var(--sopa,.55);
 }
 .aire{transform-style:preserve-3d; transform:translateX(var(--desx,0px)) translateZ(var(--alto,0px))}
@@ -482,12 +509,14 @@ a{color:inherit; text-decoration:none}
   background-image:repeating-linear-gradient(90deg,
     rgba(0,0,0,.10) 0 1px, transparent 1px 4px);
 }
-/* Grip: lija negra. El degradado a los lados insinúa el cóncavo */
+/* Grip: lija negra. El degradado a los lados insinúa el cóncavo, y
+   su ángulo gira con --luz para que la luz barra la tabla al voltear. */
 .capa.grip{
   background-color:#131316;
   background-image:
-    linear-gradient(90deg, rgba(237,234,228,.13) 0%, rgba(0,0,0,.30) 24%,
-                    rgba(0,0,0,.34) 76%, rgba(237,234,228,.13) 100%),
+    linear-gradient(calc(90deg + var(--luz,0) * 180deg),
+                    rgba(237,234,228,.16) 0%, rgba(0,0,0,.30) 26%,
+                    rgba(0,0,0,.34) 74%, rgba(237,234,228,.10) 100%),
     radial-gradient(circle, rgba(237,234,228,.20) .5px, transparent .9px);
   background-size:100% 100%, 3px 3px;
 }
@@ -564,8 +593,8 @@ a{color:inherit; text-decoration:none}
 /* Las dos caras llevan el núcleo y el asiento del balero */
 .disco.cara{
   background:
-    radial-gradient(circle at 50% 50%, #16161A 0 11%, transparent 11.5%),
-    radial-gradient(circle at 50% 50%, #9EA0A8 11.5% 19%, transparent 19.5%),
+    radial-gradient(circle at 50% 50%, #34343C 0 10%, transparent 10.5%),
+    radial-gradient(circle at 50% 50%, #8B8D96 10.5% 18%, transparent 18.5%),
     radial-gradient(circle at 50% 50%, rgba(0,0,0,.20) 19.5% 23%, transparent 23.5%),
     radial-gradient(circle at 36% 30%, rgba(255,255,255,.5) 0%, transparent 44%),
     var(--uretano,#E8E3D8);
@@ -621,6 +650,11 @@ a{color:inherit; text-decoration:none}
 .truco-suma .par{display:flex; flex-direction:column; gap:3px}
 .truco-suma .par b{font-family:var(--dato); font-size:.5625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--mute-2); font-weight:400}
 .truco-suma .par span{font-family:var(--dato); font-size:.75rem; color:var(--hueso)}
+.truco-cta{
+  padding:9px 16px; font-size:.6875rem; opacity:0; transform:translateX(-8px);
+  pointer-events:none; transition:opacity .5s var(--curva), transform .5s var(--curva);
+}
+.truco-suma.cerrada .truco-cta{opacity:1; transform:none; pointer-events:auto}
 .truco-suma .gran{font-family:var(--display); font-variation-settings:'wdth' 74,'wght' 800; font-size:1.375rem; color:var(--ember)}
 
 @media(max-width:820px){
@@ -803,6 +837,46 @@ select.campo{flex:0 0 auto; cursor:pointer}
 </head>
 <body>
 
+<!-- Materiales compartidos: uretano, maple, aluminio, acero, lija.
+     Se definen una vez y los usan todos los renders de producto. -->
+<svg class="materiales" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="m-grip" x1="0" x2="1" y1="0" y2="0">
+    <stop offset="0" stop-color="#35353E"/><stop offset=".13" stop-color="#151519"/>
+    <stop offset=".87" stop-color="#151519"/><stop offset="1" stop-color="#35353E"/>
+  </linearGradient>
+  <pattern id="m-lija" width="3" height="3" patternUnits="userSpaceOnUse">
+    <circle cx=".9" cy=".9" r=".42" fill="#EDEAE4" opacity=".2"/>
+    <circle cx="2.2" cy="2.2" r=".3" fill="#EDEAE4" opacity=".13"/>
+  </pattern>
+  <linearGradient id="m-maple" x1="0" x2="1" y1="0" y2="0">
+    <stop offset="0" stop-color="#7C5F36"/><stop offset=".3" stop-color="#CFB086"/>
+    <stop offset=".62" stop-color="#A98861"/><stop offset="1" stop-color="#6F5430"/>
+  </linearGradient>
+  <radialGradient id="m-uretano" cx=".34" cy=".27" r=".92">
+    <stop offset="0" stop-color="#FFFEF8"/><stop offset=".44" stop-color="#F2ECDE"/>
+    <stop offset=".8" stop-color="#D5CDBB"/><stop offset="1" stop-color="#A79E88"/>
+  </radialGradient>
+  <linearGradient id="m-aluminio" x1="0" x2="0" y1="0" y2="1">
+    <stop offset="0" stop-color="#D6D8DF"/><stop offset=".36" stop-color="#909299"/>
+    <stop offset=".72" stop-color="#5B5D66"/><stop offset="1" stop-color="#3A3C44"/>
+  </linearGradient>
+  <linearGradient id="m-acero" x1="0" x2="1" y1="0" y2="1">
+    <stop offset="0" stop-color="#C2C5CD"/><stop offset=".5" stop-color="#787A83"/>
+    <stop offset="1" stop-color="#494B53"/>
+  </linearGradient>
+  <radialGradient id="m-hueco" cx=".5" cy=".45" r=".55">
+    <stop offset="0" stop-color="#08080A"/><stop offset="1" stop-color="#26262C"/>
+  </radialGradient>
+  <linearGradient id="m-tela" x1="0" x2="1" y1="0" y2="1">
+    <stop offset="0" stop-color="#33333C"/><stop offset=".5" stop-color="#1D1D23"/>
+    <stop offset="1" stop-color="#101014"/>
+  </linearGradient>
+  <linearGradient id="m-cera" x1="0" x2="1" y1="0" y2="1">
+    <stop offset="0" stop-color="#F3ECDD"/><stop offset=".55" stop-color="#D8CFBA"/>
+    <stop offset="1" stop-color="#A39A85"/>
+  </linearGradient>
+</defs></svg>
+
 <header class="nav" id="nav">
   <div class="nav-in">
     <a href="#top" class="marca">Matamoros<i>.</i></a>
@@ -908,8 +982,9 @@ select.campo{flex:0 0 auto; cursor:pointer}
         <p class="dato" id="truco-pista">Sigue deslizando ↓</p>
       </div>
 
-      <div class="escena">
+      <div class="escena" id="escena">
         <div class="camara" id="camara">
+          <div class="suelo"></div>
           <div class="piso" id="piso"></div>
           <div class="aire" id="aire">
             <div class="giro" id="giro">
@@ -927,6 +1002,7 @@ select.campo{flex:0 0 auto; cursor:pointer}
         <span class="par"><b>Piezas</b><span id="truco-piezas">5</span></span>
         <span class="par"><b>Entrega</b><span id="truco-entrega">—</span></span>
         <span class="par"><b>Total</b><span class="gran cifra" id="truco-total">$0</span></span>
+        <a class="btn btn--ember truco-cta" id="truco-wa" href="#" target="_blank" rel="noopener">Pedirla</a>
       </div>
 
       <div class="truco-progreso"><i id="truco-barra"></i></div>
@@ -1049,47 +1125,128 @@ const wa = t => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(t)}`;
 const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-/* ── Planos técnicos: cuando no hay foto, se dibuja la pieza ──
-   Son dibujos de línea, como el plano de la refacción. */
+/* ── Renders de producto ──────────────────────────────
+   Cuando una pieza no trae foto, se dibuja con material
+   real: uretano con su brillo, maple prensado, aluminio.
+   Comparten los degradados definidos arriba en <defs>. */
+const SILUETA = "M44 3C56 3 65 5 71 9c5 3.4 8 7 8 11 0 3-1.5 6-2.5 10S75 38 75 44v252c0 6 .5 11 1.5 15s2.5 7 2.5 10c0 4-3 7.6-8 11-6 4-15 6-27 6s-21-2-27-6c-5-3.4-8-7-8-11 0-3 1.5-6 2.5-10S13 302 13 296V44c0-6-.5-11-1.5-15S9 22 9 19c0-4 3-7.6 8-11C23 5 32 3 44 3Z";
+
 const PLANOS = {
-  /* Tabla: silueta popsicle real — nariz y cola anchas, cintura más
-     angosta — con las ocho perforaciones y la línea del prensado. */
-  tabla:`<svg viewBox="0 0 84 330" fill="none" stroke="#EDEAE4" stroke-width="1.3" aria-hidden="true">
-    <path d="M42 2c11 0 19 1.6 25 4.6 5.4 2.7 9.6 6.8 11.5 11.4 1 2.4.6 4.6-1.3 7.4-2.4 3.6-3.4 8-3.4 14.6v250c0 6.6 1 11 3.4 14.6 1.9 2.8 2.3 5 1.3 7.4-1.9 4.6-6.1 8.7-11.5 11.4-6 3-14 4.6-25 4.6s-19-1.6-25-4.6c-5.4-2.7-9.6-6.8-11.5-11.4-1-2.4-.6-4.6 1.3-7.4C7.2 301 8.2 296.6 8.2 290V40c0-6.6-1-11-3.4-14.6C2.9 22.6 2.5 20.4 3.5 18 5.4 13.4 9.6 9.3 15 6.6 21 3.6 31 2 42 2Z"/>
-    <path d="M8.2 60h67.6M8.2 270h67.6" opacity=".18"/>
-    <g opacity=".75">
-      <circle cx="30" cy="64" r="2"/><circle cx="54" cy="64" r="2"/>
-      <circle cx="30" cy="80" r="2"/><circle cx="54" cy="80" r="2"/>
-      <circle cx="30" cy="250" r="2"/><circle cx="54" cy="250" r="2"/>
-      <circle cx="30" cy="266" r="2"/><circle cx="54" cy="266" r="2"/>
+  /* Tabla vista desde arriba: el canto de maple asoma por debajo
+     del grip, que es como se ve una tabla apoyada. */
+  tabla:`<svg viewBox="0 0 96 350" aria-hidden="true">
+    <path d="${SILUETA}" fill="url(#m-maple)" transform="translate(7,7)"/>
+    <path d="${SILUETA}" fill="url(#m-maple)" transform="translate(5,5)" opacity=".85"/>
+    <path d="${SILUETA}" fill="url(#m-grip)" transform="translate(2,2)"/>
+    <path d="${SILUETA}" fill="url(#m-lija)" transform="translate(2,2)"/>
+    <path d="${SILUETA}" fill="none" stroke="#EDEAE4" stroke-opacity=".16" transform="translate(2,2)"/>
+    <g fill="#08080A" opacity=".82" transform="translate(2,2)">
+      <circle cx="32" cy="64" r="2.1"/><circle cx="56" cy="64" r="2.1"/>
+      <circle cx="32" cy="80" r="2.1"/><circle cx="56" cy="80" r="2.1"/>
+      <circle cx="32" cy="260" r="2.1"/><circle cx="56" cy="260" r="2.1"/>
+      <circle cx="32" cy="276" r="2.1"/><circle cx="56" cy="276" r="2.1"/>
     </g>
-    <path d="M42 96v138" opacity=".16"/></svg>`,
-  /* Rueda: perfil con hombro redondeado, núcleo y asiento del balero */
-  ruedas:`<svg viewBox="0 0 120 120" fill="none" stroke="#EDEAE4" stroke-width="1.3" aria-hidden="true">
-    <circle cx="60" cy="60" r="50"/>
-    <circle cx="60" cy="60" r="45.5" opacity=".28"/>
-    <circle cx="60" cy="60" r="23" opacity=".8"/>
-    <circle cx="60" cy="60" r="16" opacity=".45"/>
-    <circle cx="60" cy="60" r="8.5"/>
-    <g opacity=".3">
-      <path d="M60 37V23M60 97v14M37 60H23M97 60h14"/>
-      <path d="M76.3 43.7 86 34M34 86l9.7-9.7M76.3 76.3 86 86M34 34l9.7 9.7"/>
-    </g></svg>`,
-  /* Truck: placa, perno rey, hanger y eje con las dos ruedas */
-  trucks:`<svg viewBox="0 0 170 104" fill="none" stroke="#EDEAE4" stroke-width="1.3" aria-hidden="true">
-    <rect x="62" y="8" width="46" height="26" rx="3"/>
-    <circle cx="70" cy="14" r="1.8" opacity=".7"/><circle cx="100" cy="14" r="1.8" opacity=".7"/>
-    <circle cx="70" cy="28" r="1.8" opacity=".7"/><circle cx="100" cy="28" r="1.8" opacity=".7"/>
-    <path d="M85 34v9" opacity=".8"/>
-    <path d="M85 43c-3 0-5 2-5 5v4h10v-4c0-3-2-5-5-5Z" opacity=".6"/>
-    <path d="M64 52h42l16 22H48l16-22Z"/>
-    <path d="M18 74h134" stroke-width="2.4"/>
-    <g><circle cx="26" cy="74" r="16"/><circle cx="26" cy="74" r="6" opacity=".55"/></g>
-    <g><circle cx="144" cy="74" r="16"/><circle cx="144" cy="74" r="6" opacity=".55"/></g></svg>`,
+  </svg>`,
+
+  /* Rueda: uretano con el brillo alto, hueco del núcleo y balero */
+  ruedas:`<svg viewBox="0 0 128 128" aria-hidden="true">
+    <ellipse cx="64" cy="120" rx="44" ry="6" fill="#000" opacity=".45"/>
+    <circle cx="64" cy="62" r="54" fill="url(#m-uretano)"/>
+    <circle cx="64" cy="62" r="54" fill="none" stroke="#000" stroke-opacity=".3"/>
+    <circle cx="64" cy="62" r="46" fill="none" stroke="#000" stroke-opacity=".09"/>
+    <circle cx="64" cy="62" r="25" fill="url(#m-hueco)"/>
+    <circle cx="64" cy="62" r="17" fill="url(#m-acero)"/>
+    <circle cx="64" cy="62" r="17" fill="none" stroke="#000" stroke-opacity=".38"/>
+    <circle cx="64" cy="62" r="6.5" fill="#08080A"/>
+    <ellipse cx="44" cy="38" rx="17" ry="9.5" fill="#fff" opacity=".4" transform="rotate(-34 44 38)"/>
+  </svg>`,
+
+  /* Truck completo: placa, perno rey, hanger de aluminio, eje y ruedas */
+  trucks:`<svg viewBox="0 0 180 124" aria-hidden="true">
+    <ellipse cx="90" cy="116" rx="70" ry="6" fill="#000" opacity=".4"/>
+    <rect x="16" y="78" width="148" height="6" rx="3" fill="url(#m-acero)"/>
+    <path d="M72 42h36l22 40H50l22-40Z" fill="url(#m-aluminio)"/>
+    <path d="M72 42h36l22 40H50l22-40Z" fill="none" stroke="#000" stroke-opacity=".32"/>
+    <path d="M78 46h24l4 8H74l4-8Z" fill="#EDEAE4" opacity=".14"/>
+    <rect x="87" y="34" width="6" height="16" rx="3" fill="url(#m-acero)"/>
+    <rect x="66" y="10" width="48" height="28" rx="4" fill="url(#m-aluminio)"/>
+    <rect x="66" y="10" width="48" height="28" rx="4" fill="none" stroke="#000" stroke-opacity=".32"/>
+    <g fill="#08080A" opacity=".78">
+      <circle cx="75" cy="17" r="2.3"/><circle cx="105" cy="17" r="2.3"/>
+      <circle cx="75" cy="31" r="2.3"/><circle cx="105" cy="31" r="2.3"/>
+    </g>
+    <g><circle cx="26" cy="81" r="17" fill="url(#m-uretano)"/>
+       <circle cx="26" cy="81" r="17" fill="none" stroke="#000" stroke-opacity=".3"/>
+       <circle cx="26" cy="81" r="6" fill="url(#m-hueco)"/></g>
+    <g><circle cx="154" cy="81" r="17" fill="url(#m-uretano)"/>
+       <circle cx="154" cy="81" r="17" fill="none" stroke="#000" stroke-opacity=".3"/>
+       <circle cx="154" cy="81" r="6" fill="url(#m-hueco)"/></g>
+  </svg>`,
+
+  /* Balero blindado: tapa, pista y las bolas asomando */
+  baleros:`<svg viewBox="0 0 128 128" aria-hidden="true">
+    <ellipse cx="64" cy="118" rx="38" ry="5" fill="#000" opacity=".42"/>
+    <circle cx="64" cy="62" r="46" fill="url(#m-acero)"/>
+    <circle cx="64" cy="62" r="46" fill="none" stroke="#000" stroke-opacity=".4"/>
+    <circle cx="64" cy="62" r="37" fill="url(#m-aluminio)"/>
+    <circle cx="64" cy="62" r="28" fill="url(#m-hueco)"/>
+    <g fill="#C7CAD2" opacity=".55">
+      <circle cx="64" cy="39" r="4"/><circle cx="80" cy="46" r="4"/><circle cx="87" cy="62" r="4"/>
+      <circle cx="80" cy="78" r="4"/><circle cx="64" cy="85" r="4"/><circle cx="48" cy="78" r="4"/>
+      <circle cx="41" cy="62" r="4"/><circle cx="48" cy="46" r="4"/>
+    </g>
+    <circle cx="64" cy="62" r="14" fill="url(#m-acero)"/>
+    <circle cx="64" cy="62" r="14" fill="none" stroke="#000" stroke-opacity=".45"/>
+    <ellipse cx="46" cy="42" rx="13" ry="7" fill="#fff" opacity=".3" transform="rotate(-34 46 42)"/>
+  </svg>`,
+
+  /* Hoja de lija con una esquina levantada */
+  lijas:`<svg viewBox="0 0 136 176" aria-hidden="true">
+    <rect x="14" y="12" width="108" height="150" rx="5" fill="#15151A"/>
+    <rect x="14" y="12" width="108" height="150" rx="5" fill="url(#m-lija)"/>
+    <rect x="14" y="12" width="108" height="150" rx="5" fill="none" stroke="#EDEAE4" stroke-opacity=".2"/>
+    <path d="M122 126v36H92l30-36Z" fill="#2C2C35"/>
+    <path d="M122 126 92 162" stroke="#EDEAE4" stroke-opacity=".24" fill="none"/>
+  </svg>`,
+
+  /* Barra de cera con el filo ya gastado */
+  ceras:`<svg viewBox="0 0 136 124" aria-hidden="true">
+    <ellipse cx="68" cy="102" rx="44" ry="6" fill="#000" opacity=".4"/>
+    <rect x="24" y="26" width="88" height="68" rx="11" fill="url(#m-cera)"/>
+    <rect x="24" y="26" width="88" height="68" rx="11" fill="none" stroke="#000" stroke-opacity=".24"/>
+    <path d="M24 70h88" stroke="#000" stroke-opacity=".13"/>
+    <ellipse cx="50" cy="44" rx="17" ry="8" fill="#fff" opacity=".45" transform="rotate(-18 50 44)"/>
+    <circle cx="68" cy="60" r="13" fill="#08080A" opacity=".18"/>
+  </svg>`,
+
+  /* Juego de tornillería con la cuerda marcada */
+  accesorios:`<svg viewBox="0 0 148 124" aria-hidden="true">
+    <ellipse cx="74" cy="110" rx="52" ry="6" fill="#000" opacity=".4"/>
+    ${[26, 62, 98].map(x => `
+      <g>
+        <rect x="${x - 11}" y="22" width="22" height="9" rx="3" fill="url(#m-acero)"/>
+        <rect x="${x - 4}" y="31" width="8" height="58" fill="url(#m-aluminio)"/>
+        <g stroke="#08080A" stroke-opacity=".4">
+          ${[44, 52, 60, 68, 76, 84].map(y => `<path d="M${x - 4} ${y}h8"/>`).join("")}
+        </g>
+        <circle cx="${x}" cy="26" r="2.6" fill="#08080A" opacity=".55"/>
+      </g>`).join("")}
+  </svg>`,
+
+  /* Playera con caída de tela */
+  ropa:`<svg viewBox="0 0 156 148" aria-hidden="true">
+    <path d="M58 16 30 30 16 58l22 12 8-14v76h64V56l8 14 22-12-14-28-28-14-10 9H68l-10-9Z"
+          fill="url(#m-tela)"/>
+    <path d="M58 16 30 30 16 58l22 12 8-14v76h64V56l8 14 22-12-14-28-28-14-10 9H68l-10-9Z"
+          fill="none" stroke="#EDEAE4" stroke-opacity=".2"/>
+    <path d="M68 16c0 7 4.5 11 10 11s10-4 10-11" fill="none" stroke="#EDEAE4" stroke-opacity=".22"/>
+    <path d="M46 92h64" stroke="#EDEAE4" stroke-opacity=".07"/>
+    <circle cx="78" cy="64" r="16" fill="#EDEAE4" opacity=".1"/>
+  </svg>`,
 };
 const PLANO_CAT = {
-  Tablas:"tabla", Ruedas:"ruedas", Trucks:"trucks",
-  Baleros:"ruedas", Lijas:"tabla", Ceras:"ruedas", Accesorios:"trucks", Ropa:"tabla"
+  Tablas:"tabla", Ruedas:"ruedas", Trucks:"trucks", Baleros:"baleros",
+  Lijas:"lijas", Ceras:"ceras", Accesorios:"accesorios", Ropa:"ropa"
 };
 
 /* ── Portada: video, foto, o atmósfera ──────────────── */
@@ -1109,6 +1266,20 @@ const PLANO_CAT = {
   wm.innerHTML = [...texto]
     .map((c, i) => `<span aria-hidden="true" style="--i:${i}">${esc(c)}</span>`).join("");
   if(!quieto) wm.classList.add("anima");
+})();
+
+/* La luz de la portada sigue al puntero */
+(function luzPortada(){
+  if(quieto || !matchMedia("(hover: hover)").matches) return;
+  const p = document.querySelector(".portada");
+  let listo = false;
+  p.addEventListener("pointermove", e => {
+    const r = p.getBoundingClientRect();
+    p.style.setProperty("--px", ((e.clientX - r.left) / r.width * 100).toFixed(1) + "%");
+    p.style.setProperty("--py", ((e.clientY - r.top) / r.height * 100).toFixed(1) + "%");
+    if(!listo){ listo = true; p.classList.add("viva"); }
+  }, { passive:true });
+  p.addEventListener("pointerleave", () => p.classList.remove("viva"));
 })();
 
 $("#rotulo-zona").textContent = `${ZONA} · Skateshop móvil`;
@@ -1528,7 +1699,7 @@ function construirPatineta(){
     } else if(c === CAPAS - 1){
       html += `<div class="capa grip" style="${base}"></div>`;
     } else {
-      const maple = c % 2 ? "#C9AA80" : "#A2814F";   // veta clara / veta oscura
+      const maple = c % 2 ? "#D6B689" : "#AC8B58";   // veta clara / veta oscura
       html += `<div class="capa veta" style="${base}; --maple:${maple}"></div>`;
     }
   }
@@ -1563,7 +1734,7 @@ function construirPatineta(){
         /* Los discos de en medio van planos y se oscurecen hacia el
            borde: así el cilindro se lee redondo y no como pila de
            monedas, que es lo que delata un apilado. */
-        const sombra = cara ? "" : `; --uretano:color-mix(in srgb, ${uretano} ${(100 - Math.abs(t01) * 22).toFixed(0)}%, #6E6A60)`;
+        const sombra = cara ? "" : `; --uretano:color-mix(in srgb, ${uretano} ${(100 - Math.abs(t01) * 14).toFixed(0)}%, #7C7768)`;
         r += `<div class="disco${cara}" style="--wd:${diam.toFixed(1)}px; --dz:${dz.toFixed(1)}px${cara ? `; --uretano:${uretano}` : sombra}"></div>`;
       }
       t += r + `</div>`;
@@ -1576,7 +1747,7 @@ function construirPatineta(){
 
 /* Cuadros clave de la secuencia. p va de 0 (entra) a 1 (se va). */
 const SECUENCIA = {
-  desx:  [[0,-300],[.20,-120],[.34,-52],[.72,66],[1,240]],
+  desx:  [[0,-250],[.20,-104],[.34,-46],[.72,54],[1,168]],
   alto:  [[0,0],[.30,0],[.37,32],[.52,96],[.67,32],[.74,0],[1,0]],
   flip:  [[0,0],[.34,0],[.70,360],[1,360]],
   pop:   [[0,0],[.24,0],[.31,-22],[.41,10],[.58,2],[.70,-8],[.77,0],[1,0]],
@@ -1645,6 +1816,7 @@ function pintarResumenTruco(){
   const a = armado();
   $("#truco-total").textContent = pesos(a.total);
   $("#truco-entrega").textContent = a.pedido ? "5 a 10 días" : "Hoy mismo";
+  $("#truco-wa").href = wa("Hola Matamoros, quiero armar esta patineta:\n\n" + a.lineas.join("\n") + `\n\nTotal: ${pesos(a.total)}`);
 }
 
 function progresoTruco(){
@@ -1659,20 +1831,55 @@ function escalaEscena(){
   return Math.max(.80, Math.min(2.0, a / 640));
 }
 
+/* ── Girarla con el dedo ──────────────────────────────
+   Además del scroll, puedes agarrar la patineta y darle
+   la vuelta para verla por donde quieras. Lo que giras se
+   suma a la toma de cámara, no la reemplaza. */
+const orbita = { z:0, x:0 };
+let orbX = null, orbY = null, orbitando = false;
+const escena = $("#escena");
+
+escena.addEventListener("pointerdown", e => {
+  orbX = e.clientX; orbY = e.clientY; orbitando = true;
+  escena.classList.add("girando");
+  escena.setPointerCapture(e.pointerId);
+});
+escena.addEventListener("pointermove", e => {
+  if(!orbitando) return;
+  orbita.z += (e.clientX - orbX) * 0.38;                       // vuelta horizontal
+  orbita.x = Math.max(-38, Math.min(26, orbita.x - (e.clientY - orbY) * 0.28));
+  orbX = e.clientX; orbY = e.clientY;
+  animarTruco(progresoTruco());
+});
+function soltarOrbita(e){
+  if(!orbitando) return;
+  orbitando = false;
+  escena.classList.remove("girando");
+  if(e && e.pointerId != null && escena.hasPointerCapture(e.pointerId)){
+    escena.releasePointerCapture(e.pointerId);
+  }
+}
+escena.addEventListener("pointerup", soltarOrbita);
+escena.addEventListener("pointercancel", soltarOrbita);
+
 function animarTruco(p){
   const e = quieto ? .5 : p;   // sin movimiento: se muestra la patineta quieta
   camara.style.setProperty("--escala", escalaEscena().toFixed(3));
-  camara.style.setProperty("--camx", valorEn(SECUENCIA.camx, e).toFixed(2) + "deg");
-  camara.style.setProperty("--camz", valorEn(SECUENCIA.camz, e).toFixed(2) + "deg");
+  camara.style.setProperty("--camx",
+    Math.max(14, Math.min(86, valorEn(SECUENCIA.camx, e) + orbita.x)).toFixed(2) + "deg");
+  camara.style.setProperty("--camz", (valorEn(SECUENCIA.camz, e) + orbita.z).toFixed(2) + "deg");
 
   const alto = valorEn(SECUENCIA.alto, e);
-  aire.style.setProperty("--desx", valorEn(SECUENCIA.desx, e).toFixed(1) + "px");
+  camara.style.setProperty("--desx", valorEn(SECUENCIA.desx, e).toFixed(1) + "px");
   aire.style.setProperty("--alto", alto.toFixed(1) + "px");
   giro.style.setProperty("--flip", valorEn(SECUENCIA.flip, e).toFixed(1) + "deg");
   giro.style.setProperty("--pop", valorEn(SECUENCIA.pop, e).toFixed(2) + "deg");
 
   const rod = valorEn(SECUENCIA.rodar, e).toFixed(1) + "deg";
   patineta.querySelectorAll(".disco").forEach(d => d.style.setProperty("--rodar", rod));
+
+  /* La luz barre el grip conforme la tabla da la vuelta */
+  patineta.style.setProperty("--luz", ((valorEn(SECUENCIA.flip, e) % 360) / 360).toFixed(3));
 
   /* La sombra se abre y se aclara conforme la tabla despega */
   const h = Math.min(1, alto / 96);
@@ -1682,9 +1889,12 @@ function animarTruco(p){
   $("#truco-barra").style.width = (p * 100).toFixed(1) + "%";
   $("#truco-pista").textContent =
     p < .06 ? "Sigue deslizando ↓" :
-    p > .93 ? "Listo — pídela abajo" : "Cambia la pieza sin salirte";
+    p > .93 ? "Listo — pídela abajo" : "Arrástrala para girarla · cambia la pieza sin salirte";
 
   FASES.forEach(f => $(`#fase-${f.k}`).classList.toggle("viva", p >= f.a && p < f.b));
+
+  /* Al aterrizar, el pedido queda a un toque */
+  document.querySelector(".truco-suma").classList.toggle("cerrada", p > .86);
 }
 
 /* ── Evento y dudas ─────────────────────────────────── */
