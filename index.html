@@ -426,6 +426,216 @@ a{color:inherit; text-decoration:none}
 .suma .v{font-family:var(--display); font-variation-settings:'wdth' 74,'wght' 800; font-size:1.875rem; color:var(--hueso); line-height:1}
 .panel .nota{font-family:var(--dato); font-size:.625rem; line-height:1.7; color:var(--mute-2); margin:14px 0 18px; letter-spacing:.02em}
 
+/* ═══ EL TRUCO ═══════════════════════════════════════
+   Una patineta armada de verdad en 3D: 9 capas de maple,
+   trucks y cuatro ruedas. El scroll la hace tirar el
+   kickflip y va abriendo la pieza que toca elegir.     */
+.truco-riel{position:relative; height:360vh}
+.truco-pin{position:sticky; top:0; height:100vh; height:100svh; overflow:hidden}
+.truco-fondo{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(56% 40% at 50% 74%, rgba(255,94,26,.20) 0%, transparent 70%),
+    radial-gradient(70% 50% at 50% 6%, rgba(150,175,255,.06) 0%, transparent 66%),
+    linear-gradient(180deg,#0C0C10 0%,var(--void) 72%);
+}
+.escena{position:absolute; inset:0; perspective:1500px; perspective-origin:50% 45%}
+.camara{
+  position:absolute; left:50%; top:60%; transform-style:preserve-3d;
+  transform:translate(-50%,-50%) scale(var(--escala,1))
+            rotateX(var(--camx,60deg)) rotateZ(var(--camz,-20deg));
+}
+/* Sombra proyectada en el suelo: se abre y aclara cuando despega */
+.piso{
+  position:absolute; left:50%; top:50%;
+  width:var(--dl); height:calc(var(--dw) * 1.5);
+  margin:calc(var(--dw) * -0.75) 0 0 calc(var(--dl) / -2);
+  border-radius:50%; background:#000; filter:blur(14px);
+  transform:translateZ(var(--suelo,-64px)) rotateZ(90deg) scale(var(--sesc,1));
+  opacity:var(--sopa,.55);
+}
+.aire{transform-style:preserve-3d; transform:translateX(var(--desx,0px)) translateZ(var(--alto,0px))}
+.giro{transform-style:preserve-3d; transform:rotateX(var(--pop,0deg)) rotateY(var(--flip,0deg))}
+.patineta{position:absolute; left:0; top:0; transform-style:preserve-3d}
+
+/* ── Tabla ───────────────────────────────────────────
+   Capas apiladas: vistas de canto dan el prensado de 7
+   capas de maple. La silueta es popsicle, más angosta en
+   la cintura que en nariz y cola.                      */
+.capa{
+  position:absolute; left:50%; top:50%;
+  width:var(--dw); height:var(--dl);
+  margin:calc(var(--dl) / -2) 0 0 calc(var(--dw) / -2);
+  transform:translateZ(calc(var(--c) * 1.1px));
+  background:var(--maple,#C2A278);
+  clip-path:polygon(
+    50% 0%,   64% .6%,  76% 2.2%, 85% 4.6%, 92% 8%,  96% 12%,  97.5% 16%,
+    95% 22%,  94% 30%,  93.6% 50%, 94% 70%, 95% 78%, 97.5% 84%,
+    96% 88%,  92% 92%,  85% 95.4%, 76% 97.8%, 64% 99.4%, 50% 100%,
+    36% 99.4%,24% 97.8%,15% 95.4%, 8% 92%,   4% 88%,  2.5% 84%,
+    5% 78%,   6% 70%,   6.4% 50%,  6% 30%,   5% 22%,  2.5% 16%,
+    4% 12%,   8% 8%,    15% 4.6%,  24% 2.2%, 36% .6%
+  );
+}
+/* Veta de la madera en el canto */
+.capa.veta{
+  background-image:repeating-linear-gradient(90deg,
+    rgba(0,0,0,.10) 0 1px, transparent 1px 4px);
+}
+/* Grip: lija negra. El degradado a los lados insinúa el cóncavo */
+.capa.grip{
+  background-color:#131316;
+  background-image:
+    linear-gradient(90deg, rgba(237,234,228,.13) 0%, rgba(0,0,0,.30) 24%,
+                    rgba(0,0,0,.34) 76%, rgba(237,234,228,.13) 100%),
+    radial-gradient(circle, rgba(237,234,228,.20) .5px, transparent .9px);
+  background-size:100% 100%, 3px 3px;
+}
+/* La cara del gráfico mira hacia abajo, como en una tabla real:
+   se lee al derecho cuando la patineta gira y enseña la panza. */
+.capa.grafico{
+  background-color:var(--tono,#1D1D22); background-size:cover; background-position:center;
+  display:grid; place-items:center;
+  transform:translateZ(calc(var(--c) * 1.1px)) rotateY(180deg);
+}
+.capa.grafico::after{   /* barniz: un brillo largo cruzando la panza */
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(112deg, transparent 30%, rgba(237,234,228,.13) 47%, transparent 60%);
+}
+.capa.grafico span{
+  font-family:var(--display); font-variation-settings:'wdth' 62,'wght' 900;
+  text-transform:uppercase; font-size:calc(var(--dw) * .2); letter-spacing:.02em;
+  color:rgba(237,234,228,.62); transform:rotate(90deg); white-space:nowrap;
+}
+
+/* ── Trucks ──────────────────────────────────────────
+   Placa, perno rey, hanger de aluminio y eje.          */
+.truck{
+  position:absolute; left:50%; top:50%; transform-style:preserve-3d;
+  transform:translate(-50%,-50%) translateY(var(--ty)) translateZ(var(--tz,-10px));
+}
+.placa{
+  position:absolute; left:50%; top:50%;
+  width:calc(var(--dw) * .46); height:calc(var(--dw) * .58);
+  margin:calc(var(--dw) * -.29) 0 0 calc(var(--dw) * -.23);
+  border-radius:3px;
+  background:linear-gradient(160deg,#5A5A64 0%,#3A3A42 58%,#2A2A31 100%);
+  box-shadow:inset 0 1px 0 rgba(237,234,228,.14);
+  transform:translateZ(calc(var(--c) * 1.4px));
+}
+/* Hanger: trapecio de aluminio, ancho del lado del eje */
+.hanger{
+  position:absolute; left:50%; top:50%;
+  width:calc(var(--aw) * .58); height:calc(var(--dw) * .46);
+  margin:calc(var(--dw) * -.23) 0 0 calc(var(--aw) * -.29);
+  background:linear-gradient(180deg,#9A9AA6 0%,#6E6E79 42%,#43434C 100%);
+  clip-path:polygon(50% 0%, 96% 78%, 100% 100%, 0% 100%, 4% 78%);
+  transform:translateY(calc(var(--dw) * var(--fuera,.22))) rotate(var(--rot,0deg))
+            translateZ(calc(var(--c) * 1.5px - 8px));
+}
+.perno{     /* perno rey */
+  position:absolute; left:50%; top:50%; width:5px; height:calc(var(--dw) * .3);
+  margin:calc(var(--dw) * -.15) 0 0 -2.5px; border-radius:2px;
+  background:linear-gradient(180deg,#B9B9C4,#5C5C66);
+  transform:translateZ(-5px);
+}
+.eje{
+  position:absolute; left:50%; top:50%; width:var(--aw); height:5px;
+  margin:-2.5px 0 0 calc(var(--aw) / -2); border-radius:3px;
+  background:linear-gradient(180deg,#C3C3CE 0%,#8A8A95 40%,#4A4A54 100%);
+  transform:translateZ(var(--ez,-16px));
+}
+
+/* ── Ruedas ──────────────────────────────────────────
+   Discos de distinto diámetro apilados sobre el eje: el
+   perfil sale abombado como el uretano real, no un tubo. */
+.rueda{
+  position:absolute; left:50%; top:50%; transform-style:preserve-3d;
+  transform:translate(-50%,-50%) translateX(var(--wx)) translateZ(var(--wz,-16px));
+}
+/* Los discos de en medio van planos: si cada uno lleva su propio
+   brillo, el apilado se nota en bandas. */
+.disco{
+  position:absolute; left:50%; top:50%; width:var(--wd); height:var(--wd);
+  margin:calc(var(--wd) / -2) 0 0 calc(var(--wd) / -2); border-radius:50%;
+  background:var(--uretano,#E8E3D8);
+  transform:rotateY(90deg) translateZ(var(--dz)) rotate(var(--rodar,0deg));
+}
+/* Las dos caras llevan el núcleo y el asiento del balero */
+.disco.cara{
+  background:
+    radial-gradient(circle at 50% 50%, #16161A 0 11%, transparent 11.5%),
+    radial-gradient(circle at 50% 50%, #9EA0A8 11.5% 19%, transparent 19.5%),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,.20) 19.5% 23%, transparent 23.5%),
+    radial-gradient(circle at 36% 30%, rgba(255,255,255,.5) 0%, transparent 44%),
+    var(--uretano,#E8E3D8);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.24);
+}
+
+/* Encabezado flotante y datos */
+.truco-tapa{
+  position:absolute; left:50%; top:clamp(74px,9vh,110px); transform:translateX(-50%);
+  text-align:center; width:min(560px,88vw); pointer-events:none; z-index:4;
+}
+.truco-tapa h2{margin:0 0 8px}
+.truco-tapa .rotulo{margin-bottom:12px}
+.truco-progreso{
+  position:absolute; left:0; right:0; bottom:0; height:2px; background:rgba(237,234,228,.10); z-index:5;
+}
+.truco-progreso i{display:block; height:100%; width:0%; background:var(--ember)}
+
+/* Tarjeta que se abre en cada fase del truco */
+.fase{
+  position:absolute; z-index:6; width:min(290px,80vw);
+  background:rgba(13,13,16,.93); backdrop-filter:blur(14px);
+  border:1px solid var(--linea-2); border-radius:3px; padding:16px 16px 18px;
+  opacity:0; transform:translateY(16px); pointer-events:none;
+  /* `visibility` además de la opacidad: si no, el backdrop-filter
+     sigue desenfocando el fondo y deja un rectángulo fantasma. */
+  visibility:hidden;
+  transition:opacity .45s var(--curva), transform .45s var(--curva), visibility .45s;
+}
+.fase.viva{opacity:1; transform:none; pointer-events:auto; visibility:visible}
+.fase .rotulo{margin-bottom:10px; color:var(--ember)}
+.fase-nombre{font-size:.9375rem; font-weight:600; margin:0; line-height:1.3}
+.fase-spec{font-family:var(--dato); font-size:.625rem; color:var(--mute-2); margin:5px 0 0; letter-spacing:.04em; line-height:1.6}
+.fase-pie{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--linea)}
+.fase-precio{font-family:var(--dato); font-size:.875rem; color:var(--ember)}
+.fase-mando{display:flex; gap:6px}
+.fase-mando button{
+  width:30px; height:30px; border:1px solid var(--linea-2); border-radius:2px;
+  display:grid; place-items:center; color:var(--mute); transition:border-color .2s, color .2s;
+}
+.fase-mando button:hover,.fase-mando button:focus-visible{border-color:var(--ember); color:var(--ember)}
+.fase--tabla{left:6%; top:26%}
+.fase--trucks{right:6%; top:34%}
+.fase--ruedas{left:6%; bottom:16%}
+
+/* Recuento del armado, abajo */
+.truco-suma{
+  position:absolute; left:50%; bottom:clamp(20px,4vh,40px); transform:translateX(-50%);
+  display:flex; align-items:center; gap:clamp(14px,3vw,30px); z-index:5;
+  padding:12px 22px; border:1px solid var(--linea); border-radius:3px;
+  background:rgba(13,13,16,.9); backdrop-filter:blur(14px); white-space:nowrap;
+}
+.truco-suma .par{display:flex; flex-direction:column; gap:3px}
+.truco-suma .par b{font-family:var(--dato); font-size:.5625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--mute-2); font-weight:400}
+.truco-suma .par span{font-family:var(--dato); font-size:.75rem; color:var(--hueso)}
+.truco-suma .gran{font-family:var(--display); font-variation-settings:'wdth' 74,'wght' 800; font-size:1.375rem; color:var(--ember)}
+
+@media(max-width:820px){
+  /* En vertical la tarjeta ocupa la parte baja, así que la patineta
+     sube para no encimarse con ella. */
+  .camara{top:44%}
+  .fase--tabla,.fase--trucks,.fase--ruedas{
+    left:50%; right:auto; top:auto; bottom:clamp(96px,15vh,150px);
+    transform:translate(-50%,16px); width:min(320px,86vw);
+  }
+  .fase.viva{transform:translate(-50%,0)}
+  .truco-suma{gap:14px; padding:10px 14px}
+  .truco-suma .par:nth-child(2){display:none}
+}
+
 /* ── Catálogo ───────────────────────────────────────── */
 .herramientas{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px}
 .campo{
@@ -457,7 +667,7 @@ select.campo{flex:0 0 auto; cursor:pointer}
 }
 .tarjeta-medio img{width:100%; height:100%; object-fit:cover; transition:transform .6s var(--curva)}
 .tarjeta:hover .tarjeta-medio img{transform:scale(1.04)}
-.tarjeta-medio svg{width:56%; height:56%; opacity:.34; transition:opacity .4s, transform .6s var(--curva)}
+.tarjeta-medio svg{width:74%; height:74%; opacity:.34; transition:opacity .4s, transform .6s var(--curva)}
 .tarjeta:hover .tarjeta-medio svg{opacity:.6; transform:scale(1.03)}
 .insignia{
   position:absolute; top:12px; left:12px;
@@ -557,7 +767,7 @@ select.campo{flex:0 0 auto; cursor:pointer}
 @media(min-width:600px){ .hoja{grid-template-columns:1fr 1fr} }
 .hoja-medio{aspect-ratio:4/5; background:var(--void); display:grid; place-items:center; overflow:hidden}
 .hoja-medio img{width:100%; height:100%; object-fit:cover}
-.hoja-medio svg{width:58%; height:58%; opacity:.4}
+.hoja-medio svg{width:70%; height:70%; opacity:.4}
 .hoja-cuerpo{padding:28px 26px; display:flex; flex-direction:column; gap:12px}
 .hoja-cuerpo h3{font-family:var(--display); font-variation-settings:'wdth' 74,'wght' 700; text-transform:uppercase; font-size:1.375rem; margin:6px 0 0; line-height:1.05}
 .cerrar{position:absolute; top:12px; right:12px; z-index:2; width:34px; height:34px; border-radius:50%; background:rgba(8,8,10,.8); color:var(--mute); display:grid; place-items:center}
@@ -566,6 +776,15 @@ select.campo{flex:0 0 auto; cursor:pointer}
 .contador button{width:32px; height:32px; border:1px solid var(--linea-2); border-radius:2px; color:var(--mute); transition:border-color .25s, color .25s}
 .contador button:hover{border-color:var(--ember); color:var(--ember)}
 .contador span{font-family:var(--dato); font-size:.875rem; min-width:2ch; text-align:center}
+
+/* Entrada del wordmark: las letras suben una tras otra */
+.wordmark span{display:inline-block; will-change:transform}
+.wordmark.anima span{
+  opacity:0; transform:translateY(.16em);
+  animation:letraSube .85s var(--curva) forwards;
+  animation-delay:calc(var(--i) * 42ms + 120ms);
+}
+@keyframes letraSube{to{opacity:1; transform:none}}
 
 /* ── Entrada al hacer scroll ────────────────────────── */
 .sube{opacity:0; transform:translateY(20px); transition:opacity .8s var(--curva), transform .8s var(--curva)}
@@ -589,6 +808,7 @@ select.campo{flex:0 0 auto; cursor:pointer}
     <a href="#top" class="marca">Matamoros<i>.</i></a>
     <nav class="nav-enlaces" aria-label="Principal">
       <a href="#taller">Taller</a>
+      <a href="#truco">El truco</a>
       <a href="#catalogo">Catálogo</a>
       <a href="#evento">Evento</a>
       <a href="#dudas">Dudas</a>
@@ -674,6 +894,42 @@ select.campo{flex:0 0 auto; cursor:pointer}
           <a class="btn btn--ember btn--bloque" id="panel-wa" href="#" target="_blank" rel="noopener">Pedir por WhatsApp</a>
         </aside>
       </div>
+    </div>
+  </section>
+
+  <!-- ═══ El truco: la patineta armada, en 3D ═══ -->
+  <section id="truco" class="truco-riel" aria-label="Tu patineta haciendo un kickflip">
+    <div class="truco-pin">
+      <div class="truco-fondo"></div>
+
+      <div class="truco-tapa">
+        <p class="rotulo">El truco</p>
+        <h2 class="titulo">Tu patineta, armada</h2>
+        <p class="dato" id="truco-pista">Sigue deslizando ↓</p>
+      </div>
+
+      <div class="escena">
+        <div class="camara" id="camara">
+          <div class="piso" id="piso"></div>
+          <div class="aire" id="aire">
+            <div class="giro" id="giro">
+              <div class="patineta" id="patineta"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fase fase--tabla"  id="fase-tabla"  data-k="tabla"></div>
+      <div class="fase fase--trucks" id="fase-trucks" data-k="trucks"></div>
+      <div class="fase fase--ruedas" id="fase-ruedas" data-k="ruedas"></div>
+
+      <div class="truco-suma">
+        <span class="par"><b>Piezas</b><span id="truco-piezas">5</span></span>
+        <span class="par"><b>Entrega</b><span id="truco-entrega">—</span></span>
+        <span class="par"><b>Total</b><span class="gran cifra" id="truco-total">$0</span></span>
+      </div>
+
+      <div class="truco-progreso"><i id="truco-barra"></i></div>
     </div>
   </section>
 
@@ -796,23 +1052,40 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">"
 /* ── Planos técnicos: cuando no hay foto, se dibuja la pieza ──
    Son dibujos de línea, como el plano de la refacción. */
 const PLANOS = {
-  tabla:`<svg viewBox="0 0 100 360" fill="none" stroke="#EDEAE4" stroke-width="1.4" aria-hidden="true">
-    <path d="M50 6c16 0 24 12 24 30v288c0 18-8 30-24 30s-24-12-24-30V36C26 18 34 6 50 6Z"/>
-    <path d="M50 14c11 0 17 9 17 22v288c0 13-6 22-17 22s-17-9-17-22V36c0-13 6-22 17-22Z" opacity=".35"/>
-    <circle cx="38" cy="70" r="1.8" opacity=".7"/><circle cx="62" cy="70" r="1.8" opacity=".7"/>
-    <circle cx="38" cy="86" r="1.8" opacity=".7"/><circle cx="62" cy="86" r="1.8" opacity=".7"/>
-    <circle cx="38" cy="274" r="1.8" opacity=".7"/><circle cx="62" cy="274" r="1.8" opacity=".7"/>
-    <circle cx="38" cy="290" r="1.8" opacity=".7"/><circle cx="62" cy="290" r="1.8" opacity=".7"/>
-    <path d="M26 180h48" opacity=".2"/></svg>`,
-  ruedas:`<svg viewBox="0 0 120 120" fill="none" stroke="#EDEAE4" stroke-width="1.4" aria-hidden="true">
-    <circle cx="60" cy="60" r="50"/><circle cx="60" cy="60" r="40" opacity=".35"/>
-    <circle cx="60" cy="60" r="20" opacity=".7"/><circle cx="60" cy="60" r="8"/>
-    <path d="M60 20v12M60 88v12M20 60h12M88 60h12" opacity=".45"/></svg>`,
-  trucks:`<svg viewBox="0 0 160 100" fill="none" stroke="#EDEAE4" stroke-width="1.4" aria-hidden="true">
-    <path d="M18 26h124" opacity=".8"/><path d="M30 26v10M130 26v10" opacity=".5"/>
-    <path d="M80 30v16"/><path d="M52 58h56l14 16H38l14-16Z"/>
-    <circle cx="34" cy="80" r="12"/><circle cx="126" cy="80" r="12"/>
-    <path d="M34 74v12M126 74v12" opacity=".4"/></svg>`,
+  /* Tabla: silueta popsicle real — nariz y cola anchas, cintura más
+     angosta — con las ocho perforaciones y la línea del prensado. */
+  tabla:`<svg viewBox="0 0 84 330" fill="none" stroke="#EDEAE4" stroke-width="1.3" aria-hidden="true">
+    <path d="M42 2c11 0 19 1.6 25 4.6 5.4 2.7 9.6 6.8 11.5 11.4 1 2.4.6 4.6-1.3 7.4-2.4 3.6-3.4 8-3.4 14.6v250c0 6.6 1 11 3.4 14.6 1.9 2.8 2.3 5 1.3 7.4-1.9 4.6-6.1 8.7-11.5 11.4-6 3-14 4.6-25 4.6s-19-1.6-25-4.6c-5.4-2.7-9.6-6.8-11.5-11.4-1-2.4-.6-4.6 1.3-7.4C7.2 301 8.2 296.6 8.2 290V40c0-6.6-1-11-3.4-14.6C2.9 22.6 2.5 20.4 3.5 18 5.4 13.4 9.6 9.3 15 6.6 21 3.6 31 2 42 2Z"/>
+    <path d="M8.2 60h67.6M8.2 270h67.6" opacity=".18"/>
+    <g opacity=".75">
+      <circle cx="30" cy="64" r="2"/><circle cx="54" cy="64" r="2"/>
+      <circle cx="30" cy="80" r="2"/><circle cx="54" cy="80" r="2"/>
+      <circle cx="30" cy="250" r="2"/><circle cx="54" cy="250" r="2"/>
+      <circle cx="30" cy="266" r="2"/><circle cx="54" cy="266" r="2"/>
+    </g>
+    <path d="M42 96v138" opacity=".16"/></svg>`,
+  /* Rueda: perfil con hombro redondeado, núcleo y asiento del balero */
+  ruedas:`<svg viewBox="0 0 120 120" fill="none" stroke="#EDEAE4" stroke-width="1.3" aria-hidden="true">
+    <circle cx="60" cy="60" r="50"/>
+    <circle cx="60" cy="60" r="45.5" opacity=".28"/>
+    <circle cx="60" cy="60" r="23" opacity=".8"/>
+    <circle cx="60" cy="60" r="16" opacity=".45"/>
+    <circle cx="60" cy="60" r="8.5"/>
+    <g opacity=".3">
+      <path d="M60 37V23M60 97v14M37 60H23M97 60h14"/>
+      <path d="M76.3 43.7 86 34M34 86l9.7-9.7M76.3 76.3 86 86M34 34l9.7 9.7"/>
+    </g></svg>`,
+  /* Truck: placa, perno rey, hanger y eje con las dos ruedas */
+  trucks:`<svg viewBox="0 0 170 104" fill="none" stroke="#EDEAE4" stroke-width="1.3" aria-hidden="true">
+    <rect x="62" y="8" width="46" height="26" rx="3"/>
+    <circle cx="70" cy="14" r="1.8" opacity=".7"/><circle cx="100" cy="14" r="1.8" opacity=".7"/>
+    <circle cx="70" cy="28" r="1.8" opacity=".7"/><circle cx="100" cy="28" r="1.8" opacity=".7"/>
+    <path d="M85 34v9" opacity=".8"/>
+    <path d="M85 43c-3 0-5 2-5 5v4h10v-4c0-3-2-5-5-5Z" opacity=".6"/>
+    <path d="M64 52h42l16 22H48l16-22Z"/>
+    <path d="M18 74h134" stroke-width="2.4"/>
+    <g><circle cx="26" cy="74" r="16"/><circle cx="26" cy="74" r="6" opacity=".55"/></g>
+    <g><circle cx="144" cy="74" r="16"/><circle cx="144" cy="74" r="6" opacity=".55"/></g></svg>`,
 };
 const PLANO_CAT = {
   Tablas:"tabla", Ruedas:"ruedas", Trucks:"trucks",
@@ -828,6 +1101,16 @@ const PLANO_CAT = {
     caja.innerHTML = `<img src="${esc(PORTADA_FOTO)}" alt="">`;
   }
 })();
+/* El wordmark entra letra por letra */
+(function entradaMarca(){
+  const wm = document.querySelector(".wordmark");
+  const texto = wm.textContent.trim();
+  wm.setAttribute("aria-label", texto);
+  wm.innerHTML = [...texto]
+    .map((c, i) => `<span aria-hidden="true" style="--i:${i}">${esc(c)}</span>`).join("");
+  if(!quieto) wm.classList.add("anima");
+})();
+
 $("#rotulo-zona").textContent = `${ZONA} · Skateshop móvil`;
 $("#panel-zona").textContent = ZONA;
 $("#pie-zona").textContent = ZONA;
@@ -947,17 +1230,24 @@ function pintarPuntos(){
     `<span class="punto ${i === sel ? "on" : ""}"></span>`).join("");
 }
 
+/* Una sola puerta para cambiar de pieza: el arco, el panel y la
+   patineta 3D son tres vistas del mismo armado. */
+function sincronizar(){
+  colocarArco();
+  pintarPanel();
+  construirPatineta();
+  pintarFases();
+  pintarResumenTruco();
+}
 function mover(delta){
   const n = ARCO[claveActiva].piezas.length;
   elegido[claveActiva] = (elegido[claveActiva] + delta + n) % n;   // da la vuelta
-  colocarArco();
-  pintarPanel();
+  sincronizar();
 }
 function irA(i){
   if(i === elegido[claveActiva]) return;
   elegido[claveActiva] = i;
-  colocarArco();
-  pintarPanel();
+  sincronizar();
 }
 
 $("#pestanas").addEventListener("click", e => {
@@ -1188,6 +1478,215 @@ $("#hoja-menos").addEventListener("click", () => { hojaCant = Math.max(1, hojaCa
 $("#hoja-mas").addEventListener("click", () => { hojaCant++; $("#hoja-cant").textContent = hojaCant; });
 $("#hoja-sumar").addEventListener("click", () => { if(hojaId){ sumar(hojaId, hojaCant); cerrarHoja(); } });
 
+/* ═══════════════════════════════════════════════════
+   EL TRUCO — la patineta armada, en 3D
+   Se construye con las piezas que elegiste arriba y el
+   scroll la hace tirar el kickflip.
+   ═══════════════════════════════════════════════════ */
+const camara = $("#camara"), aire = $("#aire"), giro = $("#giro");
+const patineta = $("#patineta"), piso = $("#piso"), riel = $("#truco");
+
+/* ── Medidas reales, a escala ─────────────────────────
+   Una tabla de 32" mide 330px aquí, así que 1 pulgada
+   son 10.3px. Todo lo demás sale de ahí, por eso las
+   proporciones se ven como una patineta de verdad.    */
+const PULGADA = 10.3;
+const LARGO = Math.round(32 * PULGADA);              // 32" de punta a punta
+const MM = PULGADA / 25.4;
+
+function pulgadasTabla(){ return /8\.25/.test(ARCO.tabla.piezas[elegido.tabla].n) ? 8.25 : 8.0; }
+function anchoTabla(){ return Math.round(pulgadasTabla() * PULGADA); }
+/* El eje va del ancho de la tabla: un hanger 5.25" calza una 8.0" */
+function anchoEje(){ return Math.round(pulgadasTabla() * PULGADA); }
+function diamRueda(){
+  const mm = /55/.test(ARCO.ruedas.piezas[elegido.ruedas].n) ? 55 : 53;
+  return Math.round(mm * MM);
+}
+function anchoRueda(){ return Math.round(31 * MM); }  // 31mm de banda de rodadura
+const ENTRE_EJES = 0.219;                             // 14" entre trucks
+
+function construirPatineta(){
+  const dw = anchoTabla(), aw = anchoEje(), wd = diamRueda();
+  const tabla = ARCO.tabla.piezas[elegido.tabla];
+  const rueda = ARCO.ruedas.piezas[elegido.ruedas];
+
+  camara.style.setProperty("--dl", LARGO + "px");
+  camara.style.setProperty("--dw", dw + "px");
+
+  const CAPAS = 9;
+  let html = "";
+
+  /* Tabla: la capa 0 es el gráfico (se ve al girar), la última el grip.
+     En medio, el maple alternando veta clara y oscura. */
+  for(let c = 0; c < CAPAS; c++){
+    const base = `--c:${c}; --dw:${dw}px; --dl:${LARGO}px`;
+    if(c === 0){
+      const fondo = tabla.img ? `background-image:url('${esc(tabla.img)}');` : "";
+      html += `<div class="capa grafico" style="${base}; --tono:${esc(tabla.color || "#1D1D22")}; ${fondo}">
+                 ${tabla.img ? "" : `<span>Matamoros</span>`}
+               </div>`;
+    } else if(c === CAPAS - 1){
+      html += `<div class="capa grip" style="${base}"></div>`;
+    } else {
+      const maple = c % 2 ? "#C9AA80" : "#A2814F";   // veta clara / veta oscura
+      html += `<div class="capa veta" style="${base}; --maple:${maple}"></div>`;
+    }
+  }
+
+  /* Dos trucks. El hanger apunta hacia el extremo más cercano, como
+     va montado de verdad, así que el de la cola va volteado. */
+  const ww = anchoRueda();
+  const colgado = -(6 + wd * 0.5);                  // qué tan abajo cuelga el eje
+  [-1, 1].forEach(lado => {
+    const ty = lado * LARGO * ENTRE_EJES;
+    let t = `<div class="truck" style="--ty:${ty}px; --dw:${dw}px; --aw:${aw}px">`;
+    for(let c = 0; c < 4; c++) t += `<div class="placa" style="--c:${-c}; --dw:${dw}px"></div>`;
+    t += `<div class="perno" style="--dw:${dw}px"></div>`;
+    t += `<div class="hanger" style="--dw:${dw}px; --aw:${aw}px; --c:-4;
+            --fuera:${lado > 0 ? .22 : -.22}; --rot:${lado > 0 ? 0 : 180}deg"></div>`;
+    t += `<div class="eje" style="--aw:${aw}px; --ez:${colgado}px"></div>`;
+
+    /* La rueda se centra hacia adentro media banda, para que su cara
+       exterior quede a ras de la punta del eje, como va montada. */
+    [-1, 1].forEach(costado => {
+      const wx = costado * (aw / 2 - ww / 2);
+      let r = `<div class="rueda" style="--wx:${wx.toFixed(1)}px; --wz:${colgado}px">`;
+      const DISCOS = 11;
+      const uretano = esc(rueda.color || "#E8E3D8");
+      for(let d = 0; d < DISCOS; d++){
+        const t01 = (d / (DISCOS - 1)) * 2 - 1;                       // -1 … 1
+        const dz = (ww / 2) * t01;
+        /* El diámetro cae solo cerca del borde: centro recto, hombros
+           redondeados — el perfil del uretano, no un tubo. */
+        const diam = wd * (1 - 0.16 * Math.pow(Math.abs(t01), 3.2));
+        const cara = (d === 0 || d === DISCOS - 1) ? " cara" : "";
+        /* Los discos de en medio van planos y se oscurecen hacia el
+           borde: así el cilindro se lee redondo y no como pila de
+           monedas, que es lo que delata un apilado. */
+        const sombra = cara ? "" : `; --uretano:color-mix(in srgb, ${uretano} ${(100 - Math.abs(t01) * 22).toFixed(0)}%, #6E6A60)`;
+        r += `<div class="disco${cara}" style="--wd:${diam.toFixed(1)}px; --dz:${dz.toFixed(1)}px${cara ? `; --uretano:${uretano}` : sombra}"></div>`;
+      }
+      t += r + `</div>`;
+    });
+    html += t + `</div>`;
+  });
+
+  patineta.innerHTML = html;
+}
+
+/* Cuadros clave de la secuencia. p va de 0 (entra) a 1 (se va). */
+const SECUENCIA = {
+  desx:  [[0,-300],[.20,-120],[.34,-52],[.72,66],[1,240]],
+  alto:  [[0,0],[.30,0],[.37,32],[.52,96],[.67,32],[.74,0],[1,0]],
+  flip:  [[0,0],[.34,0],[.70,360],[1,360]],
+  pop:   [[0,0],[.24,0],[.31,-22],[.41,10],[.58,2],[.70,-8],[.77,0],[1,0]],
+  rodar: [[0,0],[1,1160]],
+  camz:  [[0,-26],[.5,-14],[1,-24]],
+  camx:  [[0,64],[.5,54],[1,63]],
+};
+function suave(t){ return t * t * (3 - 2 * t); }
+function valorEn(kf, p){
+  for(let i = 0; i < kf.length - 1; i++){
+    const [ta, va] = kf[i], [tb, vb] = kf[i + 1];
+    if(p >= ta && p <= tb){
+      const t = tb === ta ? 0 : (p - ta) / (tb - ta);
+      return va + (vb - va) * suave(t);
+    }
+  }
+  return kf[kf.length - 1][1];
+}
+
+/* Qué pieza se abre en cada tramo del truco */
+const FASES = [
+  { k:"tabla",  a:.20, b:.42 },
+  { k:"trucks", a:.42, b:.62 },
+  { k:"ruedas", a:.62, b:.86 },
+];
+
+function pintarFases(){
+  FASES.forEach(f => {
+    const g = ARCO[f.k], pz = g.piezas[elegido[f.k]];
+    $(`#fase-${f.k}`).innerHTML = `
+      <p class="rotulo">${esc(g.titulo)}</p>
+      <p class="fase-nombre">${esc(pz.n)}</p>
+      <p class="fase-spec">${esc(pz.spec || "")}</p>
+      <div class="fase-pie">
+        <span class="fase-precio cifra">${pesos(pz.p)}</span>
+        <span class="fase-mando">
+          <button data-fk="${f.k}" data-d="-1" aria-label="${esc(g.titulo)} anterior">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button data-fk="${f.k}" data-d="1" aria-label="${esc(g.titulo)} siguiente">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </span>
+      </div>`;
+  });
+}
+
+/* Cambiar pieza desde el truco: mueve todo el sistema a la vez */
+document.querySelectorAll(".fase").forEach(f => {
+  f.addEventListener("click", e => {
+    const b = e.target.closest("[data-fk]");
+    if(!b) return;
+    const k = b.dataset.fk, n = ARCO[k].piezas.length;
+    elegido[k] = (elegido[k] + Number(b.dataset.d) + n) % n;
+    claveActiva = k;              // el arco de arriba se queda en la misma pieza
+    pintarPestanas();
+    pintarArco();                 // pintarArco llama a colocarArco
+    pintarPanel();
+    construirPatineta();
+    pintarFases();
+    pintarResumenTruco();
+  });
+});
+
+function pintarResumenTruco(){
+  const a = armado();
+  $("#truco-total").textContent = pesos(a.total);
+  $("#truco-entrega").textContent = a.pedido ? "5 a 10 días" : "Hoy mismo";
+}
+
+function progresoTruco(){
+  const r = riel.getBoundingClientRect();
+  const largo = riel.offsetHeight - innerHeight;
+  if(largo <= 0) return 0;
+  return Math.min(1, Math.max(0, -r.top / largo));
+}
+
+function escalaEscena(){
+  const a = Math.min(innerWidth, 1180);
+  return Math.max(.80, Math.min(2.0, a / 640));
+}
+
+function animarTruco(p){
+  const e = quieto ? .5 : p;   // sin movimiento: se muestra la patineta quieta
+  camara.style.setProperty("--escala", escalaEscena().toFixed(3));
+  camara.style.setProperty("--camx", valorEn(SECUENCIA.camx, e).toFixed(2) + "deg");
+  camara.style.setProperty("--camz", valorEn(SECUENCIA.camz, e).toFixed(2) + "deg");
+
+  const alto = valorEn(SECUENCIA.alto, e);
+  aire.style.setProperty("--desx", valorEn(SECUENCIA.desx, e).toFixed(1) + "px");
+  aire.style.setProperty("--alto", alto.toFixed(1) + "px");
+  giro.style.setProperty("--flip", valorEn(SECUENCIA.flip, e).toFixed(1) + "deg");
+  giro.style.setProperty("--pop", valorEn(SECUENCIA.pop, e).toFixed(2) + "deg");
+
+  const rod = valorEn(SECUENCIA.rodar, e).toFixed(1) + "deg";
+  patineta.querySelectorAll(".disco").forEach(d => d.style.setProperty("--rodar", rod));
+
+  /* La sombra se abre y se aclara conforme la tabla despega */
+  const h = Math.min(1, alto / 96);
+  piso.style.setProperty("--sesc", (1 + h * 0.5).toFixed(3));
+  piso.style.setProperty("--sopa", (0.55 - h * 0.4).toFixed(3));
+
+  $("#truco-barra").style.width = (p * 100).toFixed(1) + "%";
+  $("#truco-pista").textContent =
+    p < .06 ? "Sigue deslizando ↓" :
+    p > .93 ? "Listo — pídela abajo" : "Cambia la pieza sin salirte";
+
+  FASES.forEach(f => $(`#fase-${f.k}`).classList.toggle("viva", p >= f.a && p < f.b));
+}
+
 /* ── Evento y dudas ─────────────────────────────────── */
 $("#evento-caja").innerHTML = `
   <div class="calendario"><b class="cifra">${esc(EVENTO.dia)}</b><span>${esc(EVENTO.mes)}</span></div>
@@ -1207,6 +1706,7 @@ addEventListener("scroll", () => {
   tick = true;
   requestAnimationFrame(() => {
     $("#nav").classList.toggle("pegada", scrollY > 40);
+    animarTruco(progresoTruco());
     tick = false;
   });
 }, { passive:true });
@@ -1224,13 +1724,21 @@ let tickR = false;
 addEventListener("resize", () => {
   if(tickR) return;
   tickR = true;
-  requestAnimationFrame(() => { colocarArco(); tickR = false; });
+  requestAnimationFrame(() => {
+    colocarArco();
+    animarTruco(progresoTruco());
+    tickR = false;
+  });
 });
 
 /* ── Arranque ───────────────────────────────────────── */
 pintarPestanas();
 pintarArco();
 pintarPanel();
+construirPatineta();
+pintarFases();
+pintarResumenTruco();
+animarTruco(progresoTruco());
 pintarFiltros();
 pintarRejilla();
 pintarCarrito();
