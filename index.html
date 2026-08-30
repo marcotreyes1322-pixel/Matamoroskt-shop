@@ -38,12 +38,22 @@ const PORTADA_FOTO  = "";
            pieza, que también se ve bien.
       s: "tienda" = lo tienes físico · "pedido" = llega en 5-10 días */
 const ARCO = {
+  /* La lija va primero: es lo que se ve cuando la cámara
+     mira la tabla desde arriba. grip: cómo se dibuja. */
+  lija: {
+    titulo:"Lija",
+    piezas:[
+      { n:"Negra grano 80", p:180, s:"tienda", spec:"Hoja 9x33 · grano 80",     grip:"negra", img:"" },
+      { n:"Perforada",      p:220, s:"tienda", spec:"Sin burbujas · perforada", grip:"perf",  img:"" },
+      { n:"Roja Matamoros", p:260, s:"pedido", spec:"Serigrafía a 1 tinta",     grip:"roja",  img:"" },
+    ]
+  },
   tabla: {
     titulo:"Tabla",
     piezas:[
-      { n:'Matamoros 8.0"',    p:850, s:"tienda", spec:"Maple canadiense · 7 capas · cóncavo medio", img:"" },
-      { n:'Matamoros 8.25"',   p:850, s:"tienda", spec:"Maple canadiense · 7 capas · cóncavo medio", img:"" },
-      { n:'Skull Yellow 8.0"', p:990, s:"pedido", spec:"Gráfico serigrafiado · cóncavo alto",        img:"" },
+      { n:'Matamoros 8.0"',    p:850, s:"tienda", spec:"Maple canadiense · 7 capas · cóncavo medio", color:"#17171C", img:"" },
+      { n:'Matamoros 8.25"',   p:850, s:"tienda", spec:"Maple canadiense · 7 capas · cóncavo medio", color:"#5A1220", img:"" },
+      { n:'Skull Yellow 8.0"', p:990, s:"pedido", spec:"Gráfico serigrafiado · cóncavo alto",        color:"#C9A227", img:"" },
     ]
   },
   trucks: {
@@ -56,8 +66,8 @@ const ARCO = {
   ruedas: {
     titulo:"Ruedas",
     piezas:[
-      { n:"Catrina's Pizza 53mm", p:750, s:"tienda", spec:"Juego de 4 · 99A · calle",     img:"" },
-      { n:"Catrina's Pizza 55mm", p:780, s:"tienda", spec:"Juego de 4 · 101A · calle",    img:"" },
+      { n:"Catrina's Pizza 53mm", p:750, s:"tienda", spec:"Juego de 4 · 99A · calle",  color:"#EFE9DA", img:"" },
+      { n:"Catrina's Pizza 55mm", p:780, s:"tienda", spec:"Juego de 4 · 101A · calle", color:"#E86A2C", img:"" },
     ]
   },
 };
@@ -65,7 +75,6 @@ const ARCO = {
 /* 4. Piezas que no se eligen mirándolas — van como especificación. */
 const EXTRAS = {
   baleros:{ titulo:"Baleros", piezas:[ {n:"ABEC 7", p:320, s:"tienda"}, {n:"Cerámicos", p:890, s:"pedido"} ] },
-  lija:   { titulo:"Lija",    piezas:[ {n:"Grano 80", p:180, s:"tienda"}, {n:"Perforada", p:220, s:"tienda"} ] },
 };
 
 /* 5. Catálogo completo (todo lo demás que vendes). */
@@ -126,8 +135,13 @@ const ZONA = "Cuauhtémoc, Chihuahua";
   --hueso:#EDEAE4;
   --mute:#8E8E96;
   --mute-2:#5F5F68;
-  --ember:#FF5E1A;
+  --ember:#FF5E1A;              /* la luz, el ambiente, el uretano */
   --ember-suave:rgba(255,94,26,.13);
+  /* El rojo es de la marca y de la acción: logo, botones, etiquetas.
+     El ámbar se queda para la luz. Son vecinos, así que no pelean. */
+  --rojo:#FF1E3C;
+  --rojo-hondo:#C4102A;
+  --rojo-suave:rgba(255,30,60,.15);
   /* El maple sale del canto de la tabla y se vuelve color de marca:
      talla las letras, separa las secciones y calienta el negro. */
   --maple:#D6B689;
@@ -161,6 +175,17 @@ body{
 img{max-width:100%; display:block}
 /* El SVG de materiales solo carga los degradados: no ocupa espacio */
 .materiales{position:absolute; width:0; height:0; overflow:hidden}
+
+/* ── Grafiti ──────────────────────────────────────────
+   El skate y el aerosol se llevan. La mancha va detrás del
+   wordmark, en rojo, con el grano irregular de una lata. */
+.aerosol{
+  position:absolute; z-index:0; pointer-events:none;
+  opacity:.42;
+}
+.chorreo{position:absolute; pointer-events:none; opacity:.55}
+/* Tag: un trazo de plumón junto al número de cada familia */
+.tag-trazo{position:absolute; pointer-events:none; opacity:.5}
 
 /* ── La lija ──────────────────────────────────────────
    Toda la página es la lija de una tabla. El grano no se
@@ -243,7 +268,7 @@ a{color:inherit; text-decoration:none}
   font-family:var(--display); font-variation-settings:'wdth' 70,'wght' 800;
   text-transform:uppercase; font-size:.9375rem; letter-spacing:.02em; line-height:1;
 }
-.marca i{font-style:normal; color:var(--ember)}
+.marca i{font-style:normal; color:var(--rojo)}
 .nav-enlaces{display:flex; gap:26px; margin-left:auto; overflow-x:auto; scrollbar-width:none}
 .nav-enlaces::-webkit-scrollbar{display:none}
 .nav-enlaces a{
@@ -300,21 +325,30 @@ a{color:inherit; text-decoration:none}
 /* El wordmark llena el ancho de borde a borde: es el gesto de la
    portada. La escala está calibrada para que quepa completo —
    el nombre de la tienda nunca se corta. */
+/* El wordmark ya no es una sombra fingida: son capas reales
+   apiladas en profundidad, así que al girar el canto gira con
+   él. Se mece solo, despacio, y responde al cursor. */
+.wm-3d{
+  position:relative; display:inline-block; transform-style:preserve-3d;
+  animation:wm-vaiven 9s ease-in-out infinite;
+}
+.wm-capa{
+  position:absolute; left:0; top:0; white-space:nowrap;
+  transform:translateZ(calc(var(--k) * -1px));
+  color:var(--capa-color);
+}
+.wm-cara{position:relative; white-space:nowrap; color:var(--hueso)}
+@keyframes wm-vaiven{
+  0%,100%{transform:rotateY(-5deg) rotateX(1.5deg)}
+  50%    {transform:rotateY(5deg)  rotateX(-1.5deg)}
+}
 .wordmark{
   font-size:clamp(2.5rem,18vw,16rem);
   white-space:nowrap; margin:0 0 .07em -.012em;   /* aire para el canto */
   /* Las letras están cortadas del mismo prensado que las tablas:
      debajo de la cara de hueso asoman las capas de maple. En em,
      así el canto crece con la letra en cualquier pantalla. */
-  text-shadow:
-    0 .009em 0 #E7CEA4,
-    0 .018em 0 var(--maple),
-    0 .027em 0 var(--maple-2),
-    0 .036em 0 var(--maple-2),
-    0 .045em 0 var(--maple-3),
-    0 .054em 0 var(--maple-4),
-    0 .07em .045em rgba(0,0,0,.6);
-  transform:perspective(1600px) rotateX(var(--wx,0deg)) rotateY(var(--wy,0deg));
+  transform:perspective(1500px) rotateX(var(--wx,0deg)) rotateY(var(--wy,0deg));
   transition:transform .6s var(--curva);
   will-change:transform;
 }
@@ -353,10 +387,10 @@ a{color:inherit; text-decoration:none}
   border:1px solid var(--hueso);
   transition:background .25s var(--curva), color .25s, border-color .25s, transform .25s var(--curva);
 }
-.btn:hover,.btn:focus-visible{background:var(--ember); border-color:var(--ember); color:var(--void); transform:translateY(-2px)}
+.btn:hover,.btn:focus-visible{background:var(--rojo); border-color:var(--rojo); color:#fff; transform:translateY(-2px)}
 .btn--linea{background:transparent; color:var(--hueso); border-color:var(--linea-2)}
 .btn--linea:hover,.btn--linea:focus-visible{background:transparent; border-color:var(--ember); color:var(--ember)}
-.btn--ember{background:var(--ember); border-color:var(--ember); color:var(--void)}
+.btn--ember{background:var(--rojo); border-color:var(--rojo); color:#fff}
 .btn--ember:hover,.btn--ember:focus-visible{background:var(--hueso); border-color:var(--hueso); color:var(--void)}
 .btn--bloque{width:100%; justify-content:center}
 .btn .flecha{transition:transform .25s var(--curva)}
@@ -503,6 +537,8 @@ a{color:inherit; text-decoration:none}
   position:relative; min-height:100vh; min-height:100svh;
   display:flex; align-items:center; overflow:hidden;
   border-top:none;
+  /* Lo que está fuera de pantalla no se pinta */
+  content-visibility:auto; contain-intrinsic-size:auto 100vh;
 }
 .fam + .fam::before{content:none}
 
@@ -636,8 +672,7 @@ a{color:inherit; text-decoration:none}
 .escena.girando{cursor:grabbing}
 .camara{
   position:absolute; left:50%; top:60%; transform-style:preserve-3d;
-  transform:translate(-50%,-50%) scale(var(--escala,1))
-            rotateX(var(--camx,60deg)) rotateZ(var(--camz,-20deg));
+  transform:translate(-50%,-50%);   /* lo escribe el guion, cuadro a cuadro */
 }
 /* Suelo: un plano real bajo la patineta. Sin él la tabla flota en
    la nada; con él se entiende a qué altura va. */
@@ -658,12 +693,13 @@ a{color:inherit; text-decoration:none}
   position:absolute; left:50%; top:50%;
   width:var(--dl); height:calc(var(--dw) * 1.5);
   margin:calc(var(--dw) * -0.75) 0 0 calc(var(--dl) / -2);
-  border-radius:50%; background:#000; filter:blur(14px);
-  transform:translateX(var(--desx,0px)) translateZ(var(--suelo,-64px)) rotateZ(90deg) scale(var(--sesc,1));
-  opacity:var(--sopa,.55);
+  border-radius:50%;
+  background:radial-gradient(ellipse at center,
+    rgba(0,0,0,.92) 0%, rgba(0,0,0,.55) 38%, rgba(0,0,0,.18) 62%, transparent 78%);
+  transform:translateZ(var(--suelo,-64px)) rotateZ(90deg);
 }
-.aire{transform-style:preserve-3d; transform:translateX(var(--desx,0px)) translateZ(var(--alto,0px))}
-.giro{transform-style:preserve-3d; transform:rotateX(var(--pop,0deg)) rotateY(var(--flip,0deg))}
+.aire{transform-style:preserve-3d}
+.giro{transform-style:preserve-3d}
 .patineta{position:absolute; left:0; top:0; transform-style:preserve-3d}
 
 /* ── Tabla ───────────────────────────────────────────
@@ -692,6 +728,27 @@ a{color:inherit; text-decoration:none}
 }
 /* Grip: lija negra. El degradado a los lados insinúa el cóncavo, y
    su ángulo gira con --luz para que la luz barra la tabla al voltear. */
+/* Cada lija se ve distinta desde arriba, que es justo
+   donde la cámara empieza el truco. */
+.capa.grip[data-grip="perf"]{
+  background-color:#101014;
+  background-image:
+    linear-gradient(calc(90deg + var(--luz,0) * 180deg),
+                    rgba(237,234,228,.16) 0%, rgba(0,0,0,.30) 26%,
+                    rgba(0,0,0,.34) 74%, rgba(237,234,228,.10) 100%),
+    radial-gradient(circle, rgba(0,0,0,.85) 1.4px, transparent 1.7px),
+    radial-gradient(circle, rgba(237,234,228,.18) .5px, transparent .9px);
+  background-size:100% 100%, 11px 11px, 3px 3px;
+}
+.capa.grip[data-grip="roja"]{
+  background-color:#2A0A10;
+  background-image:
+    linear-gradient(calc(90deg + var(--luz,0) * 180deg),
+                    rgba(255,60,80,.24) 0%, rgba(0,0,0,.34) 26%,
+                    rgba(0,0,0,.38) 74%, rgba(255,60,80,.16) 100%),
+    radial-gradient(circle, rgba(255,120,130,.22) .5px, transparent .9px);
+  background-size:100% 100%, 3px 3px;
+}
 .capa.grip{
   background-color:#131316;
   background-image:
@@ -792,7 +849,7 @@ a{color:inherit; text-decoration:none}
 .truco-progreso{
   position:absolute; left:0; right:0; bottom:0; height:2px; background:rgba(237,234,228,.10); z-index:5;
 }
-.truco-progreso i{display:block; height:100%; width:0%; background:var(--ember)}
+.truco-progreso i{display:block; height:100%; width:0%; background:var(--rojo)}
 
 /* Tarjeta que se abre en cada fase del truco */
 .fase{
@@ -806,7 +863,7 @@ a{color:inherit; text-decoration:none}
   transition:opacity .45s var(--curva), transform .45s var(--curva), visibility .45s;
 }
 .fase.viva{opacity:1; transform:none; pointer-events:auto; visibility:visible}
-.fase .rotulo{margin-bottom:10px; color:var(--ember)}
+.fase .rotulo{margin-bottom:10px; color:var(--rojo)}
 .fase-nombre{font-size:.9375rem; font-weight:600; margin:0; line-height:1.3}
 .fase-spec{font-family:var(--dato); font-size:.625rem; color:var(--mute-2); margin:5px 0 0; letter-spacing:.04em; line-height:1.6}
 .fase-pie{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--linea)}
@@ -817,6 +874,7 @@ a{color:inherit; text-decoration:none}
   display:grid; place-items:center; color:var(--mute); transition:border-color .2s, color .2s;
 }
 .fase-mando button:hover,.fase-mando button:focus-visible{border-color:var(--ember); color:var(--ember)}
+.fase--lija{right:6%; top:24%}
 .fase--tabla{left:6%; top:26%}
 .fase--trucks{right:6%; top:34%}
 .fase--ruedas{left:6%; bottom:16%}
@@ -842,7 +900,7 @@ a{color:inherit; text-decoration:none}
   /* En vertical la tarjeta ocupa la parte baja, así que la patineta
      sube para no encimarse con ella. */
   .camara{top:44%}
-  .fase--tabla,.fase--trucks,.fase--ruedas{
+  .fase--lija,.fase--tabla,.fase--trucks,.fase--ruedas{
     left:50%; right:auto; top:auto; bottom:clamp(96px,15vh,150px);
     transform:translate(-50%,16px); width:min(320px,86vw);
   }
@@ -851,7 +909,29 @@ a{color:inherit; text-decoration:none}
   .truco-suma .par:nth-child(2){display:none}
 }
 
-/* ── Catálogo ───────────────────────────────────────── */
+/* ── Catálogo ─────────────────────────────────────────
+   Ya no vive en la portada: se abre entero desde un botón,
+   encima de todo, y se cierra sin perder dónde ibas. */
+#catalogo{
+  position:fixed; inset:0; z-index:150; overflow-y:auto; overscroll-behavior:contain;
+  background:var(--void); padding:0 0 120px;
+  opacity:0; visibility:hidden; transform:translateY(14px);
+  transition:opacity .38s var(--curva), transform .38s var(--curva), visibility .38s;
+}
+#catalogo.abierto{opacity:1; visibility:visible; transform:none}
+.cat-barra{
+  position:sticky; top:0; z-index:3; background:rgba(8,8,10,.97);
+  border-bottom:1px solid var(--linea); padding:18px 0; margin-bottom:38px;
+}
+.cat-barra-in{width:var(--ancho); margin-inline:auto; display:flex; align-items:center; gap:18px}
+.cat-barra .titulo{font-size:clamp(1.25rem,3vw,2rem); text-shadow:none}
+.cat-cerrar{
+  margin-left:auto; width:42px; height:42px; border-radius:50%;
+  border:1px solid var(--linea-2); display:grid; place-items:center; color:var(--mute);
+  transition:border-color .25s, color .25s;
+}
+.cat-cerrar:hover,.cat-cerrar:focus-visible{border-color:var(--rojo); color:var(--rojo)}
+
 .herramientas{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px}
 .campo{
   flex:1 1 240px; min-width:0; padding:12px 14px; border-radius:2px;
@@ -871,7 +951,7 @@ select.campo{flex:0 0 auto; cursor:pointer}
 }
 .filtro:hover{color:var(--hueso); border-color:var(--linea-2)}
 .filtro[aria-pressed="true"]{background:var(--hueso); border-color:var(--hueso); color:var(--void)}
-.filtro.fav[aria-pressed="true"]{background:var(--ember); border-color:var(--ember); color:var(--void)}
+.filtro.fav[aria-pressed="true"]{background:var(--rojo); border-color:var(--rojo); color:#fff}
 
 .rejilla{display:grid; gap:1px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); background:var(--linea); border:1px solid var(--linea)}
 .tarjeta{background:var(--void); position:relative; display:flex; flex-direction:column; transition:background .3s}
@@ -890,14 +970,14 @@ select.campo{flex:0 0 auto; cursor:pointer}
   letter-spacing:.14em; padding:4px 8px; border-radius:2px;
   background:rgba(8,8,10,.8); color:var(--mute); border:1px solid var(--linea);
 }
-.insignia.tienda{color:var(--ember); border-color:rgba(255,94,26,.35)}
+.insignia.tienda{color:var(--rojo); border-color:rgba(255,30,60,.42)}
 .corazon{
   position:absolute; top:9px; right:9px; width:30px; height:30px; border-radius:50%;
   display:grid; place-items:center; color:var(--mute); font-size:.875rem;
   background:rgba(8,8,10,.65); transition:color .25s, background .25s;
 }
 .corazon:hover{color:var(--hueso)}
-.corazon[aria-pressed="true"]{color:var(--ember)}
+.corazon[aria-pressed="true"]{color:var(--rojo)}
 .tarjeta-cuerpo{padding:16px 16px 18px; display:flex; flex-direction:column; gap:5px; flex:1}
 .tarjeta h3{font-size:.9375rem; font-weight:600; margin:0; line-height:1.25; cursor:pointer}
 .tarjeta .nota{font-family:var(--dato); font-size:.625rem; text-transform:uppercase; letter-spacing:.08em; color:var(--mute-2); margin:0}
@@ -971,6 +1051,35 @@ select.campo{flex:0 0 auto; cursor:pointer}
 .limpiar{font-family:var(--dato); font-size:.625rem; text-transform:uppercase; letter-spacing:.14em; color:var(--mute-2); transition:color .2s}
 .limpiar:hover{color:var(--ember)}
 
+/* ── El catálogo se abre encima de la página ─────────── */
+const cajaCatalogo = $("#catalogo");
+let quienAbrio = null;
+function abrirCatalogo(cat){
+  if(cat){ catActiva = cat; soloFav = false; pintarFiltros(); pintarRejilla(); }
+  quienAbrio = document.activeElement;
+  cajaCatalogo.hidden = false;
+  requestAnimationFrame(() => cajaCatalogo.classList.add("abierto"));
+  document.body.style.overflow = "hidden";
+  $("#cat-cerrar").focus();
+}
+function cerrarCatalogo(){
+  cajaCatalogo.classList.remove("abierto");
+  document.body.style.overflow = "";
+  setTimeout(() => { if(!cajaCatalogo.classList.contains("abierto")) cajaCatalogo.hidden = true; }, 400);
+  if(quienAbrio && quienAbrio.focus) quienAbrio.focus();
+}
+$("#cat-cerrar").addEventListener("click", cerrarCatalogo);
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && cajaCatalogo.classList.contains("abierto") && $("#velo").hidden) cerrarCatalogo();
+});
+/* Cualquier enlace o botón que apunte al catálogo lo abre */
+document.addEventListener("click", e => {
+  const t = e.target.closest('[href="#catalogo"], [data-abre-catalogo]');
+  if(!t) return;
+  e.preventDefault();
+  abrirCatalogo(t.dataset.abreCatalogo || null);
+});
+
 /* ── Vista rápida ───────────────────────────────────── */
 .velo{position:fixed; inset:0; z-index:120; background:rgba(8,8,10,.9); backdrop-filter:blur(6px); display:grid; place-items:center; padding:22px}
 .velo[hidden]{display:none}
@@ -992,15 +1101,6 @@ select.campo{flex:0 0 auto; cursor:pointer}
 .contador button:hover{border-color:var(--ember); color:var(--ember)}
 .contador span{font-family:var(--dato); font-size:.875rem; min-width:2ch; text-align:center}
 
-/* Entrada del wordmark: las letras suben una tras otra */
-.wordmark span{display:inline-block; will-change:transform}
-.wordmark.anima span{
-  opacity:0; transform:translateY(.16em);
-  animation:letraSube .85s var(--curva) forwards;
-  animation-delay:calc(var(--i) * 42ms + 120ms);
-}
-@keyframes letraSube{to{opacity:1; transform:none}}
-
 /* ── Entrada al hacer scroll ────────────────────────── */
 /* Las secciones no aparecen: aterrizan. El rebote corto al final
    de la curva es el mismo asentón de una tabla cuando cae. */
@@ -1015,11 +1115,23 @@ select.campo{flex:0 0 auto; cursor:pointer}
 .clack{animation:clack .2s ease-out}
 .sube.d1{transition-delay:.09s} .sube.d2{transition-delay:.18s} .sube.d3{transition-delay:.27s}
 
+/* En teléfono el desenfoque de fondo cuesta carísimo: se cambia
+   por opacidad sólida, que se ve prácticamente igual sobre negro. */
+@media(max-width:899px){
+  .wm-3d{animation:none}
+  .nav.pegada,.carrito,.velo,.fase,.truco-suma{backdrop-filter:none; -webkit-backdrop-filter:none}
+  .nav.pegada{background:rgba(8,8,10,.97)}
+  .carrito{background:rgba(13,13,16,.98)}
+  .fase,.truco-suma{background:rgba(13,13,16,.97)}
+  .velo{background:rgba(8,8,10,.96)}
+}
+
 /* ── Accesibilidad ──────────────────────────────────── */
 :focus-visible{outline:2px solid var(--ember); outline-offset:3px}
 .solo-lectores{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 @media(prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important; transition-duration:.001ms !important}
+  .wm-3d{animation:none}
   html{scroll-behavior:auto}
   .sube{opacity:1; transform:none}
 }
@@ -1071,6 +1183,16 @@ select.campo{flex:0 0 auto; cursor:pointer}
   <filter id="m-sombra" x="-45%" y="-45%" width="190%" height="190%">
     <feDropShadow dx="0" dy="14" stdDeviation="15" flood-color="#000" flood-opacity=".62"/>
   </filter>
+  <!-- Aerosol: grano irregular, como el borde de una mancha de lata -->
+  <filter id="m-spray" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="4" seed="7" result="r"/>
+    <feDisplacementMap in="SourceGraphic" in2="r" scale="46" xChannelSelector="R" yChannelSelector="G"/>
+    <feGaussianBlur stdDeviation="1.6"/>
+  </filter>
+  <filter id="m-salpica" x="-30%" y="-30%" width="160%" height="160%">
+    <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
   <radialGradient id="m-rim" cx=".68" cy=".78" r=".5">
     <stop offset=".55" stop-color="#FFF" stop-opacity="0"/>
     <stop offset="1" stop-color="#FFF" stop-opacity=".22"/>
@@ -1097,6 +1219,17 @@ select.campo{flex:0 0 auto; cursor:pointer}
   <!-- ═══ Portada ═══ -->
   <section class="portada">
     <div class="portada-medio" id="portada-medio"><div class="atmosfera"></div></div>
+    <svg class="aerosol" aria-hidden="true" viewBox="0 0 600 320"
+         style="left:2%; bottom:16%; width:min(760px,64vw)">
+      <g filter="url(#m-spray)">
+        <ellipse cx="300" cy="160" rx="230" ry="96" fill="#FF1E3C" opacity=".5"/>
+        <ellipse cx="220" cy="140" rx="120" ry="62" fill="#FF5E1A" opacity=".35"/>
+      </g>
+      <g filter="url(#m-salpica)" fill="#FF1E3C" opacity=".5">
+        <circle cx="86" cy="92" r="7"/><circle cx="520" cy="212" r="5"/>
+        <circle cx="470" cy="70" r="4"/><circle cx="140" cy="248" r="6"/>
+      </g>
+    </svg>
     <div class="portada-in">
       <p class="rotulo" id="rotulo-zona">Cuauhtémoc · Chihuahua · Skateshop móvil</p>
       <h1 class="colosal wordmark">Matamoros</h1>
@@ -1198,6 +1331,7 @@ select.campo{flex:0 0 auto; cursor:pointer}
         </div>
       </div>
 
+      <div class="fase fase--lija"   id="fase-lija"   data-k="lija"></div>
       <div class="fase fase--tabla"  id="fase-tabla"  data-k="tabla"></div>
       <div class="fase fase--trucks" id="fase-trucks" data-k="trucks"></div>
       <div class="fase fase--ruedas" id="fase-ruedas" data-k="ruedas"></div>
@@ -1213,16 +1347,20 @@ select.campo{flex:0 0 auto; cursor:pointer}
     </div>
   </section>
 
-  <!-- ═══ Catálogo ═══ -->
-  <section class="seccion" id="catalogo">
-    <div class="envoltorio">
-      <div class="cabecera sube">
-        <p class="rotulo">Catálogo</p>
-        <h2 class="titulo">Todo lo demás</h2>
-        <p class="lectura">Refacciones, lijas, ceras y ropa. Lo que está en tienda sale hoy mismo; lo que va bajo pedido llega en 5 a 10 días.</p>
+  <!-- ═══ Catálogo: se abre encima, desde un botón ═══ -->
+  <div id="catalogo" role="dialog" aria-modal="true" aria-label="Catálogo completo" hidden>
+    <div class="cat-barra">
+      <div class="cat-barra-in">
+        <h2 class="titulo">Catálogo</h2>
+        <button class="cat-cerrar" id="cat-cerrar" aria-label="Cerrar catálogo">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
       </div>
+    </div>
+    <div class="envoltorio">
+      <p class="lectura" style="margin-bottom:28px">Refacciones, lijas, ceras y ropa. Lo que está en tienda sale hoy mismo; lo que va bajo pedido llega en 5 a 10 días.</p>
 
-      <div class="herramientas sube">
+      <div class="herramientas">
         <input type="search" id="buscador" class="campo" placeholder="Buscar…" aria-label="Buscar producto">
         <select id="orden" class="campo" aria-label="Ordenar">
           <option value="">Ordenar por</option>
@@ -1234,7 +1372,7 @@ select.campo{flex:0 0 auto; cursor:pointer}
       <div class="fichas-filtro" role="group" aria-label="Filtros" id="filtros"></div>
       <div class="rejilla" id="rejilla"></div>
     </div>
-  </section>
+  </div>
 
   <!-- ═══ Evento ═══ -->
   <section class="seccion" id="evento">
@@ -1452,6 +1590,7 @@ const PLANOS = {
     <circle cx="78" cy="64" r="16" fill="#EDEAE4" opacity=".1"/>
   </svg>`,
 };
+PLANOS.lija = PLANOS.lijas;      /* el arco la llama en singular */
 const PLANO_CAT = {
   Tablas:"tabla", Ruedas:"ruedas", Trucks:"trucks", Baleros:"baleros",
   Lijas:"lijas", Ceras:"ceras", Accesorios:"accesorios", Ropa:"ropa"
@@ -1466,14 +1605,18 @@ const PLANO_CAT = {
     caja.innerHTML = `<img src="${esc(PORTADA_FOTO)}" alt="">`;
   }
 })();
-/* El wordmark entra letra por letra */
-(function entradaMarca(){
+/* El wordmark se construye en profundidad: una cara de hueso y
+   siete capas de maple detrás. Al mecerse, el canto se mueve con
+   él, que es lo que no lograba una sombra plana. */
+(function marcaEn3D(){
   const wm = document.querySelector(".wordmark");
   const texto = wm.textContent.trim();
   wm.setAttribute("aria-label", texto);
-  wm.innerHTML = [...texto]
-    .map((c, i) => `<span aria-hidden="true" style="--i:${i}">${esc(c)}</span>`).join("");
-  if(!quieto) wm.classList.add("anima");
+  const CANTO = ["#E7CEA4","#D6B689","#C2A278","#AC8B58","#96773F","#7C5F36","#5E4728","#42301A"];
+  const capas = CANTO.map((c, i) =>
+    `<span class="wm-capa" aria-hidden="true" style="--k:${(i + 1) * 3}; --capa-color:${c}">${esc(texto)}</span>`
+  ).reverse().join("");
+  wm.innerHTML = `<span class="wm-3d">${capas}<span class="wm-cara" aria-hidden="true">${esc(texto)}</span></span>`;
 })();
 
 /* ── La luz sobre la lija ─────────────────────────────
@@ -1548,6 +1691,7 @@ const CLAVES = Object.keys(ARCO);              // tabla, trucks, ruedas
    Se miden contra el escenario, no contra la pantalla, para que nunca
    se salgan del cuadro por más ancho que sea el monitor. */
 const MEDIDAS = {
+  lija:   { ar:1.30, alto:.62 },
   tabla:  { ar:3.55, alto:.80 },
   trucks: { ar:0.62, alto:.34 },
   ruedas: { ar:1,    alto:.52 },
@@ -1865,6 +2009,35 @@ function pintarCarrito(){
 }
 $("#carrito-limpiar").addEventListener("click", () => { carrito.clear(); pintarCarrito(); });
 
+/* ── El catálogo se abre encima de la página ─────────── */
+const cajaCatalogo = $("#catalogo");
+let quienAbrio = null;
+function abrirCatalogo(cat){
+  if(cat){ catActiva = cat; soloFav = false; pintarFiltros(); pintarRejilla(); }
+  quienAbrio = document.activeElement;
+  cajaCatalogo.hidden = false;
+  requestAnimationFrame(() => cajaCatalogo.classList.add("abierto"));
+  document.body.style.overflow = "hidden";
+  $("#cat-cerrar").focus();
+}
+function cerrarCatalogo(){
+  cajaCatalogo.classList.remove("abierto");
+  document.body.style.overflow = "";
+  setTimeout(() => { if(!cajaCatalogo.classList.contains("abierto")) cajaCatalogo.hidden = true; }, 400);
+  if(quienAbrio && quienAbrio.focus) quienAbrio.focus();
+}
+$("#cat-cerrar").addEventListener("click", cerrarCatalogo);
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && cajaCatalogo.classList.contains("abierto") && $("#velo").hidden) cerrarCatalogo();
+});
+/* Cualquier enlace o botón que apunte al catálogo lo abre */
+document.addEventListener("click", e => {
+  const t = e.target.closest('[href="#catalogo"], [data-abre-catalogo]');
+  if(!t) return;
+  e.preventDefault();
+  abrirCatalogo(t.dataset.abreCatalogo || null);
+});
+
 /* ── Vista rápida ───────────────────────────────────── */
 let hojaId = null, hojaCant = 1, hojaPrevio = null;
 function abrirHoja(id){
@@ -1918,7 +2091,7 @@ const FAMILIAS = [
     ficha:[["Capas","7 de maple"],["Medidas",'8.0" · 8.25"'],["Cóncavo","Medio"]] },
 
   { cat:"Ruedas", pieza:"ruedas", foto:"", alto:"30vh", giro:0, sombra:"26%",
-    acento:"#FF5E1A",
+    acento:"var(--rojo)",
     clave:"rgba(255,94,26,.30)", contra:"rgba(255,200,150,.10)",
     texto:"Uretano 99A y 101A. Para calle, plaza y lo que se atraviese en el camino.",
     ficha:[["Dureza","99A · 101A"],["Diámetro","53 · 55 mm"],["Juego","4 piezas"]] },
@@ -2007,44 +2180,49 @@ function pintarFamilias(){
 $("#familias").addEventListener("click", e => {
   const b = e.target.closest("[data-familia]");
   if(!b) return;
-  catActiva = b.dataset.familia;
-  soloFav = false;
-  pintarFiltros();
-  pintarRejilla();
-  $("#catalogo").scrollIntoView({ behavior: quieto ? "auto" : "smooth" });
+  abrirCatalogo(b.dataset.familia);
 });
 
 /* ═══════════════════════════════════════════════════
-   EL TRUCO — la patineta armada, en 3D
-   Se construye con las piezas que elegiste arriba y el
-   scroll la hace tirar el kickflip.
+   EL TRUCO — la patineta armada tirando un ollie
+   La cámara sigue un guion: primero desde arriba para
+   elegir la lija, luego se mete por abajo cuando pega
+   el pop y ahí se elige la tabla, se acerca a los
+   trucks, rodea por el costado con la tabla a 45° para
+   las ruedas, y al aterrizar la puedes girar tú.
+
+   Rendimiento: TODO lo que cambia por cuadro se escribe
+   como variable CSS en un solo elemento (la cámara) y
+   se hereda hacia abajo. Antes se escribía el giro en
+   las 44 ruedas por separado y costaba 24ms por cuadro.
    ═══════════════════════════════════════════════════ */
 const camara = $("#camara"), aire = $("#aire"), giro = $("#giro");
 const patineta = $("#patineta"), piso = $("#piso"), riel = $("#truco");
+const trucoBarra = $("#truco-barra"), trucoPista = $("#truco-pista");
+const trucoSuma = document.querySelector(".truco-suma");
 
 /* ── Medidas reales, a escala ─────────────────────────
    Una tabla de 32" mide 330px aquí, así que 1 pulgada
-   son 10.3px. Todo lo demás sale de ahí, por eso las
-   proporciones se ven como una patineta de verdad.    */
+   son 10.3px. Todo lo demás sale de ahí.             */
 const PULGADA = 10.3;
-const LARGO = Math.round(32 * PULGADA);              // 32" de punta a punta
+const LARGO = Math.round(32 * PULGADA);
 const MM = PULGADA / 25.4;
 
 function pulgadasTabla(){ return /8\.25/.test(ARCO.tabla.piezas[elegido.tabla].n) ? 8.25 : 8.0; }
 function anchoTabla(){ return Math.round(pulgadasTabla() * PULGADA); }
-/* El eje va del ancho de la tabla: un hanger 5.25" calza una 8.0" */
 function anchoEje(){ return Math.round(pulgadasTabla() * PULGADA); }
 function diamRueda(){
   const mm = /55/.test(ARCO.ruedas.piezas[elegido.ruedas].n) ? 55 : 53;
   return Math.round(mm * MM);
 }
-function anchoRueda(){ return Math.round(31 * MM); }  // 31mm de banda de rodadura
-const ENTRE_EJES = 0.219;                             // 14" entre trucks
+function anchoRueda(){ return Math.round(31 * MM); }
+const ENTRE_EJES = 0.219;
 
 function construirPatineta(){
-  const dw = anchoTabla(), aw = anchoEje(), wd = diamRueda();
+  const dw = anchoTabla(), aw = anchoEje(), wd = diamRueda(), ww = anchoRueda();
   const tabla = ARCO.tabla.piezas[elegido.tabla];
   const rueda = ARCO.ruedas.piezas[elegido.ruedas];
+  const lija  = ARCO.lija.piezas[elegido.lija];
 
   camara.style.setProperty("--dl", LARGO + "px");
   camara.style.setProperty("--dw", dw + "px");
@@ -2052,8 +2230,6 @@ function construirPatineta(){
   const CAPAS = 9;
   let html = "";
 
-  /* Tabla: la capa 0 es el gráfico (se ve al girar), la última el grip.
-     En medio, el maple alternando veta clara y oscura. */
   for(let c = 0; c < CAPAS; c++){
     const base = `--c:${c}; --dw:${dw}px; --dl:${LARGO}px`;
     if(c === 0){
@@ -2062,17 +2238,14 @@ function construirPatineta(){
                  ${tabla.img ? "" : `<span>Matamoros</span>`}
                </div>`;
     } else if(c === CAPAS - 1){
-      html += `<div class="capa grip" style="${base}"></div>`;
+      html += `<div class="capa grip" data-grip="${esc(lija.grip || "negra")}" style="${base}"></div>`;
     } else {
-      const maple = c % 2 ? "#D6B689" : "#AC8B58";   // veta clara / veta oscura
+      const maple = c % 2 ? "#D6B689" : "#AC8B58";
       html += `<div class="capa veta" style="${base}; --maple:${maple}"></div>`;
     }
   }
 
-  /* Dos trucks. El hanger apunta hacia el extremo más cercano, como
-     va montado de verdad, así que el de la cola va volteado. */
-  const ww = anchoRueda();
-  const colgado = -(6 + wd * 0.5);                  // qué tan abajo cuelga el eje
+  const colgado = -(6 + wd * 0.5);
   [-1, 1].forEach(lado => {
     const ty = lado * LARGO * ENTRE_EJES;
     let t = `<div class="truck" style="--ty:${ty}px; --dw:${dw}px; --aw:${aw}px">`;
@@ -2082,23 +2255,16 @@ function construirPatineta(){
             --fuera:${lado > 0 ? .22 : -.22}; --rot:${lado > 0 ? 0 : 180}deg"></div>`;
     t += `<div class="eje" style="--aw:${aw}px; --ez:${colgado}px"></div>`;
 
-    /* La rueda se centra hacia adentro media banda, para que su cara
-       exterior quede a ras de la punta del eje, como va montada. */
     [-1, 1].forEach(costado => {
       const wx = costado * (aw / 2 - ww / 2);
       let r = `<div class="rueda" style="--wx:${wx.toFixed(1)}px; --wz:${colgado}px">`;
-      const DISCOS = 11;
+      const DISCOS = 7;                       /* 7 bastan: menos nodos, mismo perfil */
       const uretano = esc(rueda.color || "#E8E3D8");
       for(let d = 0; d < DISCOS; d++){
-        const t01 = (d / (DISCOS - 1)) * 2 - 1;                       // -1 … 1
+        const t01 = (d / (DISCOS - 1)) * 2 - 1;
         const dz = (ww / 2) * t01;
-        /* El diámetro cae solo cerca del borde: centro recto, hombros
-           redondeados — el perfil del uretano, no un tubo. */
         const diam = wd * (1 - 0.16 * Math.pow(Math.abs(t01), 3.2));
         const cara = (d === 0 || d === DISCOS - 1) ? " cara" : "";
-        /* Los discos de en medio van planos y se oscurecen hacia el
-           borde: así el cilindro se lee redondo y no como pila de
-           monedas, que es lo que delata un apilado. */
         const sombra = cara ? "" : `; --uretano:color-mix(in srgb, ${uretano} ${(100 - Math.abs(t01) * 14).toFixed(0)}%, #7C7768)`;
         r += `<div class="disco${cara}" style="--wd:${diam.toFixed(1)}px; --dz:${dz.toFixed(1)}px${cara ? `; --uretano:${uretano}` : sombra}"></div>`;
       }
@@ -2110,15 +2276,19 @@ function construirPatineta(){
   patineta.innerHTML = html;
 }
 
-/* Cuadros clave de la secuencia. p va de 0 (entra) a 1 (se va). */
+/* ── El guion ─────────────────────────────────────────
+   camx: 0° = de cabeza (se ve el grip) · 90° = de canto
+   · más de 90° = la cámara pasó por debajo y se ve la
+   panza de la tabla. Por eso el pop enseña el gráfico. */
 const SECUENCIA = {
-  desx:  [[0,-250],[.20,-104],[.34,-46],[.72,54],[1,168]],
-  alto:  [[0,0],[.30,0],[.37,32],[.52,96],[.67,32],[.74,0],[1,0]],
-  flip:  [[0,0],[.34,0],[.70,360],[1,360]],
-  pop:   [[0,0],[.24,0],[.31,-22],[.41,10],[.58,2],[.70,-8],[.77,0],[1,0]],
-  rodar: [[0,0],[1,1160]],
-  camz:  [[0,-26],[.5,-14],[1,-24]],
-  camx:  [[0,64],[.5,54],[1,63]],
+  camx:   [[0,10],[.18,16],[.28,132],[.42,150],[.50,128],[.64,112],[.72,96],[.82,90],[.90,62],[1,58]],
+  camz:   [[0,-6],[.20,-12],[.42,-20],[.60,-48],[.74,-82],[.84,-58],[1,-22]],
+  zoom:   [[0,1],[.26,1.04],[.46,1.28],[.60,1.34],[.76,1.22],[.9,1.02],[1,1]],
+  alto:   [[0,0],[.20,0],[.25,8],[.33,62],[.50,104],[.66,62],[.76,10],[.81,0],[1,0]],
+  /* El ollie: cola abajo, nariz arriba, se empareja y cae */
+  pop:    [[0,0],[.19,0],[.245,-27],[.32,9],[.46,3],[.60,-14],[.72,-42],[.80,-14],[.855,4],[.90,0],[1,0]],
+  desx:   [[0,-190],[.20,-96],[.50,-10],[.80,52],[1,140]],
+  rodar:  [[0,0],[1,860]],
 };
 function suave(t){ return t * t * (3 - 2 * t); }
 function valorEn(kf, p){
@@ -2132,17 +2302,20 @@ function valorEn(kf, p){
   return kf[kf.length - 1][1];
 }
 
-/* Qué pieza se abre en cada tramo del truco */
+/* Cada tramo del truco abre la pieza que la cámara está mirando */
 const FASES = [
-  { k:"tabla",  a:.20, b:.42 },
-  { k:"trucks", a:.42, b:.62 },
-  { k:"ruedas", a:.62, b:.86 },
+  { k:"lija",   a:.02, b:.24 },
+  { k:"tabla",  a:.24, b:.46 },
+  { k:"trucks", a:.46, b:.68 },
+  { k:"ruedas", a:.68, b:.88 },
 ];
+const nodosFase = {};                       /* refs cacheadas: nada de buscar por cuadro */
 
 function pintarFases(){
   FASES.forEach(f => {
     const g = ARCO[f.k], pz = g.piezas[elegido[f.k]];
-    $(`#fase-${f.k}`).innerHTML = `
+    const nodo = nodosFase[f.k] || (nodosFase[f.k] = $(`#fase-${f.k}`));
+    nodo.innerHTML = `
       <p class="rotulo">${esc(g.titulo)}</p>
       <p class="fase-nombre">${esc(pz.n)}</p>
       <p class="fase-spec">${esc(pz.spec || "")}</p>
@@ -2160,16 +2333,15 @@ function pintarFases(){
   });
 }
 
-/* Cambiar pieza desde el truco: mueve todo el sistema a la vez */
 document.querySelectorAll(".fase").forEach(f => {
   f.addEventListener("click", e => {
     const b = e.target.closest("[data-fk]");
     if(!b) return;
     const k = b.dataset.fk, n = ARCO[k].piezas.length;
     elegido[k] = (elegido[k] + Number(b.dataset.d) + n) % n;
-    claveActiva = k;              // el arco de arriba se queda en la misma pieza
+    claveActiva = k;
     pintarPestanas();
-    pintarArco();                 // pintarArco llama a colocarArco
+    pintarArco();
     pintarPanel();
     construirPatineta();
     pintarFases();
@@ -2190,20 +2362,15 @@ function progresoTruco(){
   if(largo <= 0) return 0;
   return Math.min(1, Math.max(0, -r.top / largo));
 }
-
 function escalaEscena(){
   const a = Math.min(innerWidth, 1180);
-  return Math.max(.80, Math.min(2.0, a / 640));
+  return Math.max(.62, Math.min(1.7, a / 760));
 }
 
-/* ── Girarla con el dedo ──────────────────────────────
-   Además del scroll, puedes agarrar la patineta y darle
-   la vuelta para verla por donde quieras. Lo que giras se
-   suma a la toma de cámara, no la reemplaza. */
+/* Girarla con el dedo: se suma a la toma, no la reemplaza */
 const orbita = { z:0, x:0 };
 let orbX = null, orbY = null, orbitando = false;
 const escena = $("#escena");
-
 escena.addEventListener("pointerdown", e => {
   orbX = e.clientX; orbY = e.clientY; orbitando = true;
   escena.classList.add("girando");
@@ -2211,8 +2378,8 @@ escena.addEventListener("pointerdown", e => {
 });
 escena.addEventListener("pointermove", e => {
   if(!orbitando) return;
-  orbita.z += (e.clientX - orbX) * 0.38;                       // vuelta horizontal
-  orbita.x = Math.max(-38, Math.min(26, orbita.x - (e.clientY - orbY) * 0.28));
+  orbita.z += (e.clientX - orbX) * 0.38;
+  orbita.x = Math.max(-60, Math.min(60, orbita.x - (e.clientY - orbY) * 0.28));
   orbX = e.clientX; orbY = e.clientY;
   animarTruco(progresoTruco());
 });
@@ -2227,39 +2394,62 @@ function soltarOrbita(e){
 escena.addEventListener("pointerup", soltarOrbita);
 escena.addEventListener("pointercancel", soltarOrbita);
 
+/* Escribe una variable sólo si de verdad cambió: evita
+   invalidar el estilo del árbol entero sin necesidad. */
+const ultimo = {};
+function poner(nombre, valor){
+  if(ultimo[nombre] === valor) return;
+  ultimo[nombre] = valor;
+  camara.style.setProperty(nombre, valor);
+}
+
+let faseViva = -1;
 function animarTruco(p){
-  const e = quieto ? .5 : p;   // sin movimiento: se muestra la patineta quieta
-  camara.style.setProperty("--escala", escalaEscena().toFixed(3));
-  camara.style.setProperty("--camx",
-    Math.max(14, Math.min(86, valorEn(SECUENCIA.camx, e) + orbita.x)).toFixed(2) + "deg");
-  camara.style.setProperty("--camz", (valorEn(SECUENCIA.camz, e) + orbita.z).toFixed(2) + "deg");
+  const e = quieto ? .5 : p;
 
   const alto = valorEn(SECUENCIA.alto, e);
-  camara.style.setProperty("--desx", valorEn(SECUENCIA.desx, e).toFixed(1) + "px");
-  aire.style.setProperty("--alto", alto.toFixed(1) + "px");
-  giro.style.setProperty("--flip", valorEn(SECUENCIA.flip, e).toFixed(1) + "deg");
-  giro.style.setProperty("--pop", valorEn(SECUENCIA.pop, e).toFixed(2) + "deg");
+  const S  = escalaEscena() * valorEn(SECUENCIA.zoom, e);
+  const X  = Math.max(2, Math.min(178, valorEn(SECUENCIA.camx, e) + orbita.x));
+  const Z  = valorEn(SECUENCIA.camz, e) + orbita.z;
+  const dx = valorEn(SECUENCIA.desx, e);
 
-  const rod = valorEn(SECUENCIA.rodar, e).toFixed(1) + "deg";
-  patineta.querySelectorAll(".disco").forEach(d => d.style.setProperty("--rodar", rod));
+  /* Transform directo en tres elementos. Antes esto iban como
+     variables CSS en la cámara, y cada cambio invalidaba el
+     estilo de los sesenta hijos de la patineta. */
+  camara.style.transform =
+    `translate(-50%,-50%) scale(${S.toFixed(3)}) rotateX(${X.toFixed(1)}deg) rotateZ(${Z.toFixed(1)}deg)`;
+  aire.style.transform = `translateX(${dx.toFixed(1)}px) translateZ(${alto.toFixed(1)}px)`;
+  giro.style.transform = `rotateX(${valorEn(SECUENCIA.pop, e).toFixed(2)}deg)`;
 
-  /* La luz barre el grip conforme la tabla da la vuelta */
-  patineta.style.setProperty("--luz", ((valorEn(SECUENCIA.flip, e) % 360) / 360).toFixed(3));
+  const h = Math.min(1, alto / 104);
+  piso.style.transform =
+    `translateX(${dx.toFixed(1)}px) translateZ(var(--suelo,-64px)) rotateZ(90deg) scale(${(1 + h * 0.5).toFixed(3)})`;
+  piso.style.opacity = (0.55 - h * 0.4).toFixed(3);
 
-  /* La sombra se abre y se aclara conforme la tabla despega */
-  const h = Math.min(1, alto / 96);
-  piso.style.setProperty("--sesc", (1 + h * 0.5).toFixed(3));
-  piso.style.setProperty("--sopa", (0.55 - h * 0.4).toFixed(3));
+  /* Estas dos sí se heredan, así que se redondean: cambian
+     pocas veces en todo el recorrido en vez de cada cuadro. */
+  poner("--rodar", (Math.round(valorEn(SECUENCIA.rodar, e) / 8) * 8) + "deg");
+  poner("--luz", (Math.round(X / 9) / 20).toFixed(2));
 
-  $("#truco-barra").style.width = (p * 100).toFixed(1) + "%";
-  $("#truco-pista").textContent =
-    p < .06 ? "Sigue deslizando ↓" :
-    p > .93 ? "Listo — pídela abajo" : "Arrástrala para girarla · cambia la pieza sin salirte";
+  trucoBarra.style.width = (p * 100).toFixed(1) + "%";
 
-  FASES.forEach(f => $(`#fase-${f.k}`).classList.toggle("viva", p >= f.a && p < f.b));
-
-  /* Al aterrizar, el pedido queda a un toque */
-  document.querySelector(".truco-suma").classList.toggle("cerrada", p > .86);
+  /* La fase sólo se toca cuando de verdad cambia */
+  let cual = -1;
+  for(let i = 0; i < FASES.length; i++) if(p >= FASES[i].a && p < FASES[i].b){ cual = i; break; }
+  if(cual !== faseViva){
+    FASES.forEach((f, i) => {
+      const nodo = nodosFase[f.k] || (nodosFase[f.k] = $(`#fase-${f.k}`));
+      nodo.classList.toggle("viva", i === cual);
+    });
+    trucoPista.textContent =
+      cual === -1 ? (p > .9 ? "Aterrizó — gírala y pídela" : "Sigue deslizando ↓")
+                  : ["Desde arriba: elige tu lija",
+                     "Enseña la panza: elige tu tabla",
+                     "De cerca: elige tus trucks",
+                     "Por el costado: elige tus ruedas"][cual];
+    trucoSuma.classList.toggle("cerrada", p > .86);
+    faseViva = cual;
+  }
 }
 
 /* ── Evento y dudas ─────────────────────────────────── */
