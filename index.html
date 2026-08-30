@@ -494,6 +494,113 @@ a{color:inherit; text-decoration:none}
 .suma .v{font-family:var(--display); font-variation-settings:'wdth' 74,'wght' 800; font-size:1.875rem; color:var(--hueso); line-height:1}
 .panel .nota{font-family:var(--dato); font-size:.625rem; line-height:1.7; color:var(--mute-2); margin:14px 0 18px; letter-spacing:.02em}
 
+
+/* ═══ LAS FAMILIAS ════════════════════════════════════
+   Scroll horizontal secuestrado: bajas con la rueda y los
+   paneles se corren de lado. Cada familia trae su palabra
+   enorme, su pieza encima tapando las letras del centro, y
+   su propio color de ambiente.                          */
+.familias{padding:0; position:relative}
+.fam-riel{position:relative; height:calc(var(--paneles,6) * 88vh)}
+.fam-pin{position:sticky; top:0; height:100vh; height:100svh; overflow:hidden}
+.fam-pista{display:flex; height:100%; will-change:transform}
+
+.fam{
+  position:relative; flex:0 0 100vw; height:100%; overflow:hidden;
+}
+.fam-ambiente{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(62% 48% at 50% 50%, var(--tono, rgba(255,94,26,.18)) 0%, transparent 70%),
+    radial-gradient(90% 60% at 50% 108%, rgba(0,0,0,.55) 0%, transparent 60%),
+    linear-gradient(180deg,#0B0B0F 0%, var(--void) 78%);
+}
+.fam-marco{
+  position:relative; z-index:2; height:100%;
+  width:var(--ancho); margin-inline:auto;
+  display:grid; place-items:center;
+}
+.fam-palabra{
+  font-family:var(--display); font-variation-settings:'wdth' 62,'wght' 900;
+  text-transform:uppercase; letter-spacing:-.02em; line-height:.84; white-space:nowrap;
+  font-size:clamp(2.6rem,17vw,13rem); margin:0; color:var(--hueso);
+  text-shadow:
+    0 .010em 0 #E7CEA4, 0 .020em 0 var(--maple), 0 .030em 0 var(--maple-2),
+    0 .042em 0 var(--maple-3), 0 .054em 0 var(--maple-4),
+    0 .075em .05em rgba(0,0,0,.65);
+}
+/* La pieza va encima de la palabra, tapando el centro */
+.fam-pieza{
+  position:absolute; left:50%; top:50%; z-index:3; pointer-events:none;
+  height:var(--alto,42%);
+  transform:translate(-50%,-50%) rotate(var(--giro,0deg));
+  filter:drop-shadow(0 34px 48px rgba(0,0,0,.82));
+}
+.fam-pieza svg{height:100%; width:auto; display:block}
+
+/* Piezas sueltas flotando, cada una a su profundidad */
+.fam-motas{position:absolute; inset:0; z-index:1; pointer-events:none}
+.fam-mota{
+  position:absolute; opacity:.3;
+  transform:translate3d(0, calc(var(--desliz,0) * var(--hondo,1) * 1px), 0) rotate(var(--tw,0deg));
+}
+.fam-mota svg{width:100%; height:auto; display:block}
+
+.fam-datos{
+  position:absolute; left:0; bottom:11%; z-index:4; max-width:34ch; text-align:left;
+}
+.fam-datos .conteo{
+  font-family:var(--dato); font-size:.625rem; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--ember); margin:0 0 10px;
+}
+.fam-datos h4{
+  font-family:var(--display); font-variation-settings:'wdth' 76,'wght' 700;
+  text-transform:uppercase; font-size:clamp(1.05rem,2.2vw,1.5rem);
+  margin:0 0 8px; letter-spacing:.01em;
+}
+.fam-datos p{margin:0 0 18px; color:var(--mute); font-size:.9375rem; line-height:1.55}
+
+/* Indicador de avance, abajo al centro */
+.fam-avance{
+  position:absolute; left:50%; bottom:5.5%; transform:translateX(-50%); z-index:6;
+  display:flex; align-items:center; gap:10px;
+}
+.fam-avance .tramo{
+  width:34px; height:2px; background:rgba(237,234,228,.2); position:relative; overflow:hidden;
+}
+.fam-avance .tramo i{position:absolute; inset:0; background:var(--ember); transform:scaleX(0); transform-origin:left}
+.fam-avance .tramo.lleno i{transform:scaleX(1)}
+.fam-avance .tramo.curso i{transform:scaleX(var(--parcial,0))}
+.fam-avance .cual{
+  font-family:var(--dato); font-size:.625rem; letter-spacing:.18em;
+  color:var(--mute-2); margin-left:6px;
+}
+.fam-pista-nota{
+  position:absolute; right:0; bottom:11%; z-index:6;
+  font-family:var(--dato); font-size:.625rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--mute-2);
+}
+
+/* En teléfono no se secuestra el scroll: se desliza con el dedo */
+@media(max-width:899px){
+  .fam-riel{height:auto}
+  .fam-pin{position:static; height:auto}
+  .fam-pista{
+    transform:none !important; height:auto;
+    overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none;
+  }
+  .fam-pista::-webkit-scrollbar{display:none}
+  .fam{flex-basis:90vw; height:78svh; scroll-snap-align:center}
+  .fam-marco{width:82vw}
+  /* En vertical el panel es angosto: la palabra crece y la pieza se
+     achica, si no el producto se come el nombre de la familia. */
+  .fam-palabra{font-size:clamp(2.4rem,24vw,6rem)}
+  .fam-pieza{transform:translate(-50%,-50%) rotate(var(--giro,0deg)) scale(.6)}
+  .fam-datos p{font-size:.875rem}
+  .fam-datos{bottom:7%; max-width:none}
+  .fam-avance,.fam-pista-nota{display:none}
+}
+
 /* ═══ EL TRUCO ═══════════════════════════════════════
    Una patineta armada de verdad en 3D: 9 capas de maple,
    trucks y cuatro ruedas. El scroll la hace tirar el
@@ -949,6 +1056,7 @@ select.campo{flex:0 0 auto; cursor:pointer}
   <div class="nav-in">
     <a href="#top" class="marca">Matamoros<i>.</i></a>
     <nav class="nav-enlaces" aria-label="Principal">
+      <a href="#familias">Familias</a>
       <a href="#taller">Taller</a>
       <a href="#truco">El truco</a>
       <a href="#catalogo">Catálogo</a>
@@ -977,6 +1085,19 @@ select.campo{flex:0 0 auto; cursor:pointer}
         <div class="acciones">
           <a class="btn" href="#taller">Arma la tuya <span class="flecha">→</span></a>
           <a class="btn btn--linea" href="#catalogo">Ver catálogo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Las familias: scroll horizontal ═══ -->
+  <section class="familias" id="familias" aria-label="Las familias de producto">
+    <div class="fam-riel" id="fam-riel">
+      <div class="fam-pin">
+        <div class="fam-pista" id="fam-pista"></div>
+        <div class="fam-avance" id="fam-avance"></div>
+        <div class="envoltorio" style="position:absolute; left:50%; transform:translateX(-50%); bottom:0; z-index:6; pointer-events:none">
+          <span class="fam-pista-nota">Sigue bajando ⟶</span>
         </div>
       </div>
     </div>
@@ -1758,6 +1879,117 @@ $("#hoja-menos").addEventListener("click", () => { hojaCant = Math.max(1, hojaCa
 $("#hoja-mas").addEventListener("click", () => { hojaCant++; $("#hoja-cant").textContent = hojaCant; });
 $("#hoja-sumar").addEventListener("click", () => { if(hojaId){ sumar(hojaId, hojaCant); cerrarHoja(); } });
 
+
+/* ═══════════════════════════════════════════════════
+   LAS FAMILIAS
+   Seis paneles a pantalla completa que se corren de
+   lado mientras bajas. Cada uno lleva su palabra, su
+   pieza encima tapando el centro, y su color. Al darle
+   clic te lleva al catálogo ya filtrado.
+   ═══════════════════════════════════════════════════ */
+const FAMILIAS = [
+  { cat:"Tablas",     tono:"rgba(214,182,137,.20)", pieza:"tabla",      alto:"72%", giro:-22,
+    texto:"Maple canadiense prensado en siete capas. Cóncavo medio y un pop que aguanta la temporada." },
+  { cat:"Ruedas",     tono:"rgba(255,94,26,.20)",   pieza:"ruedas",     alto:"36%", giro:0,
+    texto:"Uretano 99A y 101A. Para calle, plaza y lo que se atraviese en el camino." },
+  { cat:"Trucks",     tono:"rgba(150,175,255,.16)", pieza:"trucks",     alto:"31%", giro:0,
+    texto:"Aluminio, para tablas de 8.0 y 8.25. Giran parejo desde el primer día." },
+  { cat:"Baleros",    tono:"rgba(190,200,220,.15)", pieza:"baleros",    alto:"34%", giro:0,
+    texto:"ABEC 7 y cerámicos. Lo que separa rodar de venir arrastrando la tabla." },
+  { cat:"Lijas",      tono:"rgba(237,234,228,.10)", pieza:"lijas",      alto:"50%", giro:9,
+    texto:"Grano 80 y perforada. Pegada sin burbujas, como se debe pegar." },
+  { cat:"Ceras",      tono:"rgba(216,207,186,.16)", pieza:"ceras",      alto:"30%", giro:-6,
+    texto:"Para filos y barandales. La que de verdad desliza, no la que solo mancha." },
+];
+
+/* Piezas sueltas flotando alrededor, cada una a su profundidad */
+const MOTAS = [
+  { x:"11%", y:"18%", w:"52px", hondo:.34, tw:-18, que:"accesorios" },
+  { x:"84%", y:"24%", w:"38px", hondo:.62, tw:24,  que:"baleros" },
+  { x:"75%", y:"72%", w:"44px", hondo:.22, tw:-9,  que:"accesorios" },
+  { x:"18%", y:"78%", w:"32px", hondo:.5,  tw:14,  que:"baleros" },
+];
+
+const famPista = $("#fam-pista");
+const famRiel = $("#fam-riel");
+
+function pintarFamilias(){
+  famRiel.style.setProperty("--paneles", FAMILIAS.length);
+
+  famPista.innerHTML = FAMILIAS.map((f, i) => {
+    const cuantos = PRODUCTOS.filter(p => p.cat === f.cat).length;
+    const motas = MOTAS.map(m => `
+      <span class="fam-mota" style="left:${m.x}; top:${m.y}; width:${m.w};
+            --hondo:${m.hondo}; --tw:${m.tw}deg">${PLANOS[m.que]}</span>`).join("");
+
+    return `
+      <article class="fam" style="--tono:${f.tono}">
+        <div class="fam-ambiente"></div>
+        <div class="fam-motas">${motas}</div>
+        <div class="fam-marco">
+          <h3 class="fam-palabra">${esc(f.cat)}</h3>
+          <div class="fam-pieza" style="--alto:${f.alto}; --giro:${f.giro}deg">${PLANOS[f.pieza]}</div>
+          <div class="fam-datos">
+            <p class="conteo">${String(i + 1).padStart(2,"0")} / ${String(FAMILIAS.length).padStart(2,"0")} · ${cuantos} ${cuantos === 1 ? "modelo" : "modelos"}</p>
+            <h4>${esc(f.cat)}</h4>
+            <p>${esc(f.texto)}</p>
+            <button class="btn btn--linea" data-familia="${esc(f.cat)}">
+              Ver ${f.cat.toLowerCase()} <span class="flecha">→</span>
+            </button>
+          </div>
+        </div>
+      </article>`;
+  }).join("");
+
+  $("#fam-avance").innerHTML =
+    FAMILIAS.map(() => `<span class="tramo"><i></i></span>`).join("") +
+    `<span class="cual" id="fam-cual">01</span>`;
+}
+
+/* Al elegir una familia, el catálogo queda filtrado en ella */
+famPista.addEventListener("click", e => {
+  const b = e.target.closest("[data-familia]");
+  if(!b) return;
+  catActiva = b.dataset.familia;
+  soloFav = false;
+  pintarFiltros();
+  pintarRejilla();
+  $("#catalogo").scrollIntoView({ behavior: quieto ? "auto" : "smooth" });
+});
+
+const anchoAmplio = matchMedia("(min-width: 900px)");
+
+function progresoFam(){
+  const largo = famRiel.offsetHeight - innerHeight;
+  if(largo <= 0) return 0;
+  return Math.min(1, Math.max(0, -famRiel.getBoundingClientRect().top / largo));
+}
+
+function moverFamilias(p){
+  const n = FAMILIAS.length;
+  if(anchoAmplio.matches){
+    famPista.style.transform = `translate3d(${(-p * (n - 1) * 100).toFixed(3)}vw,0,0)`;
+  } else {
+    famPista.style.transform = "";
+  }
+
+  /* Las piezas sueltas se mueven a distinta velocidad que el panel */
+  const desliz = (p * 220).toFixed(1);
+  famPista.style.setProperty("--desliz", desliz);
+
+  /* Avance: tramos llenos, el actual a medias */
+  const paso = p * (n - 1);
+  const actual = Math.min(n - 1, Math.floor(paso));
+  const parcial = paso - actual;
+  $("#fam-avance").querySelectorAll(".tramo").forEach((t, i) => {
+    t.classList.toggle("lleno", i < actual || (i === n - 1 && p >= 1));
+    t.classList.toggle("curso", i === actual && p < 1);
+    if(i === actual) t.style.setProperty("--parcial", parcial.toFixed(3));
+  });
+  const cual = $("#fam-cual");
+  if(cual) cual.textContent = String(Math.min(n, actual + 1)).padStart(2,"0");
+}
+
 /* ═══════════════════════════════════════════════════
    EL TRUCO — la patineta armada, en 3D
    Se construye con las piezas que elegiste arriba y el
@@ -2025,6 +2257,7 @@ addEventListener("scroll", () => {
   tick = true;
   requestAnimationFrame(() => {
     $("#nav").classList.toggle("pegada", scrollY > 40);
+    moverFamilias(progresoFam());
     animarTruco(progresoTruco());
     tick = false;
   });
@@ -2045,12 +2278,15 @@ addEventListener("resize", () => {
   tickR = true;
   requestAnimationFrame(() => {
     colocarArco();
+    moverFamilias(progresoFam());
     animarTruco(progresoTruco());
     tickR = false;
   });
 });
 
 /* ── Arranque ───────────────────────────────────────── */
+pintarFamilias();
+moverFamilias(progresoFam());
 pintarPestanas();
 pintarArco();
 pintarPanel();
