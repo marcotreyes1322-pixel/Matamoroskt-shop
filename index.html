@@ -1279,6 +1279,7 @@ document.addEventListener("click", e => {
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-08-31 · 3D</span>
     </div>
   </div>
 </footer>
@@ -2091,6 +2092,11 @@ try{
   render = null;
   document.querySelector("#truco")?.classList.add("sin3d");
 }
+/* Sello para saber de un vistazo si el motor 3D arrancó */
+addEventListener("DOMContentLoaded", () => {
+  const n = document.getElementById("sello-version");
+  if(n) n.textContent += render ? " ✓" : " (sin 3D)";
+});
 
 const escena3d = new T.Scene();
 const lente = new T.PerspectiveCamera(40, 1, 0.05, 60);
@@ -2408,8 +2414,8 @@ const TOMAS = [
   { t:0.54, pos:[0.62, -0.32, 1.02], mira:[0, -0.02, 0.12] },
   { t:0.66, pos:[0.74, -0.20, 0.68], mira:[0, -0.075, 0.14] },
   /* RUEDAS — al costado, pegado a la rueda */
-  { t:0.74, pos:[1.02, -0.10, 0.34], mira:[0.04, -0.078, 0.15] },
-  { t:0.86, pos:[0.94, -0.05, 0.44], mira:[0.04, -0.078, 0.15] },
+  { t:0.74, pos:[1.26, -0.12, 0.44], mira:[0.02, -0.075, 0.14] },
+  { t:0.86, pos:[1.16, -0.06, 0.56], mira:[0.02, -0.075, 0.14] },
   /* Aterriza — tres cuartos, la patineta entera */
   { t:0.94, pos:[1.12, 0.48, 1.22], mira:[0, -0.05, 0] },
   { t:1.00, pos:[1.06, 0.54, 1.38], mira:[0, -0.05, 0] },
@@ -2491,14 +2497,28 @@ function pedirCuadro(){
   pendiente = true;
   requestAnimationFrame(() => { pendiente = false; render.render(escena3d, lente); });
 }
+/* En vertical la pantalla es angosta: con el mismo lente y la misma
+   distancia, la tabla se sale por los lados. Se mantiene constante
+   el ángulo HORIZONTAL —que es el que encuadra la tabla— abriendo el
+   lente hasta cierto punto y alejando la cámara el resto. */
+let factorDist = 1;
+function ajustarLente(aspecto){
+  const objetivoH = 46 * Math.PI / 180;
+  let fov = 2 * Math.atan(Math.tan(objetivoH / 2) / aspecto);
+  fov = Math.min(Math.max(fov, 34 * Math.PI / 180), 62 * Math.PI / 180);
+  lente.fov = fov * 180 / Math.PI;
+  const logradoH = 2 * Math.atan(Math.tan(fov / 2) * aspecto);
+  factorDist = Math.min(Math.max(Math.tan(objetivoH / 2) / Math.tan(logradoH / 2), 1), 1.9);
+  lente.updateProjectionMatrix();
+}
 function medirLienzo(){
   if(!render) return;
   const c = lienzo3d.getBoundingClientRect();
   if(!c.width || !c.height) return;      /* aún sin medidas: ya volverá */
   render.setSize(c.width, c.height, false);
   lente.aspect = c.width / c.height;
-  lente.updateProjectionMatrix();
-  pedirCuadro();
+  ajustarLente(lente.aspect);
+  animarTruco(progresoTruco());
 }
 /* El lienzo vive dentro de un sticky: su tamaño puede llegar tarde.
    Con el observador de tamaño nunca se queda sin medir. */
@@ -2526,6 +2546,8 @@ function animarTruco(p){
   patineta3d.rotation.x = valorEn(OLLIE.cabeceo, e);
 
   tomaEn(e);
+  /* Aleja la cámara lo que haga falta para que quepa en vertical */
+  if(factorDist !== 1) lente.position.sub(_mira).multiplyScalar(factorDist).add(_mira);
   /* La cámara acompaña el avance para no perderla de cuadro, pero
      sigue la altura sólo a medias: si la siguiera del todo el
      ollie se vería quieto (que era el bug), y si no la siguiera
