@@ -679,6 +679,13 @@ a{color:inherit; text-decoration:none}
   cursor:grab; touch-action:pan-y; user-select:none;
 }
 .escena.girando{cursor:grabbing}
+/* Sin WebGL la escena se oculta y se avisa, en lugar de dejar un hueco */
+.sin3d .escena canvas{display:none}
+.sin3d .escena::after{
+  content:"Tu navegador no puede mostrar la patineta en 3D, pero puedes elegir tus piezas abajo.";
+  position:absolute; inset:auto 8% 42% 8%; text-align:center;
+  font-family:var(--dato); font-size:.75rem; line-height:1.7; color:var(--mute);
+}
 /* El lienzo 3D llena la escena */
 .escena canvas{position:absolute; inset:0; width:100%; height:100%; display:block}
 
@@ -2068,13 +2075,22 @@ const anchoTabla = () => (/8\.25/.test(ARCO.tabla.piezas[elegido.tabla].n) ? 8.2
 const diamRueda  = () => (/55/.test(ARCO.ruedas.piezas[elegido.ruedas].n) ? 55 : 53) / 1000;
 const anchoEje   = () => anchoTabla();
 
-const render = new T.WebGLRenderer({ canvas:lienzo3d, antialias:true, alpha:true, powerPreference:"high-performance" });
-render.setPixelRatio(Math.min(devicePixelRatio, 2));
-render.shadowMap.enabled = true;
-render.shadowMap.type = T.PCFSoftShadowMap;
-render.toneMapping = T.ACESFilmicToneMapping;
-render.toneMappingExposure = 1.15;
-render.outputColorSpace = T.SRGBColorSpace;
+/* Si el aparato no da WebGL, la escena se apaga sola y el resto de
+   la página sigue viva. Antes un fallo aquí tumbaba todo el script,
+   que se lleva de paso el catálogo, las familias y el carrito. */
+let render = null;
+try{
+  render = new T.WebGLRenderer({ canvas:lienzo3d, antialias:true, alpha:true, powerPreference:"high-performance" });
+  render.setPixelRatio(Math.min(devicePixelRatio, 2));
+  render.shadowMap.enabled = true;
+  render.shadowMap.type = T.PCFSoftShadowMap;
+  render.toneMapping = T.ACESFilmicToneMapping;
+  render.toneMappingExposure = 1.15;
+  render.outputColorSpace = T.SRGBColorSpace;
+}catch(e){
+  render = null;
+  document.querySelector("#truco")?.classList.add("sin3d");
+}
 
 const escena3d = new T.Scene();
 const lente = new T.PerspectiveCamera(40, 1, 0.05, 60);
@@ -2082,6 +2098,7 @@ const lente = new T.PerspectiveCamera(40, 1, 0.05, 60);
 /* Sin entorno, el metal sale negro. Se genera un cielo de
    degradado y se usa como reflejo: los trucks cobran vida. */
 (function entorno(){
+  if(!render) return;
   const c = document.createElement("canvas");
   c.width = 16; c.height = 128;
   const g = c.getContext("2d").createLinearGradient(0, 0, 0, 128);
@@ -2466,20 +2483,26 @@ escena.addEventListener("pointercancel", soltarOrbita);
 /* ── Render bajo demanda ──
    Sólo se dibuja cuando algo cambió y la sección está a la
    vista. Un bucle constante gastaría batería sin motivo. */
-let pendiente = false, visible = false;
+/* Arranca en visible: si el observador no llegara a disparar, la
+   escena igual se dibuja. Antes se quedaba en negro para siempre. */
+let pendiente = false, visible = true;
 function pedirCuadro(){
-  if(pendiente || !visible) return;
+  if(pendiente || !visible || !render) return;
   pendiente = true;
   requestAnimationFrame(() => { pendiente = false; render.render(escena3d, lente); });
 }
 function medirLienzo(){
+  if(!render) return;
   const c = lienzo3d.getBoundingClientRect();
-  if(!c.width || !c.height) return;
+  if(!c.width || !c.height) return;      /* aún sin medidas: ya volverá */
   render.setSize(c.width, c.height, false);
   lente.aspect = c.width / c.height;
   lente.updateProjectionMatrix();
   pedirCuadro();
 }
+/* El lienzo vive dentro de un sticky: su tamaño puede llegar tarde.
+   Con el observador de tamaño nunca se queda sin medir. */
+if("ResizeObserver" in window) new ResizeObserver(medirLienzo).observe(lienzo3d);
 if("IntersectionObserver" in window){
   new IntersectionObserver(es => {
     visible = es[0].isIntersecting;
