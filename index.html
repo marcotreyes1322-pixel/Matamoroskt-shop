@@ -1969,7 +1969,7 @@ const FAMILIAS = [
     texto:"ABEC 7 y cerámicos. Lo que separa rodar de venir arrastrando la tabla.",
     ficha:[["Grado","ABEC 7"],["Premium","Cerámicos"],["Juego","8 piezas"]] },
 
-  { cat:"Lijas", pieza:"lijas", foto:"", alto:"38vh", giro:8, sombra:"22%",
+  { cat:"Lijas", pieza:"lijas", foto:"", alto:"26vh", giro:8, sombra:"22%",
     acento:"#8E8E96",
     clave:"rgba(237,234,228,.13)", contra:"rgba(150,175,255,.08)",
     texto:"Grano 80 y perforada. Pegada sin burbujas, como se debe pegar una tabla.",
@@ -2077,7 +2077,7 @@ render.toneMappingExposure = 1.15;
 render.outputColorSpace = T.SRGBColorSpace;
 
 const escena3d = new T.Scene();
-const lente = new T.PerspectiveCamera(34, 1, 0.05, 60);
+const lente = new T.PerspectiveCamera(40, 1, 0.05, 60);
 
 /* Sin entorno, el metal sale negro. Se genera un cielo de
    degradado y se usa como reflejo: los trucks cobran vida. */
@@ -2128,7 +2128,7 @@ const piso3d = new T.Mesh(
   new T.ShadowMaterial({ opacity:0.62 })
 );
 piso3d.rotation.x = -Math.PI / 2;
-piso3d.position.y = -0.155;
+piso3d.position.y = -0.079;
 piso3d.receiveShadow = true;
 escena3d.add(piso3d);
 
@@ -2381,23 +2381,39 @@ function pintarResumenTruco(){
    Cada tramo del ollie deja ver la pieza que toca elegir.
    pos: dónde está la cámara · mira: a dónde apunta.    */
 const TOMAS = [
-  { t:0.00, pos:[0.20, 1.62, 0.34], mira:[0, 0.02, 0] },   /* de cabeza: el grip */
-  { t:0.20, pos:[0.34, 1.46, 0.62], mira:[0, 0.02, 0] },
-  { t:0.30, pos:[0.62, -0.55, 1.42], mira:[0, 0.03, 0] },  /* se mete por abajo */
-  { t:0.44, pos:[0.30, -1.02, 1.16], mira:[0, 0.04, 0] },  /* la panza, de lleno */
-  { t:0.56, pos:[0.46, -0.42, 0.80], mira:[0, -0.05, 0.16] }, /* cerca, a los trucks */
-  { t:0.68, pos:[0.92, -0.16, 0.52], mira:[0, -0.05, 0.08] },
-  { t:0.78, pos:[1.32, 0.06, 0.14], mira:[0, -0.04, 0] },  /* por el costado: ruedas */
-  { t:0.90, pos:[1.16, 0.72, 1.10], mira:[0, -0.01, 0] },  /* aterriza */
-  { t:1.00, pos:[1.06, 0.78, 1.34], mira:[0, -0.01, 0] },
+  /* LIJA — tres cuartos desde arriba: el grip completo a la vista */
+  { t:0.00, pos:[0.86, 1.20, 1.18], mira:[0, -0.03, 0] },
+  { t:0.22, pos:[0.80, 1.10, 1.30], mira:[0, 0.02, 0] },
+  /* TABLA — desde abajo, la panza de lleno */
+  { t:0.32, pos:[0.58, -0.78, 1.52], mira:[0, 0.16, 0] },
+  { t:0.44, pos:[0.38, -1.06, 1.42], mira:[0, 0.20, 0] },
+  /* TRUCKS — de cerca, a la altura del eje */
+  { t:0.54, pos:[0.62, -0.32, 1.02], mira:[0, -0.02, 0.12] },
+  { t:0.66, pos:[0.74, -0.20, 0.68], mira:[0, -0.075, 0.14] },
+  /* RUEDAS — al costado, pegado a la rueda */
+  { t:0.74, pos:[1.02, -0.10, 0.34], mira:[0.04, -0.078, 0.15] },
+  { t:0.86, pos:[0.94, -0.05, 0.44], mira:[0.04, -0.078, 0.15] },
+  /* Aterriza — tres cuartos, la patineta entera */
+  { t:0.94, pos:[1.12, 0.48, 1.22], mira:[0, -0.05, 0] },
+  { t:1.00, pos:[1.06, 0.54, 1.38], mira:[0, -0.05, 0] },
 ];
 /* El ollie: agacha, pega la cola, sube con la nariz arriba,
    se empareja en el aire y cae. Nada de giros de kickflip. */
 const OLLIE = {
-  alto:  [[0,0],[.20,0],[.245,-0.012],[.30,0.05],[.44,0.15],[.58,0.15],[.70,0.07],[.78,0],[.815,-0.008],[.85,0],[1,0]],
-  cabeceo:[[0,0],[.19,0],[.245,-0.42],[.31,0.22],[.44,0.10],[.58,-0.06],[.70,-0.34],[.78,-0.12],[.815,0.06],[.86,0],[1,0]],
-  avance:[[0,-0.55],[.20,-0.30],[.50,-0.02],[.80,0.20],[1,0.44]],
-  rodar: [[0,0],[1,26]],
+  /* Altura del centro de la tabla. En el pop la cola toca el piso,
+     así que el centro ya va arriba aunque no haya despegado. */
+  alto:   [[0,0],[.19,0],[.235,0.03],[.27,0.245],[.34,0.36],[.46,0.43],
+           [.56,0.44],[.66,0.34],[.74,0.16],[.79,0.02],[.815,-0.014],[.85,0],[1,0]],
+  /* Cabeceo: positivo = nariz arriba. La cola truena, la nariz se va
+     hasta ~53°, y el pie de adelante la empareja en el aire. */
+  cabeceo:[[0,0],[.19,0],[.235,0.15],[.27,0.92],[.33,0.80],[.40,0.52],
+           [.48,0.22],[.56,0.02],[.64,-0.05],[.72,0],[.78,0.05],[.815,0],[1,0]],
+  avance: [[0,-0.55],[.20,-0.30],[.50,-0.02],[.80,0.20],[1,0.44]],
+  /* Qué tanto sigue la cámara la altura. En el pop y la subida va
+     suelta, para que el salto se vea; en los acercamientos a los
+     trucks y las ruedas se pega a la tabla para no perderlas. */
+  seguirY:[[0,0.85],[.19,0.20],[.30,0],[.52,0],[.64,0.95],[.86,0.95],[.93,0.6],[1,0.6]],
+  rodar:  [[0,0],[1,26]],
 };
 function suave(t){ return t * t * (3 - 2 * t); }
 function valorEn(kf, p){
@@ -2410,7 +2426,7 @@ function valorEn(kf, p){
   }
   return kf[kf.length - 1][1];
 }
-const _a = new T.Vector3(), _b = new T.Vector3(), _mira = new T.Vector3();
+const _a = new T.Vector3(), _b = new T.Vector3(), _mira = new T.Vector3(), _sigue = new T.Vector3();
 function tomaEn(p){
   let i = 0;
   while(i < TOMAS.length - 2 && p > TOMAS[i + 1].t) i++;
@@ -2487,8 +2503,13 @@ function animarTruco(p){
   patineta3d.rotation.x = valorEn(OLLIE.cabeceo, e);
 
   tomaEn(e);
-  _mira.addScaledVector(patineta3d.position, 0.82);   /* la sigue */
-  lente.position.addScaledVector(patineta3d.position, 0.82);
+  /* La cámara acompaña el avance para no perderla de cuadro, pero
+     sigue la altura sólo a medias: si la siguiera del todo el
+     ollie se vería quieto (que era el bug), y si no la siguiera
+     nada la tabla se saldría del cuadro al saltar. */
+  _sigue.set(0, patineta3d.position.y * valorEn(OLLIE.seguirY, e), patineta3d.position.z * 0.92);
+  _mira.add(_sigue);
+  lente.position.add(_sigue);
   /* Lo que arrastra el usuario orbita la cámara alrededor
      de la patineta, sin romper la toma del guion. */
   if(orbita.z || orbita.x){
