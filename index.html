@@ -177,19 +177,34 @@ img{max-width:100%; display:block}
 .materiales{position:absolute; width:0; height:0; overflow:hidden}
 
 /* ── Grafiti ──────────────────────────────────────────
-   El skate y el aerosol se llevan. La mancha va detrás del
-   wordmark, en rojo, con el grano irregular de una lata. */
+   No es un adorno: es el escudo de la casa pintado con lata.
+   La catrina que ya trae el catálogo (ruedas Catrina's Pizza,
+   cera Catrina), montada sobre dos tablas cruzadas y dentro de
+   un cempasúchil. Calavera + tablas + flor = Matamoros. */
 .grafiti{position:absolute; z-index:0; pointer-events:none}
-@media(max-width:860px){ .grafiti{width:min(190px,40vw) !important; top:7% !important; right:4% !important} }
-/* La bomba: relleno rojo, contorno negro grueso y una sombra dura
+@media(max-width:860px){ .grafiti{width:min(228px,48vw) !important; top:6% !important; right:3% !important} }
+/* El cráneo: hueso con contorno negro grueso y sombra dura
    desplazada, que es como se ve un throw-up sobre una barda. */
 .gf-cuerpo{
-  fill:var(--rojo); stroke:#08080A; stroke-width:9; stroke-linejoin:round;
-  filter:drop-shadow(7px 9px 0 rgba(8,8,10,.85));
+  fill:#EDEAE4; stroke:#08080A; stroke-width:9; stroke-linejoin:round;
+  filter:drop-shadow(8px 10px 0 rgba(8,8,10,.9));
 }
-.gf-brillo{fill:#fff; opacity:.5}
-.gf-chorreo{fill:var(--rojo); stroke:#08080A; stroke-width:6; stroke-linejoin:round}
-.gf-tag{opacity:.92; transform-origin:50% 60%; transform:rotate(-9deg)}
+.gf-hueco{fill:#08080A}
+.gf-petalo{fill:var(--ember)}
+.gf-nucleo{fill:#FFD9A8}
+.gf-marca{fill:var(--rojo); stroke:#08080A; stroke-width:5; stroke-linejoin:round}
+.gf-costura{fill:none; stroke:#08080A; stroke-width:8; stroke-linecap:round}
+/* Las tablas cruzadas: rojo de la casa, contorno negro */
+.gf-tabla{fill:var(--rojo-hondo); stroke:#08080A; stroke-width:9; stroke-linejoin:round}
+.gf-tabla .gf-lija{fill:#08080A; stroke:none; opacity:.6}
+.gf-tabla .gf-rueda{fill:#EDEAE4}
+/* El cempasúchil: la flor de muerto. Dos vueltas de pétalos
+   girados alrededor de la calavera. */
+.gf-flor--fuera{fill:#B8461B; opacity:.75}
+.gf-flor--dentro{fill:#FF7A2E; opacity:.75}
+.gf-brillo{fill:#fff; opacity:.4}
+.gf-chorreo{fill:#EDEAE4; stroke:#08080A; stroke-width:7; stroke-linejoin:round}
+.gf-tag{opacity:.95; transform-origin:50% 50%; transform:rotate(-7deg)}
 .chorreo{position:absolute; pointer-events:none; opacity:.55}
 /* Tag: un trazo de plumón junto al número de cada familia */
 .tag-trazo{position:absolute; pointer-events:none; opacity:.5}
@@ -690,6 +705,14 @@ a{color:inherit; text-decoration:none}
 .escena canvas{position:absolute; inset:0; width:100%; height:100%; display:block}
 
 /* Encabezado flotante y datos */
+/* Velo oscuro arriba: aunque la tabla pase cerca, el título se
+   sigue leyendo. La cámara ya la mantiene abajo; esto es el
+   cinturón de seguridad. */
+.truco-pin::before{
+  content:""; position:absolute; left:0; right:0; top:0; height:38%;
+  background:linear-gradient(180deg, rgba(8,8,10,.88) 0%, rgba(8,8,10,.62) 42%, rgba(8,8,10,0) 100%);
+  pointer-events:none; z-index:3;
+}
 .truco-tapa{
   position:absolute; left:50%; top:clamp(74px,9vh,110px); transform:translateX(-50%);
   text-align:center; width:min(560px,88vw); pointer-events:none; z-index:4;
@@ -1069,26 +1092,81 @@ document.addEventListener("click", e => {
   <!-- ═══ Portada ═══ -->
   <section class="portada">
     <div class="portada-medio" id="portada-medio"><div class="atmosfera"></div></div>
-    <!-- Throw-up: la M de Matamoros en bomba, con su contorno,
-         su brillo y los chorreados que deja la pintura fresca. -->
-    <svg class="grafiti" aria-hidden="true" viewBox="0 0 400 340"
-         style="right:7%; top:11%; width:min(330px,25vw)">
-      <g filter="url(#m-salpica)" fill="var(--rojo)" opacity=".55">
-        <circle cx="24" cy="52" r="5"/><circle cx="370" cy="96" r="4"/>
-        <circle cx="348" cy="30" r="3"/><circle cx="52" cy="286" r="4.5"/>
-        <circle cx="300" cy="300" r="3.5"/><circle cx="12" cy="150" r="3"/>
+    <!-- El escudo de la casa, pintado con lata.
+         La calavera catrina —que ya vive en el catálogo: ruedas
+         Catrina's Pizza, cera Catrina— sobre dos tablas cruzadas
+         como huesos, dentro del cempasúchil de Día de Muertos.
+         Cráneo = Matamoros · tablas = skateshop · flor = de aquí. -->
+    <svg class="grafiti" aria-hidden="true" viewBox="0 0 400 400"
+         style="right:4.5%; top:8%; width:min(392px,29vw)">
+      <g filter="url(#m-salpica)" fill="var(--rojo)" opacity=".5">
+        <circle cx="20" cy="60" r="5"/><circle cx="378" cy="104" r="4"/>
+        <circle cx="352" cy="34" r="3"/><circle cx="44" cy="330" r="4.5"/>
+        <circle cx="316" cy="352" r="3.5"/><circle cx="10" cy="180" r="3"/>
       </g>
+
       <g class="gf-tag">
-        <!-- chorreados: la pintura escurre de las patas -->
-        <g class="gf-chorreo">
-          <path d="M62 252c0 26 2 44 4 56 1 7 11 7 12 0 2-12 4-30 4-56z"/>
-          <path d="M266 250c0 34 2 56 4 70 1 8 12 8 13 0 2-14 4-36 4-70z"/>
-          <path d="M176 214c0 18 1 30 2 38 1 6 9 6 10 0 1-8 2-20 2-38z"/>
+        <!-- Cempasúchil: los pétalos son el trazo cortado de la lata -->
+        <defs>
+          <path id="gf-pet"  d="M200 16c14 18 18 46 9 70-5 9-13 9-18 0-9-24-5-52 9-70z"/>
+          <path id="gf-pet2" d="M200 50c11 14 15 37 7 57-4 8-10 8-14 0-8-20-4-43 7-57z"/>
+        </defs>
+        <!-- Cempasúchil: la flor de muerto, dos vueltas de pétalos -->
+        <g class="gf-flor gf-flor--fuera"><use href="#gf-pet"/><use href="#gf-pet" transform="rotate(25.7 200 196)"/><use href="#gf-pet" transform="rotate(51.4 200 196)"/><use href="#gf-pet" transform="rotate(77.1 200 196)"/><use href="#gf-pet" transform="rotate(102.9 200 196)"/><use href="#gf-pet" transform="rotate(128.6 200 196)"/><use href="#gf-pet" transform="rotate(154.3 200 196)"/><use href="#gf-pet" transform="rotate(180 200 196)"/><use href="#gf-pet" transform="rotate(205.7 200 196)"/><use href="#gf-pet" transform="rotate(231.4 200 196)"/><use href="#gf-pet" transform="rotate(257.1 200 196)"/><use href="#gf-pet" transform="rotate(282.9 200 196)"/><use href="#gf-pet" transform="rotate(308.6 200 196)"/><use href="#gf-pet" transform="rotate(334.3 200 196)"/></g>
+        <g class="gf-flor gf-flor--dentro"><use href="#gf-pet2" transform="rotate(12.9 200 196)"/><use href="#gf-pet2" transform="rotate(38.6 200 196)"/><use href="#gf-pet2" transform="rotate(64.3 200 196)"/><use href="#gf-pet2" transform="rotate(90 200 196)"/><use href="#gf-pet2" transform="rotate(115.8 200 196)"/><use href="#gf-pet2" transform="rotate(141.5 200 196)"/><use href="#gf-pet2" transform="rotate(167.2 200 196)"/><use href="#gf-pet2" transform="rotate(192.9 200 196)"/><use href="#gf-pet2" transform="rotate(218.6 200 196)"/><use href="#gf-pet2" transform="rotate(244.3 200 196)"/><use href="#gf-pet2" transform="rotate(270 200 196)"/><use href="#gf-pet2" transform="rotate(295.8 200 196)"/><use href="#gf-pet2" transform="rotate(321.5 200 196)"/><use href="#gf-pet2" transform="rotate(347.2 200 196)"/></g>
+
+        <!-- Dos tablas cruzadas, como las tibias de una bandera -->
+        <g class="gf-tabla">
+          <g transform="rotate(-33 200 196)">
+            <circle class="gf-rueda" cx="82" cy="230" r="13"/>
+            <circle class="gf-rueda" cx="318" cy="230" r="13"/>
+            <rect x="16" y="178" width="368" height="40" rx="19"/>
+            <path class="gf-lija" d="M40 183h320c7 0 7 9 0 9H40z"/>
+          </g>
+          <g transform="rotate(33 200 196)">
+            <circle class="gf-rueda" cx="82" cy="230" r="13"/>
+            <circle class="gf-rueda" cx="318" cy="230" r="13"/>
+            <rect x="16" y="178" width="368" height="40" rx="19"/>
+            <path class="gf-lija" d="M40 183h320c7 0 7 9 0 9H40z"/>
+          </g>
         </g>
-        <!-- la bomba -->
-        <path class="gf-cuerpo" d="M40 250C30 180 34 120 52 78 66 46 100 38 122 62l54 70 54-70c22-24 56-16 70 16 18 42 22 102 12 172-8 18-40 22-50 2-10-42-12-84-16-112l-46 60c-12 14-36 14-48 0l-46-60c-4 28-6 70-16 112-10 20-42 16-50-2z"/>
-        <!-- brillo, como el reflejo del sol en la pintura -->
-        <path class="gf-brillo" d="M64 108c6-22 20-38 36-40 8-1 10 10 3 14-12 6-22 18-27 32-3 8-14 3-12-6z"/>
+
+        <!-- Escurrido de pintura fresca bajo la quijada -->
+        <g class="gf-chorreo">
+          <path d="M168 300c0 30 2 50 3 62 1 7 11 7 12 0 2-13 3-32 3-62z"/>
+          <path d="M214 304c0 22 1 37 2 46 1 6 9 6 10 0 1-9 2-24 2-46z"/>
+        </g>
+
+        <!-- La calavera -->
+        <path class="gf-cuerpo" d="M200 96c58 0 100 38 100 94 0 29-11 51-29 65-6 5-9 11-10 18-1 15-10 25-24 28-8 2-13 8-19 13-6 4-30 4-36 0-6-5-11-11-19-13-14-3-23-13-24-28-1-7-4-13-10-18-18-14-29-36-29-65 0-56 42-94 100-94z"/>
+
+        <!-- Cuencas, con su flor adentro: eso es lo catrina -->
+        <ellipse class="gf-hueco" cx="166" cy="186" rx="28" ry="30"/>
+        <ellipse class="gf-hueco" cx="234" cy="186" rx="28" ry="30"/>
+        <g class="gf-petalo">
+          <ellipse cx="166" cy="171" rx="7" ry="11"/><ellipse cx="180" cy="186" rx="11" ry="7"/>
+          <ellipse cx="166" cy="201" rx="7" ry="11"/><ellipse cx="152" cy="186" rx="11" ry="7"/>
+          <ellipse cx="234" cy="171" rx="7" ry="11"/><ellipse cx="248" cy="186" rx="11" ry="7"/>
+          <ellipse cx="234" cy="201" rx="7" ry="11"/><ellipse cx="220" cy="186" rx="11" ry="7"/>
+        </g>
+        <circle class="gf-nucleo" cx="166" cy="186" r="6"/>
+        <circle class="gf-nucleo" cx="234" cy="186" r="6"/>
+
+        <!-- Nariz de corazón invertido -->
+        <path class="gf-hueco" d="M200 248c-15-10-23-22-18-32 4-9 15-6 18 3 3-9 14-12 18-3 5 10-3 22-18 32z"/>
+
+        <!-- Boca cosida: la sonrisa de la catrina -->
+        <g class="gf-costura">
+          <path d="M150 268q50 15 100 0"/>
+          <path d="M166 262v20"/><path d="M183 267v20"/><path d="M200 269v20"/>
+          <path d="M217 267v20"/><path d="M234 262v20"/>
+        </g>
+
+        <!-- La M de Matamoros marcada en la frente -->
+        <path class="gf-marca" d="M180 152v-30h11l9 15 9-15h11v30h-10v-16l-7 12h-6l-7-12v16z"/>
+
+        <!-- Brillo: el reflejo del sol en la pintura fresca -->
+        <path class="gf-brillo" d="M132 148c8-24 24-40 42-44 8-2 11 9 4 13-14 7-26 20-32 36-3 8-16 4-14-5z"/>
       </g>
     </svg>
     <div class="portada-in">
@@ -1279,7 +1357,7 @@ document.addEventListener("click", e => {
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-08-31 · 3D</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-01 · 3D</span>
     </div>
   </div>
 </footer>
@@ -2108,12 +2186,19 @@ const lente = new T.PerspectiveCamera(40, 1, 0.05, 60);
   const c = document.createElement("canvas");
   c.width = 16; c.height = 128;
   const g = c.getContext("2d").createLinearGradient(0, 0, 0, 128);
-  g.addColorStop(0.00, "#4a5a72");
-  g.addColorStop(0.42, "#20242e");
-  g.addColorStop(0.62, "#241a16");
-  g.addColorStop(1.00, "#0a0a0c");
+  g.addColorStop(0.00, "#d6e2f6");   /* cielo: es lo que refleja el aluminio */
+  g.addColorStop(0.26, "#8b98ad");
+  g.addColorStop(0.50, "#474d5a");
+  g.addColorStop(0.68, "#4a3629");   /* apenas un rescoldo, no una fogata */
+  g.addColorStop(1.00, "#1c1c22");
   const ctx = c.getContext("2d");
   ctx.fillStyle = g; ctx.fillRect(0, 0, 16, 128);
+  /* Dos bandas de luz, como los tubos de un taller. Son las que
+     el aluminio y el acero devuelven como brillo: sin ellas el
+     metal no tiene nada que reflejar y se ve negro. */
+  ctx.fillStyle = "rgba(255,251,244,.98)"; ctx.fillRect(0, 14, 16, 13);
+  ctx.fillStyle = "rgba(196,218,255,.62)"; ctx.fillRect(0, 42, 16, 7);
+  ctx.fillStyle = "rgba(255,138,60,.30)";  ctx.fillRect(0, 96, 16, 10);
   const tex = new T.CanvasTexture(c);
   tex.mapping = T.EquirectangularReflectionMapping;
   tex.colorSpace = T.SRGBColorSpace;
@@ -2126,43 +2211,253 @@ const lente = new T.PerspectiveCamera(40, 1, 0.05, 60);
    Clave cálida que proyecta la sombra, contraluz frío que
    despega la silueta del fondo, y un rebote ámbar desde
    abajo que es el que le da el ambiente de la sección. */
-const clave = new T.DirectionalLight(0xfff2e2, 3.1);
-clave.position.set(0.85, 1.5, 0.75);
+const clave = new T.DirectionalLight(0xfff4ea, 2.7);
+clave.position.set(0.95, 1.65, 0.80);
 clave.castShadow = true;
-clave.shadow.mapSize.set(1024, 1024);
-clave.shadow.camera.near = 0.2; clave.shadow.camera.far = 5;
-clave.shadow.camera.left = -0.9; clave.shadow.camera.right = 0.9;
-clave.shadow.camera.top = 0.9;   clave.shadow.camera.bottom = -0.9;
-clave.shadow.bias = -0.0012; clave.shadow.radius = 3;
+/* Mapa de sombra grande en monitor y a la mitad en celular:
+   la sombra se sigue viendo suave y la GPU del teléfono no sufre. */
+const finoSombra = (innerWidth > 900 && devicePixelRatio <= 2) ? 2048 : 1024;
+clave.shadow.mapSize.set(finoSombra, finoSombra);
+clave.shadow.camera.near = 0.4; clave.shadow.camera.far = 4.2;
+clave.shadow.camera.left = -0.62; clave.shadow.camera.right = 0.62;
+clave.shadow.camera.top = 0.62;   clave.shadow.camera.bottom = -0.62;
+clave.shadow.bias = -0.0006; clave.shadow.normalBias = 0.006; clave.shadow.radius = 2.4;
 escena3d.add(clave);
 
-const contra = new T.DirectionalLight(0x9ab6ff, 1.5);
-contra.position.set(-1.1, 0.5, -1.0);
+/* Contraluz frío: le dibuja el filo a la tabla contra el fondo */
+const contra = new T.DirectionalLight(0x93a8ce, 0.95);
+contra.position.set(-1.25, 0.40, -1.05);
 escena3d.add(contra);
-escena3d.add(new T.HemisphereLight(0x33405a, 0x0a0a0c, 0.75));
 
-const rebote = new T.PointLight(0xff5e1a, 0.9, 2.4, 2);
-rebote.position.set(0, -0.55, 0.1);
+/* Relleno neutro desde abajo. Antes este trabajo lo hacía una
+   luz naranja fortísima y pintaba la panza y los trucks de
+   color zanahoria: el aluminio tiene que verse aluminio. */
+const relleno = new T.DirectionalLight(0xc3d2ee, 1.05);
+relleno.position.set(0.35, -1.15, 0.95);
+escena3d.add(relleno);
+
+/* Luz de lente: viaja con la cámara. En los acercamientos por
+   debajo de la tabla, la clave no llega y los trucks quedaban
+   en sombra total; con ésta, lo que mires siempre tiene luz. */
+const foco = new T.DirectionalLight(0xffece0, 0.9);
+escena3d.add(foco);
+
+escena3d.add(new T.HemisphereLight(0x3f4c66, 0x101014, 0.62));
+
+/* El rescoldo ámbar de la sección, ya sólo como ambiente */
+const rebote = new T.PointLight(0xff6a2a, 0.08, 3.2, 2);
+rebote.position.set(0, -0.85, 0.1);
 escena3d.add(rebote);
 
-/* Piso invisible que sólo recibe la sombra */
+/* Piso invisible que sólo recibe la sombra proyectada */
 const piso3d = new T.Mesh(
   new T.PlaneGeometry(6, 6),
-  new T.ShadowMaterial({ opacity:0.62 })
+  new T.ShadowMaterial({ opacity:0.55 })
 );
 piso3d.rotation.x = -Math.PI / 2;
 piso3d.position.y = -0.079;
 piso3d.receiveShadow = true;
 escena3d.add(piso3d);
 
+/* Sombra de contacto: la mancha oscura que se abre y se aclara
+   conforme la tabla despega. Es lo que amarra la patineta al
+   piso; sin ella el ollie parece un recorte flotando. */
+const sombraContacto = (function(){
+  const c = document.createElement("canvas");
+  c.width = c.height = 128;
+  const x = c.getContext("2d");
+  const g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+  g.addColorStop(0.00, "rgba(0,0,0,.85)");
+  g.addColorStop(0.42, "rgba(0,0,0,.42)");
+  g.addColorStop(1.00, "rgba(0,0,0,0)");
+  x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+  const tex = new T.CanvasTexture(c);
+  const m = new T.Mesh(
+    new T.PlaneGeometry(1, 1),
+    new T.MeshBasicMaterial({ map:tex, transparent:true, depthWrite:false, opacity:0.7 })
+  );
+  m.rotation.x = -Math.PI / 2;
+  m.position.y = -0.0775;
+  m.renderOrder = -1;
+  escena3d.add(m);
+  return m;
+})();
+
+/* ── Texturas generadas ───────────────────────────────
+   Nada se descarga: el grano de la lija y las capas del
+   maple se dibujan en un canvas al vuelo.               */
+
+/* Arena de la lija: un normal map de ruido fino. Es la
+   diferencia entre "negro plano" y grip de verdad. */
+function texArena(){
+  const n = 128, c = document.createElement("canvas");
+  c.width = c.height = n;
+  const x = c.getContext("2d"), d = x.createImageData(n, n);
+  for(let i = 0; i < n * n; i++){
+    const a = Math.random() * 2 - 1, b = Math.random() * 2 - 1;
+    d.data[i*4]     = 128 + a * 58;
+    d.data[i*4 + 1] = 128 + b * 58;
+    d.data[i*4 + 2] = 246;
+    d.data[i*4 + 3] = 255;
+  }
+  x.putImageData(d, 0, 0);
+  const t = new T.CanvasTexture(c);
+  t.wrapS = t.wrapT = T.RepeatWrapping;
+  t.repeat.set(9, 32);
+  return t;
+}
+
+/* Las 7 capas del maple, para el canto. La v de la UV va de
+   panza a grip, así que las vetas salen paralelas de verdad. */
+function texMaple(){
+  const c = document.createElement("canvas");
+  c.width = 4; c.height = 64;
+  const x = c.getContext("2d");
+  const capas = ["#8b6941","#a68763","#7d5c37","#a68763","#8b6941","#a68763","#725230"];
+  for(let i = 0; i < 7; i++){
+    x.fillStyle = capas[i];
+    x.fillRect(0, Math.round(i * 64 / 7), 4, Math.ceil(64 / 7) + 1);
+  }
+  /* la línea de pegamento entre capa y capa */
+  x.fillStyle = "rgba(46,28,12,.45)";
+  for(let i = 1; i < 7; i++) x.fillRect(0, Math.round(i * 64 / 7) - 1, 4, 1);
+  /* el canto de la tabla se oscurece contra la panza */
+  const s2 = x.createLinearGradient(0, 0, 0, 64);
+  s2.addColorStop(0, "rgba(0,0,0,.42)"); s2.addColorStop(0.22, "rgba(0,0,0,0)");
+  s2.addColorStop(0.86, "rgba(0,0,0,0)"); s2.addColorStop(1, "rgba(0,0,0,.34)");
+  x.fillStyle = s2; x.fillRect(0, 0, 4, 64);
+  const t = new T.CanvasTexture(c);
+  t.wrapS = t.wrapT = T.RepeatWrapping;
+  t.colorSpace = T.SRGBColorSpace;
+  return t;
+}
+
 /* ── Materiales ── */
-const matGrip = new T.MeshStandardMaterial({ color:0x0d0d10, roughness:0.99, metalness:0 });
-const matCanto = new T.MeshStandardMaterial({ color:0xd0ab7e, roughness:0.72, metalness:0 });
-const matPanza = new T.MeshStandardMaterial({ color:0x17171c, roughness:0.34, metalness:0.05, clearcoat:1 });
-const matAluminio = new T.MeshStandardMaterial({ color:0xb9bcc4, roughness:0.31, metalness:0.94 });
-const matAcero = new T.MeshStandardMaterial({ color:0xd6d9e0, roughness:0.19, metalness:1 });
-const matBuje = new T.MeshStandardMaterial({ color:0xffb347, roughness:0.5, metalness:0, transparent:true, opacity:0.92 });
-const matUretano = new T.MeshStandardMaterial({ color:0xefe9da, roughness:0.36, metalness:0 });
+const mapArena = texArena();
+/* La lija es negra, pero si se deja lisa y mate se ve un hueco
+   negro. Con el ruido de normal y de aspereza agarra el brillo
+   raspado que tiene el grip de verdad. */
+const matGrip = new T.MeshStandardMaterial({
+  color:0x16151a, roughness:0.70, metalness:0.03,
+  normalMap:mapArena, normalScale:new T.Vector2(0.95, 0.95),
+  roughnessMap:mapArena,
+});
+const mapMaple = texMaple();
+mapMaple.channel = 1;                        /* usa la UV de las capas */
+const matCanto = new T.MeshStandardMaterial({ color:0xffffff, map:mapMaple, roughness:0.62, metalness:0 });
+/* La panza lleva barniz: capa transparente encima del gráfico. */
+const matPanza = new T.MeshPhysicalMaterial({
+  color:0x17171c, roughness:0.42, metalness:0,
+  clearcoat:0.85, clearcoatRoughness:0.16,
+});
+/* Aluminio crudo de truck: pulido pero no espejo. */
+const matAluminio = new T.MeshStandardMaterial({ color:0xd2d6de, roughness:0.28, metalness:0.55 });
+const matAlumOscuro = new T.MeshStandardMaterial({ color:0xa6acb6, roughness:0.46, metalness:0.50 });
+const matAcero = new T.MeshStandardMaterial({ color:0xe4e8ef, roughness:0.20, metalness:0.78 });
+const matNegro = new T.MeshStandardMaterial({ color:0x2a2a31, roughness:0.38, metalness:0.62 });
+/* Buje de uretano: ámbar apagado y translúcido, no naranja neón. */
+const matBuje = new T.MeshPhysicalMaterial({
+  color:0xb8813c, roughness:0.44, metalness:0,
+  transmission:0.25, thickness:0.01, transparent:true, opacity:0.95,
+});
+const matPivote = new T.MeshStandardMaterial({ color:0x232329, roughness:0.7, metalness:0 });
+/* Escudo del balero: acero mate. Si va de espejo se ve como un
+   agujero negro en el centro de la rueda. */
+const matEscudo = new T.MeshStandardMaterial({ color:0xb4b9c2, roughness:0.42, metalness:0.45 });
+const matUretano = new T.MeshPhysicalMaterial({
+  color:0xefe9da, roughness:0.26, metalness:0,
+  clearcoat:0.8, clearcoatRoughness:0.14,
+});
+
+/* ── Herramientas de geometría ───────────────────────── */
+const _Y = new T.Vector3(0, 1, 0);
+/* Un cilindro tendido entre dos puntos: el perno rey, el yugo
+   y el brazo del pivote van en diagonal, no en un eje. */
+function varilla(r1, r2, a, b, mat, lados){
+  const d = new T.Vector3().subVectors(b, a);
+  const m = new T.Mesh(new T.CylinderGeometry(r1, r2, d.length(), lados || 16), mat);
+  m.position.copy(a).addScaledVector(d, 0.5);
+  m.quaternion.setFromUnitVectors(_Y, d.clone().normalize());
+  return m;
+}
+/* Caja con las esquinas redondeadas y el canto matado: una
+   placa fresada no tiene aristas de navaja. */
+function cajaRedonda(ax, ay, az, r){
+  const s = new T.Shape(), hx = ax/2 - r, hz = az/2 - r;
+  s.moveTo(-hx, -az/2);
+  s.lineTo(hx, -az/2);   s.quadraticCurveTo(ax/2, -az/2, ax/2, -hz);
+  s.lineTo(ax/2, hz);    s.quadraticCurveTo(ax/2, az/2, hx, az/2);
+  s.lineTo(-hx, az/2);   s.quadraticCurveTo(-ax/2, az/2, -ax/2, hz);
+  s.lineTo(-ax/2, -hz);  s.quadraticCurveTo(-ax/2, -az/2, -hx, -az/2);
+  const g = new T.ExtrudeGeometry(s, {
+    depth:ay - 0.0012, bevelEnabled:true, bevelThickness:0.0006,
+    bevelSize:0.0006, bevelSegments:2, curveSegments:6,
+  });
+  g.rotateX(-Math.PI / 2);
+  g.translate(0, -ay / 2 + 0.0006, 0);
+  return g;
+}
+/* Barre una sección por estaciones a lo largo de X. Así se hace
+   un hanger: gordo al centro, adelgazando hacia las puntas.
+   La sección va en sentido horario en el plano (z,y).  */
+function geoBarrido(seccion, estaciones){
+  const n = seccion.length, m = estaciones.length, pos = [];
+  const V3 = (i, j) => {
+    const e = estaciones[j], p = seccion[i];
+    return [e.x, p[1] * e.sy + e.dy, p[0] * e.sz];
+  };
+  for(let j = 0; j < m - 1; j++){
+    for(let i = 0; i < n; i++){
+      const k = (i + 1) % n;
+      const a = V3(i, j), b = V3(k, j), c = V3(k, j+1), d = V3(i, j+1);
+      pos.push(...a, ...b, ...c, ...a, ...c, ...d);
+    }
+  }
+  for(let t = 0; t < 2; t++){
+    const j = t ? m - 1 : 0, e = estaciones[j], centro = [e.x, e.dy, 0];
+    for(let i = 0; i < n; i++){
+      const k = (i + 1) % n, a = V3(i, j), b = V3(k, j);
+      if(t) pos.push(...centro, ...a, ...b);
+      else  pos.push(...centro, ...b, ...a);
+    }
+  }
+  const g = new T.BufferGeometry();
+  g.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+  g.computeVertexNormals();
+  return g;
+}
+/* Sección del hanger: achatada arriba, panza llena abajo
+   envolviendo el eje. Vista de frente es la silueta del truck. */
+const SECCION_HANGER = [
+  [ 0.34,  1.00],[ 0.70,  0.93],[ 0.94,  0.66],[ 1.00,  0.16],
+  [ 0.90, -0.30],[ 0.62, -0.70],[ 0.22, -0.96],[-0.22, -0.96],
+  [-0.62, -0.70],[-0.90, -0.30],[-1.00,  0.16],[-0.94,  0.66],
+  [-0.70,  0.93],[-0.34,  1.00],
+];
+/* Cuánto adelgaza el brazo del hanger de centro a punta */
+const AFILADO = [[0,1],[0.16,0.98],[0.34,0.90],[0.56,0.74],[0.80,0.58],[1,0.46]];
+function geoHanger(medio, alto, hondo, sube){
+  const est = [], N = 24, kFin = AFILADO[AFILADO.length - 1][1];
+  for(let i = 0; i <= N; i++){
+    const u = i / N * 2 - 1, k = escalaEn(AFILADO, Math.abs(u));
+    /* el cuerpo va montado arriba del eje y los brazos bajan
+       hasta él: así el eje sale por la punta del hanger y no
+       por la mitad de una salchicha. */
+    est.push({ x:u * medio, sy:alto * k, sz:hondo * k,
+               dy:-sube * (1 - k) / (1 - kFin) });
+  }
+  return geoBarrido(SECCION_HANGER, est);
+}
+function escalaEn(kf, p){
+  for(let i = 0; i < kf.length - 1; i++){
+    const [ta, va] = kf[i], [tb, vb] = kf[i + 1];
+    if(p >= ta && p <= tb){
+      const t = tb === ta ? 0 : (p - ta) / (tb - ta);
+      return va + (vb - va) * (t * t * (3 - 2 * t));
+    }
+  }
+  return kf[kf.length - 1][1];
+}
 
 /* ── La silueta popsicle, en 2D, para extruir ── */
 function siluetaTabla(ancho, largo){
@@ -2220,8 +2515,13 @@ function agruparPorCara(geo){
     tri.push({ i, g: n.y > 0.45 ? 0 : (n.y < -0.45 ? 1 : 2) });
   }
   tri.sort((x, y) => x.g - y.g);
-  const orden = new Float32Array(p.count * 3);
-  const nor = geo.attributes.normal, ordenN = new Float32Array(p.count * 3);
+  /* Se reordenan también las UV: la capa 0 lleva el grano de la
+     lija y la 1 las vetas del maple en el canto. */
+  const nor = geo.attributes.normal;
+  const uv = geo.attributes.uv, uv1 = geo.attributes.uv1;
+  const orden = new Float32Array(p.count * 3), ordenN = new Float32Array(p.count * 3);
+  const ordenU = uv ? new Float32Array(p.count * 2) : null;
+  const ordenU1 = uv1 ? new Float32Array(p.count * 2) : null;
   let k = 0;
   const cuenta = [0, 0, 0];
   tri.forEach(t => {
@@ -2229,12 +2529,16 @@ function agruparPorCara(geo){
     for(let j = 0; j < 3; j++){
       orden[k*3] = p.getX(t.i+j); orden[k*3+1] = p.getY(t.i+j); orden[k*3+2] = p.getZ(t.i+j);
       ordenN[k*3] = nor.getX(t.i+j); ordenN[k*3+1] = nor.getY(t.i+j); ordenN[k*3+2] = nor.getZ(t.i+j);
+      if(ordenU){ ordenU[k*2] = uv.getX(t.i+j); ordenU[k*2+1] = uv.getY(t.i+j); }
+      if(ordenU1){ ordenU1[k*2] = uv1.getX(t.i+j); ordenU1[k*2+1] = uv1.getY(t.i+j); }
       k++;
     }
   });
   const g2 = new T.BufferGeometry();
   g2.setAttribute("position", new T.BufferAttribute(orden, 3));
   g2.setAttribute("normal", new T.BufferAttribute(ordenN, 3));
+  if(ordenU) g2.setAttribute("uv", new T.BufferAttribute(ordenU, 2));
+  if(ordenU1) g2.setAttribute("uv1", new T.BufferAttribute(ordenU1, 2));
   let off = 0;
   cuenta.forEach((c, gi) => { if(c){ g2.addGroup(off, c, gi); off += c; } });
   return g2;
@@ -2264,6 +2568,8 @@ const patineta3d = new T.Group();
 escena3d.add(patineta3d);
 let tablaMesh = null;
 const ruedasMesh = [];      /* para hacerlas rodar sin buscarlas cada cuadro */
+const _proy = new T.Vector3();   /* dónde cae la tabla en pantalla */
+const _lado = new T.Vector3();   /* el eje horizontal de la cámara */
 
 function construirPatineta(){
   while(patineta3d.children.length) patineta3d.remove(patineta3d.children[0]);
@@ -2279,69 +2585,172 @@ function construirPatineta(){
   matGrip.color.set(lija.grip === "roja" ? 0x3a0d16 : lija.grip === "perf" ? 0x0a0a0d : 0x0d0d10);
   matGrip.roughness = lija.grip === "perf" ? 0.93 : 0.99;
 
-  /* Tabla */
+  /* ── Tabla ── */
   let geo = new T.ExtrudeGeometry(siluetaTabla(ancho, M.largo), {
-    depth:M.grosor, bevelEnabled:true, bevelThickness:0.0016,
-    bevelSize:0.0016, bevelSegments:2, curveSegments:26,
+    depth:M.grosor, bevelEnabled:true, bevelThickness:0.0014,
+    bevelSize:0.0014, bevelSegments:2, curveSegments:26,
   });
   geo.rotateX(-Math.PI / 2);
-  geo.translate(0, M.grosor / 2, 0);
+  /* Centrada en su propio grosor: así la placa del truck queda
+     pegada a la panza y no colgando en el aire, que era el hueco
+     raro que se veía entre la tabla y los trucks. */
+  geo.translate(0, -M.grosor / 2, 0);
+  /* Segunda UV: 0 en la panza y 1 en el grip. Con ella el canto
+     dibuja las siete capas de maple prensadas. */
+  const pv = geo.attributes.position, u1 = new Float32Array(pv.count * 2);
+  for(let i = 0; i < pv.count; i++){
+    u1[i*2] = 0.5;
+    u1[i*2 + 1] = (pv.getY(i) + M.grosor / 2) / M.grosor;
+  }
+  geo.setAttribute("uv1", new T.BufferAttribute(u1, 2));
   moldear(geo, ancho, M.largo);
   geo = agruparPorCara(geo);
   tablaMesh = new T.Mesh(geo, [matGrip, matPanza, matCanto]);
   tablaMesh.castShadow = true; tablaMesh.receiveShadow = true;
   patineta3d.add(tablaMesh);
 
-  /* Trucks y ruedas */
+  /* ── Trucks y ruedas ──
+     Un truck de verdad: placa atornillada a la panza, perno rey
+     en diagonal con sus dos bujes de uretano, hanger de aluminio
+     que adelgaza hacia las puntas y eje con tuercas.           */
+  const medioHanger = Math.min(aw * 0.335, aw / 2 - M.ruedaAncho - 0.004);
+
   [-1, 1].forEach(lado => {
     const t = new T.Group();
     t.position.set(0, -M.grosor / 2, lado * M.entreEjes / 2);
+    const V = (x, y, z) => new T.Vector3(x, y, z);
 
-    const placa = new T.Mesh(new T.BoxGeometry(ancho * 0.46, 0.006, 0.062), matAluminio);
-    placa.position.y = -0.003; placa.castShadow = true;
-    t.add(placa);
+    /* Placa base */
+    const plato = new T.Mesh(cajaRedonda(0.0570, 0.0082, 0.0740, 0.0060), matAluminio);
+    plato.position.set(0, -0.0041, lado * 0.0020);
+    plato.castShadow = true; plato.receiveShadow = true;
+    t.add(plato);
 
-    const hanger = new T.Mesh(new T.CylinderGeometry(0.010, 0.028, 0.046, 4), matAluminio);
-    hanger.rotation.z = Math.PI / 2; hanger.rotation.y = Math.PI / 4;
-    hanger.position.set(0, -M.cuelgue * 0.52, lado * 0.012);
-    hanger.scale.set(1, aw * 0.44 / 0.023, 1);
-    hanger.castShadow = true;
+    /* Copa del pivote, hacia la punta de la tabla */
+    const copa = new T.Mesh(new T.CylinderGeometry(0.0088, 0.0100, 0.0090, 14), matAlumOscuro);
+    copa.position.set(0, -0.0086, lado * 0.0290);
+    copa.rotation.x = -lado * 0.30;
+    t.add(copa);
+
+    /* Tetón donde asienta la cabeza del perno rey, hacia el centro */
+    const teton = new T.Mesh(cajaRedonda(0.0230, 0.0100, 0.0175, 0.0035), matAluminio);
+    teton.position.set(0, -0.0110, -lado * 0.0245);
+    teton.rotation.x = lado * 0.42;
+    teton.castShadow = true;
+    t.add(teton);
+
+    /* Hanger: el cuerpo que envuelve el eje */
+    const hanger = new T.Mesh(geoHanger(medioHanger, 0.0172, 0.0150, 0.0074), matAluminio);
+    hanger.position.set(0, -M.cuelgue + 0.0074, 0);
+    hanger.castShadow = true; hanger.receiveShadow = true;
     t.add(hanger);
 
-    const perno = new T.Mesh(new T.CylinderGeometry(0.0026, 0.0026, 0.036, 8), matAcero);
-    perno.position.set(0, -0.019, lado * 0.019);
-    perno.rotation.x = lado * 0.42;
-    t.add(perno);
+    /* Los dos brazos del hanger: al perno rey y a la copa */
+    const bocaPerno = V(0, -M.cuelgue + 0.0205, -lado * 0.0090);
+    const puntaPivote = V(0, -M.cuelgue + 0.0150, lado * 0.0250);
+    const yugo = varilla(0.0092, 0.0130, bocaPerno, V(0, -M.cuelgue + 0.002, -lado * 0.001), matAluminio, 14);
+    yugo.castShadow = true;
+    t.add(yugo);
+    const anillo = new T.Mesh(new T.CylinderGeometry(0.0105, 0.0105, 0.0090, 16), matAluminio);
+    anillo.position.copy(bocaPerno);
+    anillo.rotation.x = -lado * 0.72;
+    t.add(anillo);
+    const brazo = varilla(0.0042, 0.0092, puntaPivote, V(0, -M.cuelgue + 0.004, lado * 0.004), matAluminio, 12);
+    brazo.castShadow = true;
+    t.add(brazo);
 
-    const buje = new T.Mesh(new T.CylinderGeometry(0.0085, 0.0085, 0.009, 12), matBuje);
-    buje.position.set(0, -0.016, lado * 0.017);
-    t.add(buje);
+    /* Perno rey en diagonal, con sus bujes, rondanas y tuerca */
+    const cabeza = V(0, -0.0098, -lado * 0.0300);
+    const punta  = V(0, -M.cuelgue + 0.0335, lado * 0.0055);
+    const dir = new T.Vector3().subVectors(punta, cabeza).normalize();
+    const en = d => cabeza.clone().addScaledVector(dir, d);
+    const largoPerno = cabeza.distanceTo(punta);
 
-    const eje = new T.Mesh(new T.CylinderGeometry(0.0038, 0.0038, aw * 1.005, 10), matAcero);
+    t.add(varilla(0.0026, 0.0026, cabeza, punta, matAcero, 12));
+    const tornillo = new T.Mesh(new T.CylinderGeometry(0.0058, 0.0058, 0.0048, 6), matAcero);
+    tornillo.position.copy(en(-0.0016));
+    tornillo.quaternion.setFromUnitVectors(_Y, dir);
+    t.add(tornillo);
+
+    /* Buje de arriba (cónico) y de abajo, el sándwich del hanger */
+    const bujeAlto = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0104, 0.0100, 16), matBuje);
+    bujeAlto.position.copy(en(largoPerno * 0.36));
+    bujeAlto.quaternion.setFromUnitVectors(_Y, dir);
+    t.add(bujeAlto);
+    const bujeBajo = new T.Mesh(new T.CylinderGeometry(0.0104, 0.0068, 0.0092, 16), matBuje);
+    bujeBajo.position.copy(en(largoPerno * 0.74));
+    bujeBajo.quaternion.setFromUnitVectors(_Y, dir);
+    t.add(bujeBajo);
+    const rondana = new T.Mesh(new T.CylinderGeometry(0.0092, 0.0092, 0.0016, 16), matAcero);
+    rondana.position.copy(en(largoPerno * 0.815));
+    rondana.quaternion.setFromUnitVectors(_Y, dir);
+    t.add(rondana);
+    const tuercaRey = new T.Mesh(new T.CylinderGeometry(0.0060, 0.0060, 0.0048, 6), matAcero);
+    tuercaRey.position.copy(en(largoPerno - 0.0006));
+    tuercaRey.quaternion.setFromUnitVectors(_Y, dir);
+    t.add(tuercaRey);
+
+    /* Eje de acero de lado a lado */
+    const eje = new T.Mesh(new T.CylinderGeometry(0.0040, 0.0040, aw * 1.02, 14), matAcero);
     eje.rotation.z = Math.PI / 2;
     eje.position.y = -M.cuelgue;
+    eje.castShadow = true;
     t.add(eje);
 
-    /* Cada rueda va dentro de su truck, y colgada de un grupo que
-       la orienta, para que gire sobre su propio eje y no sobre el
-       del mundo. Antes las cuatro caían encimadas en el centro. */
+    /* Tornillería: la cabeza asoma por el grip (se ve en la toma
+       de la lija) y la tuerca por debajo de la placa. */
+    [-1, 1].forEach(cx => [-1, 1].forEach(cz => {
+      const x = cx * 0.0207, z = cz * 0.0270 + lado * 0.0020;
+      const cab = new T.Mesh(new T.CylinderGeometry(0.0048, 0.0048, 0.0018, 10), matNegro);
+      cab.position.set(x, M.grosor + 0.0014, z);
+      t.add(cab);
+      const tca = new T.Mesh(new T.CylinderGeometry(0.0042, 0.0042, 0.0036, 6), matAcero);
+      tca.position.set(x, -0.0098, z);
+      t.add(tca);
+    }));
+
+    /* Cada rueda cuelga de un grupo que la orienta, para que gire
+       sobre su propio eje y no sobre el del mundo. */
     [-1, 1].forEach(costado => {
       const soporte = new T.Group();
       soporte.rotation.z = Math.PI / 2;
-      soporte.position.set(costado * (aw / 2 - M.ruedaAncho / 2), -M.cuelgue, 0);
+      soporte.position.set(costado * (aw / 2 - M.ruedaAncho / 2 - 0.0055), -M.cuelgue, 0);
 
       const r = new T.Mesh(geoRueda(wd, M.ruedaAncho), matUretano);
       r.castShadow = true; r.receiveShadow = true;
       soporte.add(r);
       ruedasMesh.push(r);
 
-      const bal = new T.Mesh(new T.CylinderGeometry(0.0105, 0.0105, M.ruedaAncho * 0.62, 18), matAcero);
-      soporte.add(bal);
+      /* Baleros: el escudo metálico que se asoma por el núcleo */
+      [-1, 1].forEach(cara => {
+        const bal = new T.Mesh(new T.CylinderGeometry(0.0110, 0.0110, 0.0018, 20), matEscudo);
+        bal.position.y = cara * (M.ruedaAncho / 2 - 0.0012);
+        soporte.add(bal);
+        const nucleo = new T.Mesh(new T.CylinderGeometry(0.0044, 0.0044, 0.0022, 12), matNegro);
+        nucleo.position.y = cara * (M.ruedaAncho / 2 - 0.0006);
+        soporte.add(nucleo);
+      });
+
+      /* Rondana de velocidad y tuerca de eje */
+      const rd = new T.Mesh(new T.CylinderGeometry(0.0072, 0.0072, 0.0012, 14), matAcero);
+      rd.position.y = M.ruedaAncho / 2 + 0.0010;
+      soporte.add(rd);
+      const tuerca = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0062, 0.0048, 6), matAcero);
+      tuerca.position.y = M.ruedaAncho / 2 + 0.0042;
+      tuerca.castShadow = true;
+      soporte.add(tuerca);
 
       t.add(soporte);
     });
     patineta3d.add(t);
   });
+
+  /* El piso se acomoda al diámetro de rueda elegido, para que las
+     ruedas lo toquen exacto en vez de hundirse en él. */
+  const suelo = -M.grosor / 2 - M.cuelgue - wd / 2;
+  piso3d.position.y = suelo;
+  sombraContacto.position.y = suelo + 0.0012;
+
   pedirCuadro();
 }
 
@@ -2405,20 +2814,20 @@ function pintarResumenTruco(){
    pos: dónde está la cámara · mira: a dónde apunta.    */
 const TOMAS = [
   /* LIJA — tres cuartos desde arriba: el grip completo a la vista */
-  { t:0.00, pos:[0.86, 1.20, 1.18], mira:[0, -0.03, 0] },
-  { t:0.22, pos:[0.80, 1.10, 1.30], mira:[0, 0.02, 0] },
+  { t:0.00, pos:[0.58, 1.22, 0.60], mira:[0, 0.00, 0] },
+  { t:0.22, pos:[0.46, 1.14, 0.86], mira:[0, 0.01, 0] },
   /* TABLA — desde abajo, la panza de lleno */
-  { t:0.32, pos:[0.58, -0.78, 1.52], mira:[0, 0.16, 0] },
-  { t:0.44, pos:[0.38, -1.06, 1.42], mira:[0, 0.20, 0] },
-  /* TRUCKS — de cerca, a la altura del eje */
-  { t:0.54, pos:[0.62, -0.32, 1.02], mira:[0, -0.02, 0.12] },
-  { t:0.66, pos:[0.74, -0.20, 0.68], mira:[0, -0.075, 0.14] },
-  /* RUEDAS — al costado, pegado a la rueda */
-  { t:0.74, pos:[1.26, -0.12, 0.44], mira:[0.02, -0.075, 0.14] },
-  { t:0.86, pos:[1.16, -0.06, 0.56], mira:[0.02, -0.075, 0.14] },
+  { t:0.32, pos:[0.56, -0.74, 0.98], mira:[0, 0.05, 0] },
+  { t:0.44, pos:[0.38, -0.96, 0.92], mira:[0, 0.07, 0] },
+  /* TRUCKS — encima del truck de adelante, a la altura del eje */
+  { t:0.54, pos:[0.335, -0.030, 0.392], mira:[0, -0.046, 0.172] },
+  { t:0.66, pos:[0.255, -0.072, 0.352], mira:[0, -0.050, 0.172] },
+  /* RUEDAS — pegado a la rueda de adelante */
+  { t:0.74, pos:[0.318, -0.005, 0.286], mira:[0.086, -0.056, 0.176] },
+  { t:0.86, pos:[0.290,  0.030, 0.330], mira:[0.086, -0.056, 0.176] },
   /* Aterriza — tres cuartos, la patineta entera */
-  { t:0.94, pos:[1.12, 0.48, 1.22], mira:[0, -0.05, 0] },
-  { t:1.00, pos:[1.06, 0.54, 1.38], mira:[0, -0.05, 0] },
+  { t:0.94, pos:[0.86, 0.48, 1.02], mira:[0, -0.02, 0] },
+  { t:1.00, pos:[0.78, 0.52, 1.18], mira:[0, -0.02, 0] },
 ];
 /* El ollie: agacha, pega la cola, sube con la nariz arriba,
    se empareja en el aire y cae. Nada de giros de kickflip. */
@@ -2426,16 +2835,22 @@ const OLLIE = {
   /* Altura del centro de la tabla. En el pop la cola toca el piso,
      así que el centro ya va arriba aunque no haya despegado. */
   alto:   [[0,0],[.19,0],[.235,0.03],[.27,0.245],[.34,0.36],[.46,0.43],
-           [.56,0.44],[.66,0.34],[.74,0.16],[.79,0.02],[.815,-0.014],[.85,0],[1,0]],
+           [.60,0.45],[.78,0.44],[.86,0.37],[.92,0.13],[.955,0.00],
+           [.972,-0.013],[.99,0],[1,0]],
   /* Cabeceo: positivo = nariz arriba. La cola truena, la nariz se va
      hasta ~53°, y el pie de adelante la empareja en el aire. */
   cabeceo:[[0,0],[.19,0],[.235,0.15],[.27,0.92],[.33,0.80],[.40,0.52],
-           [.48,0.22],[.56,0.02],[.64,-0.05],[.72,0],[.78,0.05],[.815,0],[1,0]],
-  avance: [[0,-0.55],[.20,-0.30],[.50,-0.02],[.80,0.20],[1,0.44]],
+           [.48,0.22],[.56,0.04],[.70,0.00],[.84,0.02],[.92,0.07],[.955,0],[1,0]],
+  avance: [[0,-0.50],[.20,-0.28],[.50,-0.04],[.86,0.16],[1,0.44]],
   /* Qué tanto sigue la cámara la altura. En el pop y la subida va
      suelta, para que el salto se vea; en los acercamientos a los
      trucks y las ruedas se pega a la tabla para no perderlas. */
-  seguirY:[[0,0.85],[.19,0.20],[.30,0],[.52,0],[.64,0.95],[.86,0.95],[.93,0.6],[1,0.6]],
+  /* Mientras la cámara está lejos puede soltarla y el salto se
+     ve. En los acercamientos tiene que ir clavada a la tabla: a
+     40 cm el cuadro mide 28 cm y un ollie de 44 la saca entera
+     de pantalla —que era justo el salto raro que se metía en
+     el título. */
+  seguirY:[[0,0.55],[.19,0.15],[.26,0.06],[.40,0.12],[.52,1],[.86,1],[.93,0.6],[1,0.55]],
   rodar:  [[0,0],[1,26]],
 };
 function suave(t){ return t * t * (3 - 2 * t); }
@@ -2503,13 +2918,28 @@ function pedirCuadro(){
    lente hasta cierto punto y alejando la cámara el resto. */
 let factorDist = 1;
 function ajustarLente(aspecto){
-  const objetivoH = 46 * Math.PI / 180;
+  /* En vertical sobra alto y falta ancho: se cierra el ángulo
+     horizontal para que la patineta llene más la pantalla del
+     celular en lugar de quedarse chiquita a media plana. */
+  const k = Math.min(1, Math.max(0, (aspecto - 0.45) / 0.40));
+  const objetivoH = (38 + 8 * k) * Math.PI / 180;
   let fov = 2 * Math.atan(Math.tan(objetivoH / 2) / aspecto);
   fov = Math.min(Math.max(fov, 34 * Math.PI / 180), 62 * Math.PI / 180);
   lente.fov = fov * 180 / Math.PI;
   const logradoH = 2 * Math.atan(Math.tan(fov / 2) * aspecto);
   factorDist = Math.min(Math.max(Math.tan(objetivoH / 2) / Math.tan(logradoH / 2), 1), 1.9);
   lente.updateProjectionMatrix();
+}
+/* Hasta dónde puede subir la tabla sin meterse en el título.
+   Se mide el bloque del encabezado de verdad, en lugar de
+   adivinar: en el celular ocupa mucho más alto que en monitor. */
+let techoCuadro = 0.34;
+function medirTecho(){
+  const tapa = document.querySelector(".truco-tapa");
+  const c = lienzo3d.getBoundingClientRect();
+  if(!tapa || !c.height) return;
+  const r = tapa.getBoundingClientRect();
+  techoCuadro = Math.min(0.54, Math.max(0.18, (r.bottom - c.top) / c.height + 0.035));
 }
 function medirLienzo(){
   if(!render) return;
@@ -2518,6 +2948,7 @@ function medirLienzo(){
   render.setSize(c.width, c.height, false);
   lente.aspect = c.width / c.height;
   ajustarLente(lente.aspect);
+  medirTecho();
   animarTruco(progresoTruco());
 }
 /* El lienzo vive dentro de un sticky: su tamaño puede llegar tarde.
@@ -2568,12 +2999,58 @@ function animarTruco(p){
       _mira.z + r * Math.cos(ph) * Math.cos(th)
     );
   }
+  /* ── Encuadre ──
+     Dos pasadas. Primero se apunta más arriba del foco, para que
+     el foco caiga en el centro de la franja libre (debajo del
+     título y arriba del resumen). Después se MIDE en pantalla
+     dónde quedó la tabla y, si el ollie la metió en el título,
+     se baja lo que sobró. Medir sale más barato que adivinar. */
+  const medioAlto = Math.tan(lente.fov * Math.PI / 360) * lente.position.distanceTo(_mira);
+  if(medioAlto > 0.0001){
+    const objetivo = techoCuadro + (0.94 - techoCuadro) * 0.48;
+    _mira.y += (objetivo - 0.5) * 2 * medioAlto;
+    /* En pantalla ancha la ficha de la pieza vive a la derecha:
+       la toma se corre a la izquierda para no quedar debajo. */
+    if(lente.aspect > 1.15){
+      _lado.set(lente.matrix.elements[0], lente.matrix.elements[1], lente.matrix.elements[2]);
+      _mira.addScaledVector(_lado, 0.13 * 2 * medioAlto * lente.aspect);
+    }
+    /* Red de seguridad: se mide en pantalla dónde quedó la tabla
+       y si se metió arriba del título se corrige. Tres vueltas
+       bastan para acomodarla; medir sale mejor que adivinar. */
+    const limite = Math.max(0.04, techoCuadro - 0.02);
+    for(let it = 0; it < 3; it++){
+      lente.lookAt(_mira);
+      lente.updateMatrixWorld(true);
+      lente.matrixWorldInverse.copy(lente.matrixWorld).invert();
+      const enY = (1 - _proy.copy(patineta3d.position).project(lente).y) / 2;
+      if(enY >= limite) break;
+      _mira.y += (limite - enY) * 2 * medioAlto;
+    }
+  }
   lente.lookAt(_mira);
+
+  /* La luz de lente sube conforme la cámara se acerca: en los
+     acercamientos bajo la tabla no llega nada más, y en los
+     planos abiertos aplanaría la escena si fuera igual de fuerte.
+     Es lo que hace un fotógrafo cuando se mete a hacer macro. */
+  foco.position.copy(lente.position);
+  foco.target.position.copy(_mira);
+  foco.target.updateMatrixWorld();
+  const cercania = Math.min(1, Math.max(0, (1.0 - lente.position.distanceTo(_mira)) / 0.62));
+  foco.intensity = 0.9 + 2.6 * cercania * cercania;
 
   const rod = valorEn(OLLIE.rodar, e);
   for(let i = 0; i < ruedasMesh.length; i++) ruedasMesh[i].rotation.y = rod;
 
-  rebote.position.set(0, patineta3d.position.y - 0.5, patineta3d.position.z);
+  /* La mancha del piso se abre y se destiñe conforme despega */
+  const alt = Math.max(0, patineta3d.position.y);
+  sombraContacto.position.z = patineta3d.position.z;
+  sombraContacto.scale.set(0.34 + alt * 0.95, 0.95 + alt * 1.30, 1);
+  const cerca = Math.max(0, 1 - alt / 0.50);
+  sombraContacto.material.opacity = 0.08 + 0.60 * cerca * cerca;
+
+  rebote.position.set(0, patineta3d.position.y - 0.85, patineta3d.position.z);
   pedirCuadro();
 
   trucoBarra.style.width = (p * 100).toFixed(1) + "%";
