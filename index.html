@@ -595,6 +595,12 @@ a{color:inherit; text-decoration:none}
 /* ── El escenario: palabra + producto + reflejo ── */
 .fam-escena{position:relative; display:grid; place-items:center;
   min-height:50vh; margin-bottom:clamp(20px,3vh,44px)}
+/* Dos capas que se mueven a distinta velocidad con el scroll: la
+   palabra al fondo, la pieza al frente. El transform va aquí y no
+   en la palabra ni en la pieza, para no pelearse con la animación
+   de entrada de cada una. */
+.fam-capa--frente{position:absolute; inset:0; z-index:2; pointer-events:none}
+.fam-capa--fondo,.fam-capa--frente{will-change:transform}
 .fam-palabra{
   font-family:var(--display); font-variation-settings:'wdth' 62,'wght' 900;
   text-transform:uppercase; letter-spacing:-.02em; line-height:.84; white-space:nowrap;
@@ -614,6 +620,7 @@ a{color:inherit; text-decoration:none}
   transition:opacity .9s .12s var(--curva), transform 1.15s .12s cubic-bezier(.16,1.06,.3,1);
 }
 .fam-producto img,.fam-producto svg{height:100%; width:auto; display:block}
+.fam-producto img.retrato,.fam-reflejo img.retrato{object-fit:contain; max-width:min(86vw,940px)}
 /* Sombra de contacto: pegada y dura debajo, difusa alrededor */
 .fam-contacto{
   position:absolute; left:50%; z-index:2; pointer-events:none;
@@ -624,20 +631,20 @@ a{color:inherit; text-decoration:none}
 }
 /* Reflejo en el piso */
 .fam-reflejo{
-  position:absolute; left:50%; top:calc(50% + var(--alto,30vh) / 2); z-index:1;
+  position:absolute; left:50%; top:calc(50% + var(--alto,30vh) * .42); z-index:1;
   height:var(--alto,30vh); pointer-events:none;
   transform:translateX(-50%);
-  -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.5) 0%, transparent 52%);
-  mask-image:linear-gradient(180deg, rgba(0,0,0,.5) 0%, transparent 52%);
+  -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.6) 0%, transparent 44%);
+  mask-image:linear-gradient(180deg, rgba(0,0,0,.6) 0%, transparent 44%);
   opacity:0; transition:opacity 1s .3s ease;
 }
-.fam-reflejo-in{height:100%; transform:scaleY(-1) rotate(calc(var(--giro,0deg) * -1)); filter:blur(1.5px)}
+.fam-reflejo-in{height:100%; transform:scaleY(-1) rotate(calc(var(--giro,0deg) * -1)); filter:blur(.8px)}
 .fam-reflejo svg,.fam-reflejo img{height:100%; width:auto; display:block}
 
 .fam.entra .fam-palabra{opacity:1; transform:none}
 .fam.entra .fam-producto{opacity:1; transform:translate(-50%,-50%) rotate(var(--giro,0deg)) scale(1)}
 .fam.entra .fam-contacto{opacity:1}
-.fam.entra .fam-reflejo{opacity:.2}
+.fam.entra .fam-reflejo{opacity:.26}
 
 /* ── Pie: texto a la izquierda, ficha a la derecha ── */
 .fam-pie{
@@ -665,11 +672,11 @@ a{color:inherit; text-decoration:none}
 
 @media(max-width:859px){
   .fam-in{padding:100px 0 72px}
-  .fam-palabra{font-size:clamp(2.4rem,22vw,7rem)}
+  .fam-palabra{font-size:clamp(2.4rem,24.5vw,7rem)}
   .fam-escena{min-height:38vh}
   /* En vertical el producto se achica: si no, tapa la palabra entera */
-  .fam-producto,.fam-reflejo{height:calc(var(--alto,30vh) * .62)}
-  .fam-reflejo{top:calc(50% + var(--alto,30vh) * .31)}
+  .fam-producto,.fam-reflejo{height:calc(var(--alto,30vh) * .50)}
+  .fam-reflejo{top:calc(50% + var(--alto,30vh) * .21)}
   .fam-producto{transform:translate(-50%,-50%) rotate(var(--giro,0deg)) scale(.9)}
   .fam.entra .fam-producto{transform:translate(-50%,-50%) rotate(var(--giro,0deg)) scale(1)}
   .fam-ficha{border-left:none; padding-top:16px; border-top:1px solid var(--linea)}
@@ -1485,7 +1492,7 @@ a{color:inherit; text-decoration:none}
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-01b · 3D</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-01c · 3D</span>
     </div>
   </div>
 </footer>
@@ -2189,31 +2196,31 @@ $("#hoja-sumar").addEventListener("click", () => { if(hojaId){ sumar(hojaId, hoj
    externas, así que ahí conviene subir el archivo.
    ═══════════════════════════════════════════════════ */
 const FAMILIAS = [
-  { cat:"Tablas", pieza:"tabla", foto:"", alto:"52vh", giro:-19, sombra:"20%",
+  { cat:"Tablas", pieza:"tabla", foto:"", alto:"58vh", giro:0, sombra:"18%",
     acento:"#D6B689",
     clave:"rgba(214,182,137,.26)", contra:"rgba(255,180,90,.10)",
     texto:"Maple canadiense prensado en siete capas. Cóncavo medio y un pop que aguanta la temporada completa.",
     ficha:[["Capas","7 de maple"],["Medidas",'8.0" · 8.25"'],["Cóncavo","Medio"]] },
 
-  { cat:"Ruedas", pieza:"ruedas", foto:"", alto:"30vh", giro:0, sombra:"26%",
+  { cat:"Ruedas", pieza:"ruedas", foto:"", alto:"40vh", giro:0, sombra:"34%",
     acento:"var(--rojo)",
     clave:"rgba(255,94,26,.30)", contra:"rgba(255,200,150,.10)",
     texto:"Uretano 99A y 101A. Para calle, plaza y lo que se atraviese en el camino.",
     ficha:[["Dureza","99A · 101A"],["Diámetro","53 · 55 mm"],["Juego","4 piezas"]] },
 
-  { cat:"Trucks", pieza:"trucks", foto:"", alto:"26vh", giro:0, sombra:"34%",
+  { cat:"Trucks", pieza:"trucks", foto:"", alto:"40vh", giro:0, sombra:"40%",
     acento:"#9BB4E8",
     clave:"rgba(150,175,255,.22)", contra:"rgba(200,220,255,.10)",
     texto:"Aluminio, para tablas de 8.0 y 8.25. Giran parejo desde el primer día, sin bujes que se aplasten.",
     ficha:[["Hanger",'5.25" · 5.5"'],["Material","Aluminio"],["Juego","Par"]] },
 
-  { cat:"Baleros", pieza:"baleros", foto:"", alto:"28vh", giro:0, sombra:"22%",
+  { cat:"Baleros", pieza:"baleros", foto:"", alto:"36vh", giro:0, sombra:"32%",
     acento:"#C3C8D4",
     clave:"rgba(195,200,212,.20)", contra:"rgba(150,175,255,.10)",
     texto:"ABEC 7 y cerámicos. Lo que separa rodar de venir arrastrando la tabla.",
     ficha:[["Grado","ABEC 7"],["Premium","Cerámicos"],["Juego","8 piezas"]] },
 
-  { cat:"Lijas", pieza:"lijas", foto:"", alto:"26vh", giro:8, sombra:"22%",
+  { cat:"Lijas", pieza:"lijas", foto:"", alto:"46vh", giro:0, sombra:"20%",
     acento:"#8E8E96",
     clave:"rgba(237,234,228,.13)", contra:"rgba(150,175,255,.08)",
     texto:"Grano 80 y perforada. Pegada sin burbujas, como se debe pegar una tabla.",
@@ -2236,6 +2243,7 @@ function pintarFamilias(){
 
     return `
       <section class="fam" id="fam-${esc(f.cat.toLowerCase())}"
+               data-pieza="${esc(f.pieza)}" data-cat="${esc(f.cat)}"
                style="--clave:${f.clave}; --contra:${f.contra}; --acento:${f.acento};
                       --alto:${f.alto}; --giro:${f.giro}deg; --sombraW:${f.sombra}">
         <div class="fam-luz"></div>
@@ -2248,10 +2256,12 @@ function pintarFamilias(){
           </div>
 
           <div class="fam-escena">
-            <h2 class="fam-palabra">${esc(f.cat)}</h2>
-            <div class="fam-reflejo"><div class="fam-reflejo-in">${arte}</div></div>
-            <div class="fam-contacto"></div>
-            <div class="fam-producto">${arte}</div>
+            <div class="fam-capa fam-capa--fondo"><h2 class="fam-palabra">${esc(f.cat)}</h2></div>
+            <div class="fam-capa fam-capa--frente">
+              <div class="fam-reflejo"><div class="fam-reflejo-in fam-arte">${arte}</div></div>
+              <div class="fam-contacto"></div>
+              <div class="fam-producto fam-arte">${arte}</div>
+            </div>
           </div>
 
           <div class="fam-pie">
@@ -2270,15 +2280,87 @@ function pintarFamilias(){
       </section>`;
   }).join("");
 
-  /* Cada familia se arma sola al llegar a ella */
+  /* Cada familia se arma sola al llegar a ella, y de paso
+     posa para su propio retrato en 3D. Se toma al llegar, no
+     al cargar: así la portada abre sin pagar por seis renders. */
   if("IntersectionObserver" in window && !quieto){
     const ob = new IntersectionObserver(es => {
-      es.forEach(e => { if(e.isIntersecting){ e.target.classList.add("entra"); ob.unobserve(e.target); } });
-    }, { threshold:.28 });
+      es.forEach(e => {
+        if(!e.isIntersecting) return;
+        e.target.classList.add("entra");
+        ob.unobserve(e.target);
+        posarFamilia(e.target);
+      });
+    }, { threshold:.28, rootMargin:"20% 0px" });
     casa.querySelectorAll(".fam").forEach(el => ob.observe(el));
   } else {
-    casa.querySelectorAll(".fam").forEach(el => el.classList.add("entra"));
+    casa.querySelectorAll(".fam").forEach(el => { el.classList.add("entra"); posarFamilia(el); });
   }
+}
+
+/* ── Paralaje ─────────────────────────────────────────
+   La palabra va más despacio que la pieza: al pasar por una
+   familia, la pieza se despega del fondo. Un solo oyente para
+   las seis, y sólo se tocan las que están en pantalla. Se leen
+   todas las medidas primero y luego se escribe: si se alterna
+   leer y escribir, el navegador recalcula el diseño en cada
+   vuelta y se siente. */
+const capasFam = [];
+function medirCapas(){
+  capasFam.length = 0;
+  document.querySelectorAll(".fam").forEach(f => {
+    const fondo = f.querySelector(".fam-capa--fondo");
+    const frente = f.querySelector(".fam-capa--frente");
+    if(fondo && frente) capasFam.push({ f, fondo, frente });
+  });
+}
+let pendienteFam = false;
+function moverFamilias(){
+  pendienteFam = false;
+  if(quieto) return;
+  const mitad = innerHeight / 2, vivas = [];
+  for(let i = 0; i < capasFam.length; i++){
+    const c = capasFam[i], r = c.f.getBoundingClientRect();
+    if(r.bottom < -160 || r.top > innerHeight + 160) continue;
+    vivas.push([c, Math.max(-1, Math.min(1, ((r.top + r.height / 2) - mitad) / mitad))]);
+  }
+  for(let i = 0; i < vivas.length; i++){
+    const [c, p] = vivas[i];
+    c.fondo.style.transform = `translate3d(0,${(p * 30).toFixed(1)}px,0)`;
+    c.frente.style.transform = `translate3d(0,${(p * -54).toFixed(1)}px,0)`;
+  }
+}
+function seguirFamilias(){
+  medirCapas();
+  if(quieto || !capasFam.length) return;
+  addEventListener("scroll", () => {
+    if(pendienteFam) return;
+    pendienteFam = true;
+    requestAnimationFrame(moverFamilias);
+  }, { passive:true });
+  addEventListener("resize", moverFamilias);
+  moverFamilias();
+}
+
+/* Cambia el plano dibujado por el retrato en 3D del juego */
+function posarFamilia(nodo, intento){
+  const clave = nodo.dataset.pieza;
+  if(!clave) return;
+  let dato = retratoFamilia[clave];
+  if(dato === undefined){
+    dato = typeof tomarRetratoFamilia === "function" ? tomarRetratoFamilia(clave) : null;
+    /* El estudio puede estar ocupado con el catálogo: se vuelve a
+       intentar en lugar de quedarse con el plano para siempre. */
+    if(dato === null && retratoFamilia[clave] === undefined && (intento || 0) < 40){
+      requestAnimationFrame(() => posarFamilia(nodo, (intento || 0) + 1));
+      return;
+    }
+  }
+  if(!dato) return;                       /* sin 3D se queda el plano */
+  nodo.querySelectorAll(".fam-arte").forEach(caja => {
+    caja.innerHTML = `<img class="retrato" src="${dato}" alt="${esc(nodo.dataset.cat || "")}" decoding="async">`;
+  });
+  nodo.classList.add("con-retrato");
 }
 
 /* Al elegir una familia, el catálogo queda filtrado en ella */
@@ -3122,47 +3204,64 @@ function encuadrarFoto(lente2, obj, pose){
   return _esfFoto.center;
 }
 
+/* ── El estudio ───────────────────────────────────────
+   Montar y desmontar el set: se esconde la patineta y el
+   piso, se apaga la sombra proyectada (no hay suelo que la
+   reciba y volver a llenar un mapa de 2048 sí se siente), y
+   se deja el lienzo del tamaño del retrato. Al cerrar queda
+   todo como estaba. Lo usan el catálogo y las familias. */
+let tomandoFotos = false;
+function abrirEstudio(A, B){
+  const anchoAntes = lienzo3d.width, altoAntes = lienzo3d.height;
+  const dprAntes = render.getPixelRatio(), focoAntes = foco.intensity;
+  const verTabla = patineta3d.visible, verPiso = piso3d.visible, verSombra = sombraContacto.visible;
+  const sombraAntes = clave.castShadow;
+  tomandoFotos = true;
+  patineta3d.visible = false; piso3d.visible = false; sombraContacto.visible = false;
+  clave.castShadow = false;
+  render.setPixelRatio(1);
+  render.setSize(A, B, false);
+  const lenteFoto = new T.PerspectiveCamera(34, A / B, 0.01, 8);
+  const bolsa = new T.Group();
+  escena3d.add(bolsa);
+  return {
+    lenteFoto, bolsa,
+    /* Posa una pieza y devuelve su render como imagen */
+    posar(pieza, pose, calidad){
+      bolsa.clear(); bolsa.add(pieza);
+      const centro = encuadrarFoto(lenteFoto, bolsa, pose);
+      foco.intensity = 1.9;
+      foco.position.copy(lenteFoto.position);
+      foco.target.position.copy(centro);
+      foco.target.updateMatrixWorld();
+      render.render(escena3d, lenteFoto);
+      return lienzo3d.toDataURL("image/webp", calidad || 0.86);
+    },
+    cerrar(){
+      tomandoFotos = false;
+      escena3d.remove(bolsa);
+      patineta3d.visible = verTabla; piso3d.visible = verPiso; sombraContacto.visible = verSombra;
+      clave.castShadow = sombraAntes;
+      foco.intensity = focoAntes;
+      render.setPixelRatio(dprAntes);
+      render.setSize(anchoAntes / dprAntes, altoAntes / dprAntes, false);
+      tenirPiezas(elegido.tabla, elegido.ruedas, elegido.lija);
+      medirLienzo();
+    },
+  };
+}
+
 /* Se dispara una sola vez, con el catálogo ya encima tapando
    la pantalla: el lienzo del truco parpadea sin que se vea.
    Va por tandas, un puñado por cuadro, para que ni en un
    teléfono lento se quede la página trabada mientras posa. */
 function tomarRetratos(alSalir){
   if(retratosListos || !render) return;
-  retratosListos = true; tomandoFotos = true;
-
-  const anchoAntes = lienzo3d.width, altoAntes = lienzo3d.height;
-  const dprAntes = render.getPixelRatio(), focoAntes = foco.intensity;
-  const verTabla = patineta3d.visible, verPiso = piso3d.visible, verSombra = sombraContacto.visible;
-  const sombraAntes = clave.castShadow;
-  const A = 400, B = 500;
-  let lenteFoto = null, bolsa = null;
+  retratosListos = true;
   const ids = Object.keys(RETRATOS);
-  let i = 0;
-
-  function guardar(){
-    tomandoFotos = false;
-    if(bolsa) escena3d.remove(bolsa);
-    patineta3d.visible = verTabla; piso3d.visible = verPiso; sombraContacto.visible = verSombra;
-    clave.castShadow = sombraAntes;
-    foco.intensity = focoAntes;
-    render.setPixelRatio(dprAntes);
-    render.setSize(anchoAntes / dprAntes, altoAntes / dprAntes, false);
-    tenirPiezas(elegido.tabla, elegido.ruedas, elegido.lija);
-    medirLienzo();
-    if(alSalir) alSalir();
-  }
-
-  try{
-    patineta3d.visible = false; piso3d.visible = false; sombraContacto.visible = false;
-    /* La sombra proyectada no aporta nada en un retrato sin piso,
-       y volver a llenar un mapa de 2048 trece veces sí se siente. */
-    clave.castShadow = false;
-    render.setPixelRatio(1);
-    render.setSize(A, B, false);
-    lenteFoto = new T.PerspectiveCamera(34, A / B, 0.01, 8);
-    bolsa = new T.Group();
-    escena3d.add(bolsa);
-  }catch(e){ guardar(); return; }
+  let i = 0, set = null;
+  try{ set = abrirEstudio(400, 500); }
+  catch(e){ tomandoFotos = false; if(alSalir) alSalir(); return; }
 
   function tanda(){
     try{
@@ -3171,26 +3270,93 @@ function tomarRetratos(alSalir){
         const r = RETRATOS[ids[i]];
         const pieza = piezaSuelta(r);
         if(!pieza) continue;
-        bolsa.clear(); bolsa.add(pieza);
-        const centro = encuadrarFoto(lenteFoto, bolsa, POSES[r.pieza]);
-        foco.intensity = 1.9;
-        foco.position.copy(lenteFoto.position);
-        foco.target.position.copy(centro);
-        foco.target.updateMatrixWorld();
-        render.render(escena3d, lenteFoto);
-        retratoDe[ids[i]] = lienzo3d.toDataURL("image/webp", 0.86);
+        retratoDe[ids[i]] = set.posar(pieza, POSES[r.pieza], 0.86);
       }
     }catch(e){
       /* Si algo truena se quedan los planos dibujados: nadie se entera */
       i = ids.length;
     }
     if(i < ids.length){ if(alSalir) alSalir(); requestAnimationFrame(tanda); }
-    else guardar();
+    else { set.cerrar(); if(alSalir) alSalir(); }
   }
   tanda();
 }
 
-/* Cada tramo del truco abre la pieza que la cámara está mirando */
+/* ── El retrato de cada familia ───────────────────────
+   Aquí no va una pieza suelta sino el juego completo —tres
+   ruedas, el par de trucks, los baleros abanicados—, porque
+   eso es lo que quiere decir "familia". Se toma en cuanto se
+   llega a esa pantalla, no antes: así no cuesta nada al abrir. */
+function juegoDe(clave){
+  const g = new T.Group();
+  if(clave === "tabla"){
+    tenirPiezas(1, elegido.ruedas, 0);
+    const t = armarTabla(8.25 * 0.0254);
+    t.rotation.set(0, 0, Math.PI);          /* la panza al frente: es el gráfico */
+    g.add(t);
+    return { obj:g, ancho:600, alto:900, pose:{ dir:[0.26, 0.93, 0.26], arriba:[0, 0, 1], aire:1.06 } };
+  }
+  if(clave === "ruedas"){
+    tenirPiezas(elegido.tabla, 1, elegido.lija);
+    const wd = 0.055;
+    [[-0.040, 0, 0.010, 0.16], [0.006, 0.002, -0.026, -0.42], [0.046, -0.001, 0.024, 0.72]]
+      .forEach(([x, y, z, giro]) => {
+        const r = armarRueda(wd, false);
+        r.position.set(x, y, z);
+        r.rotation.y = giro;
+        g.add(r);
+      });
+    return { obj:g, ancho:920, alto:560, pose:{ dir:[0.52, 0.42, 0.74], aire:1.10 } };
+  }
+  if(clave === "trucks"){
+    const aw = 8.25 * 0.0254;
+    [[-0.056, 0.004, -0.040, 0.34], [0.062, -0.004, 0.046, 1.05]].forEach(([x, y, z, giro]) => {
+      const t = armarTruck(1, aw, 0.053, aw, null, false);
+      const cuna = new T.Group();
+      cuna.add(t);
+      cuna.position.set(x, y, z);
+      cuna.rotation.y = giro;
+      g.add(cuna);
+    });
+    return { obj:g, ancho:920, alto:560, pose:{ dir:[0.60, 0.26, 0.76], aire:1.12 } };
+  }
+  if(clave === "baleros"){
+    [[-0.026, 0, 0.006, 0.30], [0, 0.001, -0.014, -0.20], [0.026, -0.001, 0.012, 0.62]]
+      .forEach(([x, y, z, giro]) => {
+        const bl = armarBalero();
+        bl.position.set(x, y, z);
+        bl.rotation.set(0.34, giro, 0.22);
+        g.add(bl);
+      });
+    return { obj:g, ancho:920, alto:560, pose:{ dir:[0.44, 0.56, 0.70], aire:1.14 } };
+  }
+  if(clave === "lijas"){
+    tenirPiezas(elegido.tabla, elegido.ruedas, 0);
+    const h = armarHoja();
+    h.rotation.set(-0.32, 0.22, 0.06);
+    g.add(h);
+    return { obj:g, ancho:560, alto:900, pose:{ dir:[0.24, 0.90, 0.36], arriba:[0, 0, 1], aire:1.06 } };
+  }
+  return null;
+}
+
+const retratoFamilia = {};
+function tomarRetratoFamilia(clave){
+  if(!render || retratoFamilia[clave] || tomandoFotos) return null;
+  let set = null;
+  try{
+    const juego = juegoDe(clave);
+    if(!juego) return null;
+    set = abrirEstudio(juego.ancho, juego.alto);
+    retratoFamilia[clave] = set.posar(juego.obj, juego.pose, 0.84);
+  }catch(e){
+    retratoFamilia[clave] = null;
+  }
+  if(set) set.cerrar(); else tomandoFotos = false;
+  return retratoFamilia[clave];
+}
+
+/* Cada tramo del truco abre la pieza que la cámara está mirando *//* Cada tramo del truco abre la pieza que la cámara está mirando */
 const FASES = [
   { k:"lija",   a:.02, b:.24 },
   { k:"tabla",  a:.24, b:.46 },
@@ -3343,7 +3509,6 @@ escena.addEventListener("pointercancel", soltarOrbita);
 /* Arranca en visible: si el observador no llegara a disparar, la
    escena igual se dibuja. Antes se quedaba en negro para siempre. */
 let pendiente = false, visible = true;
-let tomandoFotos = false;      /* posando para el catálogo */
 function pedirCuadro(){
   if(pendiente || !visible || !render || tomandoFotos) return;
   pendiente = true;
@@ -3558,6 +3723,7 @@ addEventListener("resize", () => {
 
 /* ── Arranque ───────────────────────────────────────── */
 pintarFamilias();
+seguirFamilias();
 pintarPestanas();
 pintarArco();
 pintarPanel();
