@@ -219,35 +219,6 @@ img{max-width:100%; display:block}
 /* El SVG de materiales solo carga los degradados: no ocupa espacio */
 .materiales{position:absolute; width:0; height:0; overflow:hidden}
 
-/* ── Grafiti ──────────────────────────────────────────
-   No es un adorno: es el escudo de la casa pintado con lata.
-   La catrina que ya trae el catálogo (ruedas Catrina's Pizza,
-   cera Catrina), montada sobre dos tablas cruzadas y dentro de
-   un cempasúchil. Calavera + tablas + flor = Matamoros. */
-.grafiti{position:absolute; z-index:0; pointer-events:none}
-@media(max-width:860px){ .grafiti{width:min(228px,48vw) !important; top:6% !important; right:3% !important} }
-/* El cráneo: hueso con contorno negro grueso y sombra dura
-   desplazada, que es como se ve un throw-up sobre una barda. */
-.gf-cuerpo{
-  fill:#EDEAE4; stroke:#08080A; stroke-width:9; stroke-linejoin:round;
-  filter:drop-shadow(8px 10px 0 rgba(8,8,10,.9));
-}
-.gf-hueco{fill:#08080A}
-.gf-petalo{fill:var(--ember)}
-.gf-nucleo{fill:#FFD9A8}
-.gf-marca{fill:var(--rojo); stroke:#08080A; stroke-width:5; stroke-linejoin:round}
-.gf-costura{fill:none; stroke:#08080A; stroke-width:8; stroke-linecap:round}
-/* Las tablas cruzadas: rojo de la casa, contorno negro */
-.gf-tabla{fill:var(--rojo-hondo); stroke:#08080A; stroke-width:9; stroke-linejoin:round}
-.gf-tabla .gf-lija{fill:#08080A; stroke:none; opacity:.6}
-.gf-tabla .gf-rueda{fill:#EDEAE4}
-/* El cempasúchil: la flor de muerto. Dos vueltas de pétalos
-   girados alrededor de la calavera. */
-.gf-flor--fuera{fill:#B8461B; opacity:.75}
-.gf-flor--dentro{fill:#FF7A2E; opacity:.75}
-.gf-brillo{fill:#fff; opacity:.4}
-.gf-chorreo{fill:#EDEAE4; stroke:#08080A; stroke-width:7; stroke-linejoin:round}
-.gf-tag{opacity:.95; transform-origin:50% 50%; transform:rotate(-7deg)}
 .chorreo{position:absolute; pointer-events:none; opacity:.55}
 /* Tag: un trazo de plumón junto al número de cada familia */
 .tag-trazo{position:absolute; pointer-events:none; opacity:.5}
@@ -1101,12 +1072,6 @@ a{color:inherit; text-decoration:none}
     radial-gradient(62% 74% at 8% 22%, rgba(255,94,26,.16) 0%, transparent 70%),
     linear-gradient(135deg, var(--noche) 0%, var(--void) 72%);
 }
-/* La marca de agua: la misma calavera de la portada */
-.evento-sello{
-  position:absolute; right:-3%; bottom:-14%; width:min(300px,34%); z-index:1;
-  opacity:.13; filter:grayscale(.72); pointer-events:none;
-}
-@media(max-width:759px){ .evento-sello{width:170px; right:-11%; bottom:-9%; opacity:.10} }
 
 .evento-barra{
   position:relative; z-index:2; display:flex; align-items:center; gap:16px; flex-wrap:wrap;
@@ -1149,7 +1114,6 @@ a{color:inherit; text-decoration:none}
 .evento.paso .evento-dia b{color:var(--mute)}
 .evento.paso .evento-cuenta{color:var(--mute-2)}
 .evento.paso .evento-cuenta::before{background:var(--mute-2)}
-.evento.paso .evento-sello{opacity:.06; filter:grayscale(1)}
 .evento.paso .evento-foto img{filter:grayscale(1); opacity:.32}
 /* A un evento que ya pasó no le hace falta el cómo llegar */
 .evento.paso a.btn{display:none}
@@ -1376,15 +1340,6 @@ a{color:inherit; text-decoration:none}
     <feDropShadow dx="0" dy="14" stdDeviation="15" flood-color="#000" flood-opacity=".62"/>
   </filter>
   <!-- Aerosol: grano irregular, como el borde de una mancha de lata -->
-  <filter id="m-spray" x="-20%" y="-20%" width="140%" height="140%">
-    <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="4" seed="7" result="r"/>
-    <feDisplacementMap in="SourceGraphic" in2="r" scale="46" xChannelSelector="R" yChannelSelector="G"/>
-    <feGaussianBlur stdDeviation="1.6"/>
-  </filter>
-  <filter id="m-salpica" x="-30%" y="-30%" width="160%" height="160%">
-    <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="n"/>
-    <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
   <radialGradient id="m-rim" cx=".68" cy=".78" r=".5">
     <stop offset=".55" stop-color="#FFF" stop-opacity="0"/>
     <stop offset="1" stop-color="#FFF" stop-opacity=".22"/>
@@ -1411,85 +1366,6 @@ a{color:inherit; text-decoration:none}
   <!-- ═══ Portada ═══ -->
   <section class="portada">
     <div class="portada-medio" id="portada-medio"><div class="atmosfera"></div></div>
-    <!-- El escudo de la casa, pintado con lata.
-         La calavera catrina —que ya vive en el catálogo: ruedas
-         Catrina's Pizza, cera Catrina— sobre dos tablas cruzadas
-         como huesos, dentro del cempasúchil de Día de Muertos.
-         Cráneo = Matamoros · tablas = skateshop · flor = de aquí. -->
-    <svg class="grafiti" aria-hidden="true" viewBox="0 0 400 400"
-         style="right:4.5%; top:8%; width:min(392px,29vw)">
-      <g filter="url(#m-salpica)" fill="var(--rojo)" opacity=".5">
-        <circle cx="20" cy="60" r="5"/><circle cx="378" cy="104" r="4"/>
-        <circle cx="352" cy="34" r="3"/><circle cx="44" cy="330" r="4.5"/>
-        <circle cx="316" cy="352" r="3.5"/><circle cx="10" cy="180" r="3"/>
-      </g>
-
-      <!-- Con id, porque el cartel del evento la vuelve a usar
-           con <use> en lugar de repetir todos los trazos. -->
-      <g class="gf-tag" id="marca-casa">
-        <!-- Cempasúchil: los pétalos son el trazo cortado de la lata -->
-        <defs>
-          <path id="gf-pet"  d="M200 16c14 18 18 46 9 70-5 9-13 9-18 0-9-24-5-52 9-70z"/>
-          <path id="gf-pet2" d="M200 50c11 14 15 37 7 57-4 8-10 8-14 0-8-20-4-43 7-57z"/>
-        </defs>
-        <!-- Cempasúchil: la flor de muerto, dos vueltas de pétalos -->
-        <g class="gf-flor gf-flor--fuera"><use href="#gf-pet"/><use href="#gf-pet" transform="rotate(25.7 200 196)"/><use href="#gf-pet" transform="rotate(51.4 200 196)"/><use href="#gf-pet" transform="rotate(77.1 200 196)"/><use href="#gf-pet" transform="rotate(102.9 200 196)"/><use href="#gf-pet" transform="rotate(128.6 200 196)"/><use href="#gf-pet" transform="rotate(154.3 200 196)"/><use href="#gf-pet" transform="rotate(180 200 196)"/><use href="#gf-pet" transform="rotate(205.7 200 196)"/><use href="#gf-pet" transform="rotate(231.4 200 196)"/><use href="#gf-pet" transform="rotate(257.1 200 196)"/><use href="#gf-pet" transform="rotate(282.9 200 196)"/><use href="#gf-pet" transform="rotate(308.6 200 196)"/><use href="#gf-pet" transform="rotate(334.3 200 196)"/></g>
-        <g class="gf-flor gf-flor--dentro"><use href="#gf-pet2" transform="rotate(12.9 200 196)"/><use href="#gf-pet2" transform="rotate(38.6 200 196)"/><use href="#gf-pet2" transform="rotate(64.3 200 196)"/><use href="#gf-pet2" transform="rotate(90 200 196)"/><use href="#gf-pet2" transform="rotate(115.8 200 196)"/><use href="#gf-pet2" transform="rotate(141.5 200 196)"/><use href="#gf-pet2" transform="rotate(167.2 200 196)"/><use href="#gf-pet2" transform="rotate(192.9 200 196)"/><use href="#gf-pet2" transform="rotate(218.6 200 196)"/><use href="#gf-pet2" transform="rotate(244.3 200 196)"/><use href="#gf-pet2" transform="rotate(270 200 196)"/><use href="#gf-pet2" transform="rotate(295.8 200 196)"/><use href="#gf-pet2" transform="rotate(321.5 200 196)"/><use href="#gf-pet2" transform="rotate(347.2 200 196)"/></g>
-
-        <!-- Dos tablas cruzadas, como las tibias de una bandera -->
-        <g class="gf-tabla">
-          <g transform="rotate(-33 200 196)">
-            <circle class="gf-rueda" cx="82" cy="230" r="13"/>
-            <circle class="gf-rueda" cx="318" cy="230" r="13"/>
-            <rect x="16" y="178" width="368" height="40" rx="19"/>
-            <path class="gf-lija" d="M40 183h320c7 0 7 9 0 9H40z"/>
-          </g>
-          <g transform="rotate(33 200 196)">
-            <circle class="gf-rueda" cx="82" cy="230" r="13"/>
-            <circle class="gf-rueda" cx="318" cy="230" r="13"/>
-            <rect x="16" y="178" width="368" height="40" rx="19"/>
-            <path class="gf-lija" d="M40 183h320c7 0 7 9 0 9H40z"/>
-          </g>
-        </g>
-
-        <!-- Escurrido de pintura fresca bajo la quijada -->
-        <g class="gf-chorreo">
-          <path d="M168 300c0 30 2 50 3 62 1 7 11 7 12 0 2-13 3-32 3-62z"/>
-          <path d="M214 304c0 22 1 37 2 46 1 6 9 6 10 0 1-9 2-24 2-46z"/>
-        </g>
-
-        <!-- La calavera -->
-        <path class="gf-cuerpo" d="M200 96c58 0 100 38 100 94 0 29-11 51-29 65-6 5-9 11-10 18-1 15-10 25-24 28-8 2-13 8-19 13-6 4-30 4-36 0-6-5-11-11-19-13-14-3-23-13-24-28-1-7-4-13-10-18-18-14-29-36-29-65 0-56 42-94 100-94z"/>
-
-        <!-- Cuencas, con su flor adentro: eso es lo catrina -->
-        <ellipse class="gf-hueco" cx="166" cy="186" rx="28" ry="30"/>
-        <ellipse class="gf-hueco" cx="234" cy="186" rx="28" ry="30"/>
-        <g class="gf-petalo">
-          <ellipse cx="166" cy="171" rx="7" ry="11"/><ellipse cx="180" cy="186" rx="11" ry="7"/>
-          <ellipse cx="166" cy="201" rx="7" ry="11"/><ellipse cx="152" cy="186" rx="11" ry="7"/>
-          <ellipse cx="234" cy="171" rx="7" ry="11"/><ellipse cx="248" cy="186" rx="11" ry="7"/>
-          <ellipse cx="234" cy="201" rx="7" ry="11"/><ellipse cx="220" cy="186" rx="11" ry="7"/>
-        </g>
-        <circle class="gf-nucleo" cx="166" cy="186" r="6"/>
-        <circle class="gf-nucleo" cx="234" cy="186" r="6"/>
-
-        <!-- Nariz de corazón invertido -->
-        <path class="gf-hueco" d="M200 248c-15-10-23-22-18-32 4-9 15-6 18 3 3-9 14-12 18-3 5 10-3 22-18 32z"/>
-
-        <!-- Boca cosida: la sonrisa de la catrina -->
-        <g class="gf-costura">
-          <path d="M150 268q50 15 100 0"/>
-          <path d="M166 262v20"/><path d="M183 267v20"/><path d="M200 269v20"/>
-          <path d="M217 267v20"/><path d="M234 262v20"/>
-        </g>
-
-        <!-- La M de Matamoros marcada en la frente -->
-        <path class="gf-marca" d="M180 152v-30h11l9 15 9-15h11v30h-10v-16l-7 12h-6l-7-12v16z"/>
-
-        <!-- Brillo: el reflejo del sol en la pintura fresca -->
-        <path class="gf-brillo" d="M132 148c8-24 24-40 42-44 8-2 11 9 4 13-14 7-26 20-32 36-3 8-16 4-14-5z"/>
-      </g>
-    </svg>
     <div class="portada-in">
       <p class="rotulo" id="rotulo-zona">Cuauhtémoc · Chihuahua · Skateshop móvil</p>
       <h1 class="colosal wordmark">Matamoros</h1>
@@ -1688,7 +1564,7 @@ a{color:inherit; text-decoration:none}
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-03 · montaje</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-04 · montaje</span>
     </div>
   </div>
 </footer>
@@ -4084,7 +3960,6 @@ function pintarEventos(){
     ${cartel.foto
       ? `<div class="evento-foto"><img src="${esc(cartel.foto)}" alt="" loading="lazy" decoding="async"></div>`
       : `<div class="evento-fondo"></div>`}
-    <svg class="evento-sello" viewBox="0 0 400 400" aria-hidden="true"><use href="#marca-casa"/></svg>
     <div class="evento-barra">
       <span>${paso ? "Ya fue" : "Próximo"}</span>
       <span class="evento-cuenta">${esc(cuantoFalta(dias))}</span>
