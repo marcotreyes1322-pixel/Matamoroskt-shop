@@ -793,76 +793,201 @@ a{color:inherit; text-decoration:none}
 }
 #catalogo.abierto{opacity:1; visibility:visible; transform:none}
 .cat-barra{
-  position:sticky; top:0; z-index:3; background:rgba(8,8,10,.97);
-  border-bottom:1px solid var(--linea); padding:18px 0; margin-bottom:38px;
+  position:sticky; top:0; z-index:3; background:var(--void);
+  border-bottom:1px solid var(--linea); padding:16px 0; margin-bottom:34px;
+}
+.cat-barra::after{
+  content:""; position:absolute; left:0; bottom:-1px; width:34%; max-width:280px;
+  height:1px; background:var(--ember);
 }
 .cat-barra-in{width:var(--ancho); margin-inline:auto; display:flex; align-items:center; gap:18px}
-.cat-barra .titulo{font-size:clamp(1.25rem,3vw,2rem); text-shadow:none}
+.cat-barra .titulo{font-size:clamp(1.25rem,3vw,2rem); text-shadow:none; margin:0}
+.cat-rotulo #cat-cuenta{margin:3px 0 0; color:var(--mute-2); font-size:.625rem; letter-spacing:.16em; text-transform:uppercase}
+.cat-entrada{margin-bottom:26px; max-width:52ch}
 .cat-cerrar{
   margin-left:auto; width:42px; height:42px; border-radius:50%;
   border:1px solid var(--linea-2); display:grid; place-items:center; color:var(--mute);
-  transition:border-color .25s, color .25s;
+  transition:border-color .25s, color .25s, transform .25s var(--curva);
 }
-.cat-cerrar:hover,.cat-cerrar:focus-visible{border-color:var(--rojo); color:var(--rojo)}
+.cat-cerrar:hover,.cat-cerrar:focus-visible{border-color:var(--rojo); color:var(--rojo); transform:rotate(90deg)}
 
-.herramientas{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px}
-.campo{
-  flex:1 1 240px; min-width:0; padding:12px 14px; border-radius:2px;
-  background:var(--raise); border:1px solid var(--linea); color:var(--hueso);
+/* ── Buscar y ordenar ──
+   Nada de <select> del sistema: en cada sistema operativo se ve
+   distinto y rompe la estética. Botones que se apagan al repicar. */
+.herramientas{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px}
+.busca{
+  flex:1 1 260px; min-width:0; display:flex; align-items:center; gap:10px;
+  padding:12px 15px; border-radius:2px;
+  background:var(--raise); border:1px solid var(--linea);
+  transition:border-color .25s;
+}
+.busca:focus-within{border-color:var(--ember)}
+.busca svg{width:15px; height:15px; flex:none; color:var(--mute-2); transition:color .25s}
+.busca:focus-within svg{color:var(--ember)}
+.busca input{
+  flex:1; min-width:0; border:0; background:none; color:var(--hueso);
   font-family:var(--dato); font-size:.75rem; letter-spacing:.04em;
 }
-.campo::placeholder{color:var(--mute-2)}
-.campo:focus-visible{border-color:var(--linea-2); outline:none}
-select.campo{flex:0 0 auto; cursor:pointer}
-
-.fichas-filtro{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:34px}
-.filtro{
-  padding:8px 15px; border-radius:2px; border:1px solid var(--linea);
-  font-family:var(--dato); font-size:.6875rem; text-transform:uppercase;
-  letter-spacing:.14em; color:var(--mute);
-  transition:border-color .25s, color .25s, background .25s;
+.busca input:focus{outline:none}
+.busca input::placeholder{color:var(--mute-2)}
+.busca input::-webkit-search-cancel-button{filter:grayscale(1) opacity(.5)}
+.ordenes{display:flex; border:1px solid var(--linea); border-radius:2px; overflow:hidden}
+.ordenes button{
+  padding:12px 14px; font-family:var(--dato); font-size:.625rem;
+  text-transform:uppercase; letter-spacing:.14em; color:var(--mute-2);
+  border-right:1px solid var(--linea); transition:color .22s, background .22s;
 }
-.filtro:hover{color:var(--hueso); border-color:var(--linea-2)}
-.filtro[aria-pressed="true"]{background:var(--hueso); border-color:var(--hueso); color:var(--void)}
-.filtro.fav[aria-pressed="true"]{background:var(--rojo); border-color:var(--rojo); color:#fff}
+.ordenes button:last-child{border-right:0}
+.ordenes button:hover{color:var(--hueso)}
+.ordenes button[aria-pressed="true"]{background:var(--raise); color:var(--ember)}
 
-.rejilla{display:grid; gap:1px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); background:var(--linea); border:1px solid var(--linea)}
-.tarjeta{background:var(--void); position:relative; display:flex; flex-direction:column; transition:background .3s}
+/* ── Índice de familias ──
+   Sin píldora rellena: un subrayado ámbar y la cuenta al lado.
+   Se lee como el índice de una hoja de inventario. */
+.fichas-filtro{
+  display:flex; gap:22px; flex-wrap:wrap; margin-bottom:30px;
+  padding-bottom:14px; border-bottom:1px solid var(--linea);
+}
+.filtro{
+  position:relative; padding:5px 0 9px; display:inline-flex; align-items:flex-start; gap:5px;
+  font-family:var(--dato); font-size:.6875rem; text-transform:uppercase;
+  letter-spacing:.14em; color:var(--mute-2);
+  transition:color .22s;
+}
+.filtro i{font-style:normal; font-size:.5rem; color:var(--mute-2); transform:translateY(-1px); transition:color .22s}
+.filtro::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:1px;
+  background:var(--ember); transform:scaleX(0); transform-origin:left;
+  transition:transform .28s var(--curva);
+}
+.filtro:hover,.filtro:focus-visible{color:var(--hueso)}
+.filtro[aria-pressed="true"]{color:var(--hueso)}
+.filtro[aria-pressed="true"] i{color:var(--ember)}
+.filtro[aria-pressed="true"]::after{transform:scaleX(1)}
+.filtro.fav[aria-pressed="true"]{color:var(--rojo)}
+.filtro.fav[aria-pressed="true"]::after{background:var(--rojo)}
+
+/* ── Rejilla de piezas ── */
+.rejilla{display:grid; gap:1px; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); background:var(--linea); border:1px solid var(--linea)}
+.tarjeta{
+  position:relative; background:var(--void); overflow:hidden;
+  display:flex; flex-direction:column; transition:background .3s;
+}
 .tarjeta:hover{background:var(--noche)}
+/* El filo ámbar avisa que esa pieza sale hoy, sin leer nada */
+.tarjeta.hoy::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:1px;
+  background:var(--ember); opacity:.55; z-index:2;
+}
+/* El medio es una mesa de luz: el retrato cae sobre un foco,
+   no sobre negro plano. */
 .tarjeta-medio{
   aspect-ratio:4/5; position:relative; overflow:hidden; cursor:zoom-in;
-  background:var(--noche); display:grid; place-items:center;
+  background:
+    radial-gradient(78% 52% at 50% 84%, rgba(255,94,26,.16) 0%, transparent 72%),
+    radial-gradient(62% 44% at 50% 16%, rgba(150,175,255,.05) 0%, transparent 70%),
+    var(--noche);
+  display:grid; place-items:center;
 }
-.tarjeta-medio img{width:100%; height:100%; object-fit:cover; transition:transform .6s var(--curva)}
-.tarjeta:hover .tarjeta-medio img{transform:scale(1.04)}
-.tarjeta-medio svg{width:74%; height:74%; opacity:.34; transition:opacity .4s, transform .6s var(--curva)}
-.tarjeta:hover .tarjeta-medio svg{opacity:.6; transform:scale(1.03)}
-.insignia{
-  position:absolute; top:12px; left:12px;
-  font-family:var(--dato); font-size:.5625rem; text-transform:uppercase;
-  letter-spacing:.14em; padding:4px 8px; border-radius:2px;
-  background:rgba(8,8,10,.8); color:var(--mute); border:1px solid var(--linea);
+.tarjeta-medio img{
+  width:100%; height:100%; object-fit:cover; position:relative; z-index:1;
+  transition:transform .6s var(--curva);
 }
-.insignia.tienda{color:var(--rojo); border-color:rgba(255,30,60,.42)}
+.tarjeta-medio img.retrato{object-fit:contain; padding:3% 5%}
+.tarjeta:hover .tarjeta-medio img{transform:scale(1.05)}
+.tarjeta-medio svg{width:78%; height:78%; opacity:.9; position:relative; z-index:1; transition:transform .6s var(--curva)}
+.tarjeta:hover .tarjeta-medio svg{transform:scale(1.04)}
+/* Folio: el número de la pieza en la hoja, en fantasma */
+.folio{
+  position:absolute; left:12px; top:8px; z-index:0;
+  font-family:var(--display); font-variation-settings:'wdth' 70,'wght' 800;
+  font-size:3.25rem; line-height:1; color:var(--hueso); opacity:.055;
+}
+/* Marca de esquina: aparece al pasar encima, como una mira */
+.esquina{
+  position:absolute; right:10px; bottom:10px; width:14px; height:14px; z-index:2;
+  border-right:1px solid var(--ember); border-bottom:1px solid var(--ember);
+  opacity:0; transform:translate(-5px,-5px); transition:opacity .3s, transform .3s var(--curva);
+}
+.tarjeta:hover .esquina{opacity:.85; transform:none}
 .corazon{
-  position:absolute; top:9px; right:9px; width:30px; height:30px; border-radius:50%;
+  position:absolute; top:9px; right:9px; z-index:3; width:30px; height:30px; border-radius:50%;
   display:grid; place-items:center; color:var(--mute); font-size:.875rem;
-  background:rgba(8,8,10,.65); transition:color .25s, background .25s;
+  background:rgba(8,8,10,.6); opacity:0;
+  transition:color .25s, background .25s, opacity .25s;
 }
+.tarjeta:hover .corazon,.corazon:focus-visible{opacity:1}
 .corazon:hover{color:var(--hueso)}
-.corazon[aria-pressed="true"]{color:var(--rojo)}
-.tarjeta-cuerpo{padding:16px 16px 18px; display:flex; flex-direction:column; gap:5px; flex:1}
-.tarjeta h3{font-size:.9375rem; font-weight:600; margin:0; line-height:1.25; cursor:pointer}
-.tarjeta .nota{font-family:var(--dato); font-size:.625rem; text-transform:uppercase; letter-spacing:.08em; color:var(--mute-2); margin:0}
-.tarjeta-pie{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:14px}
-.tarjeta .precio{font-family:var(--dato); font-size:.9375rem; color:var(--hueso); letter-spacing:.02em}
-.sumar{
-  font-family:var(--dato); font-size:.625rem; text-transform:uppercase; letter-spacing:.14em;
-  color:var(--mute); padding:7px 12px; border:1px solid var(--linea); border-radius:2px;
-  transition:border-color .25s, color .25s;
+.corazon[aria-pressed="true"]{color:var(--rojo); opacity:1}
+
+.tarjeta-cuerpo{padding:15px 16px 16px; display:flex; flex-direction:column; gap:5px; flex:1}
+.tarjeta-cat{
+  margin:0 0 1px; font-family:var(--dato); font-size:.5rem;
+  text-transform:uppercase; letter-spacing:.2em; color:var(--ember); opacity:.75;
 }
-.sumar:hover,.sumar:focus-visible{border-color:var(--ember); color:var(--ember)}
+.tarjeta h3{
+  margin:0; line-height:1.16; cursor:pointer;
+  font-family:var(--display); font-variation-settings:'wdth' 84,'wght' 600;
+  font-size:1.0625rem; transition:color .22s;
+}
+.tarjeta h3:hover{color:var(--ember)}
+.tarjeta .nota{font-family:var(--dato); font-size:.5625rem; text-transform:uppercase; letter-spacing:.1em; color:var(--mute-2); margin:0; line-height:1.7}
+.tarjeta-pie{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-top:auto; padding-top:14px}
+.tarjeta .precio{
+  font-family:var(--display); font-variation-settings:'wdth' 76,'wght' 700;
+  font-size:1.25rem; color:var(--hueso); letter-spacing:.01em;
+}
+.entrega{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--dato); font-size:.5625rem; text-transform:uppercase;
+  letter-spacing:.12em; color:var(--mute-2);
+}
+.entrega::before{content:""; width:5px; height:5px; border-radius:50%; background:var(--mute-2)}
+.entrega.tienda{color:var(--ember)}
+.entrega.tienda::before{background:var(--ember)}
+/* Agregar: una barra que sube desde abajo. En reposo la rejilla
+   queda tranquila; en táctil, donde no hay "pasar encima", va fija. */
+.sumar{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:12px 16px; background:var(--hueso); color:var(--void);
+  font-family:var(--dato); font-size:.625rem; text-transform:uppercase; letter-spacing:.16em;
+  transform:translateY(100%); transition:transform .32s var(--curva), background .22s;
+}
+.sumar i{font-style:normal; font-size:.875rem; line-height:1}
+.tarjeta:hover .sumar,.sumar:focus-visible{transform:none}
+.sumar:hover{background:var(--ember); color:#fff}
+@media(hover:none){
+  .sumar{transform:none}
+  .corazon{opacity:1}
+  .esquina{display:none}
+}
 .sin-nada{grid-column:1/-1; background:var(--void); padding:52px 20px; text-align:center}
+
+/* ── El catálogo en el teléfono ──
+   Antes había que pasar por el párrafo, el buscador, el orden y
+   tres renglones de familias antes de ver una sola pieza. Ahora
+   el índice se desliza de lado y caben dos piezas por renglón. */
+@media(max-width:700px){
+  .cat-entrada{display:none}
+  .cat-barra{margin-bottom:22px}
+  .herramientas{gap:8px; margin-bottom:14px}
+  .busca{flex:1 1 100%}
+  .ordenes{flex:1}
+  .ordenes button{flex:1; padding:11px 8px; text-align:center}
+  .fichas-filtro{
+    flex-wrap:nowrap; overflow-x:auto; gap:20px; margin-bottom:22px;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .fichas-filtro::-webkit-scrollbar{display:none}
+  .filtro{flex:none}
+  .rejilla{grid-template-columns:repeat(auto-fill,minmax(152px,1fr))}
+  .tarjeta-cuerpo{padding:12px 12px 13px}
+  .tarjeta h3{font-size:.9375rem}
+  .tarjeta .precio{font-size:1.0625rem}
+  .tarjeta-pie{flex-direction:column; align-items:flex-start; gap:5px; padding-top:11px}
+  .folio{font-size:2.25rem; left:9px; top:6px}
+  .sumar{padding:11px 12px; font-size:.5625rem}
+}
 
 /* ── Evento ─────────────────────────────────────────── */
 .evento{
@@ -924,47 +1049,43 @@ select.campo{flex:0 0 auto; cursor:pointer}
 .limpiar{font-family:var(--dato); font-size:.625rem; text-transform:uppercase; letter-spacing:.14em; color:var(--mute-2); transition:color .2s}
 .limpiar:hover{color:var(--ember)}
 
-/* ── El catálogo se abre encima de la página ─────────── */
-const cajaCatalogo = $("#catalogo");
-let quienAbrio = null;
-function abrirCatalogo(cat){
-  if(cat){ catActiva = cat; soloFav = false; pintarFiltros(); pintarRejilla(); }
-  quienAbrio = document.activeElement;
-  cajaCatalogo.hidden = false;
-  requestAnimationFrame(() => cajaCatalogo.classList.add("abierto"));
-  document.body.style.overflow = "hidden";
-  $("#cat-cerrar").focus();
-}
-function cerrarCatalogo(){
-  cajaCatalogo.classList.remove("abierto");
-  document.body.style.overflow = "";
-  setTimeout(() => { if(!cajaCatalogo.classList.contains("abierto")) cajaCatalogo.hidden = true; }, 400);
-  if(quienAbrio && quienAbrio.focus) quienAbrio.focus();
-}
-$("#cat-cerrar").addEventListener("click", cerrarCatalogo);
-document.addEventListener("keydown", e => {
-  if(e.key === "Escape" && cajaCatalogo.classList.contains("abierto") && $("#velo").hidden) cerrarCatalogo();
-});
-/* Cualquier enlace o botón que apunte al catálogo lo abre */
-document.addEventListener("click", e => {
-  const t = e.target.closest('[href="#catalogo"], [data-abre-catalogo]');
-  if(!t) return;
-  e.preventDefault();
-  abrirCatalogo(t.dataset.abreCatalogo || null);
-});
 
 /* ── Vista rápida ───────────────────────────────────── */
-.velo{position:fixed; inset:0; z-index:120; background:rgba(8,8,10,.9); backdrop-filter:blur(6px); display:grid; place-items:center; padding:22px}
+/* Arriba del catálogo (z 150): si no, picarle a una pieza abría
+   la vista rápida DETRÁS de la capa y parecía que no pasaba nada. */
+.velo{position:fixed; inset:0; z-index:170; background:rgba(8,8,10,.9); backdrop-filter:blur(6px); display:grid; place-items:center; padding:22px}
 .velo[hidden]{display:none}
+/* Sello de existencia de la vista rápida */
+.insignia{
+  display:inline-flex; align-items:center; gap:7px; align-self:flex-start;
+  font-family:var(--dato); font-size:.5625rem; text-transform:uppercase;
+  letter-spacing:.14em; color:var(--mute-2);
+  padding:5px 10px; border:1px solid var(--linea); border-radius:2px;
+}
+.insignia::before{content:""; width:5px; height:5px; border-radius:50%; background:var(--mute-2)}
+.insignia.tienda{color:var(--ember); border-color:rgba(255,94,26,.34)}
+.insignia.tienda::before{background:var(--ember)}
 .hoja{
   background:var(--noche); border:1px solid var(--linea-2); border-radius:3px;
   max-width:620px; width:100%; max-height:88vh; overflow:auto;
   display:grid; grid-template-columns:1fr; position:relative;
 }
 @media(min-width:600px){ .hoja{grid-template-columns:1fr 1fr} }
-.hoja-medio{aspect-ratio:4/5; background:var(--void); display:grid; place-items:center; overflow:hidden}
+/* Misma mesa de luz que las tarjetas: la pieza cae sobre un foco,
+   no sobre negro plano. */
+.hoja-medio{
+  aspect-ratio:4/5; display:grid; place-items:center; overflow:hidden;
+  background:
+    radial-gradient(78% 52% at 50% 84%, rgba(255,94,26,.16) 0%, transparent 72%),
+    radial-gradient(62% 44% at 50% 16%, rgba(150,175,255,.05) 0%, transparent 70%),
+    var(--noche);
+}
 .hoja-medio img{width:100%; height:100%; object-fit:cover}
-.hoja-medio svg{width:70%; height:70%; opacity:.4}
+.hoja-medio img.retrato{object-fit:contain; padding:4% 6%}
+.hoja-medio svg{width:76%; height:76%; opacity:.9}
+/* En una columna el retrato vertical empujaba el botón de pedir
+   fuera de la pantalla: apaisado, cabe todo sin desplazar. */
+@media(max-width:599px){ .hoja-medio{aspect-ratio:5/4} }
 .hoja-cuerpo{padding:28px 26px; display:flex; flex-direction:column; gap:12px}
 .hoja-cuerpo h3{font-family:var(--display); font-variation-settings:'wdth' 74,'wght' 700; text-transform:uppercase; font-size:1.375rem; margin:6px 0 0; line-height:1.05}
 .cerrar{position:absolute; top:12px; right:12px; z-index:2; width:34px; height:34px; border-radius:50%; background:rgba(8,8,10,.8); color:var(--mute); display:grid; place-items:center}
@@ -1282,23 +1403,30 @@ document.addEventListener("click", e => {
   <div id="catalogo" role="dialog" aria-modal="true" aria-label="Catálogo completo" hidden>
     <div class="cat-barra">
       <div class="cat-barra-in">
-        <h2 class="titulo">Catálogo</h2>
+        <div class="cat-rotulo">
+          <h2 class="titulo">Catálogo</h2>
+          <p class="dato" id="cat-cuenta">16 piezas</p>
+        </div>
         <button class="cat-cerrar" id="cat-cerrar" aria-label="Cerrar catálogo">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
       </div>
     </div>
     <div class="envoltorio">
-      <p class="lectura" style="margin-bottom:28px">Refacciones, lijas, ceras y ropa. Lo que está en tienda sale hoy mismo; lo que va bajo pedido llega en 5 a 10 días.</p>
+      <p class="lectura cat-entrada">Refacciones, lijas, ceras y ropa. Lo que está en tienda sale hoy mismo; lo que va bajo pedido llega en 5 a 10 días.</p>
 
       <div class="herramientas">
-        <input type="search" id="buscador" class="campo" placeholder="Buscar…" aria-label="Buscar producto">
-        <select id="orden" class="campo" aria-label="Ordenar">
-          <option value="">Ordenar por</option>
-          <option value="precio-asc">Precio ↑</option>
-          <option value="precio-desc">Precio ↓</option>
-          <option value="nombre">Nombre A–Z</option>
-        </select>
+        <label class="busca">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/>
+          </svg>
+          <input type="search" id="buscador" placeholder="Buscar pieza…" aria-label="Buscar producto">
+        </label>
+        <div class="ordenes" id="ordenes" role="group" aria-label="Ordenar">
+          <button data-orden="precio-asc"  aria-pressed="false">Precio ↑</button>
+          <button data-orden="precio-desc" aria-pressed="false">Precio ↓</button>
+          <button data-orden="nombre"      aria-pressed="false">A–Z</button>
+        </div>
       </div>
       <div class="fichas-filtro" role="group" aria-label="Filtros" id="filtros"></div>
       <div class="rejilla" id="rejilla"></div>
@@ -1357,7 +1485,7 @@ document.addEventListener("click", e => {
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-01 · 3D</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-01b · 3D</span>
     </div>
   </div>
 </footer>
@@ -1865,10 +1993,11 @@ let favs = new Set();
 try{ favs = new Set(JSON.parse(localStorage.getItem("mm_favs") || "[]")); }catch(e){}
 const guardarFavs = () => { try{ localStorage.setItem("mm_favs", JSON.stringify([...favs])); }catch(e){} };
 
+const cuentaDe = c => c === "Todo" ? PRODUCTOS.length : PRODUCTOS.filter(p => p.cat === c).length;
 function pintarFiltros(){
   $("#filtros").innerHTML =
-    cats.map(c => `<button class="filtro" data-cat="${esc(c)}" aria-pressed="${c === catActiva}">${esc(c)}</button>`).join("") +
-    `<button class="filtro fav" id="filtro-fav" aria-pressed="${soloFav}">♥ Guardados</button>`;
+    cats.map(c => `<button class="filtro" data-cat="${esc(c)}" aria-pressed="${c === catActiva}">${esc(c)}<i>${cuentaDe(c)}</i></button>`).join("") +
+    `<button class="filtro fav" id="filtro-fav" aria-pressed="${soloFav}">♥ Guardados<i>${favs.size}</i></button>`;
 }
 
 function pintarRejilla(){
@@ -1882,34 +2011,55 @@ function pintarRejilla(){
   else if(orden === "precio-desc") l.sort((a,b) => b.precio - a.precio);
   else if(orden === "nombre") l.sort((a,b) => a.nombre.localeCompare(b.nombre, "es"));
 
+  const enTienda = l.filter(p => p.stock === "tienda").length;
+  $("#cat-cuenta").textContent = l.length
+    ? `${l.length} ${l.length === 1 ? "pieza" : "piezas"} · ${enTienda} en tienda hoy`
+    : "Nada con esos filtros";
   if(!l.length){
     $("#rejilla").innerHTML = `<p class="sin-nada dato">Nada con esos filtros. Prueba quitando alguno.</p>`;
     return;
   }
-  $("#rejilla").innerHTML = l.map(p => `
-    <article class="tarjeta">
+  $("#rejilla").innerHTML = l.map((p, i) => `
+    <article class="tarjeta ${p.stock === "tienda" ? "hoy" : ""}">
       <div class="tarjeta-medio" data-ver="${p.id}">
-        <span class="insignia ${p.stock}">${p.stock === "tienda" ? "En tienda" : "Bajo pedido"}</span>
-        <button class="corazon" data-fav="${p.id}" aria-pressed="${favs.has(p.id)}"
-                aria-label="Guardar ${esc(p.nombre)}">${favs.has(p.id) ? "♥" : "♡"}</button>
-        ${p.img
-          ? `<img src="${esc(p.img)}" alt="${esc(p.nombre)}" loading="lazy" decoding="async">`
-          : PLANOS[PLANO_CAT[p.cat] || "trucks"]}
+        <span class="folio" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
+        ${medioDe(p, true)}
+        <span class="esquina" aria-hidden="true"></span>
       </div>
+      <button class="corazon" data-fav="${p.id}" aria-pressed="${favs.has(p.id)}"
+              aria-label="Guardar ${esc(p.nombre)}">${favs.has(p.id) ? "♥" : "♡"}</button>
       <div class="tarjeta-cuerpo">
+        <p class="tarjeta-cat">${esc(p.cat)}</p>
         <h3 data-ver="${p.id}">${esc(p.nombre)}</h3>
         <p class="nota">${esc(p.nota)}</p>
         <div class="tarjeta-pie">
           <span class="precio cifra">${pesos(p.precio)}</span>
-          <button class="sumar" data-add="${p.id}">Agregar</button>
+          <span class="entrega ${p.stock}">${p.stock === "tienda" ? "Hoy mismo" : "5 a 10 días"}</span>
         </div>
       </div>
+      <button class="sumar" data-add="${p.id}"><span>Agregar</span><i aria-hidden="true">+</i></button>
     </article>`).join("");
+}
+
+/* La foto de la pieza, en orden de preferencia: la que tú pusiste,
+   el retrato en 3D que se tomó la página, y de último el plano
+   dibujado. Nunca se queda un hueco. */
+function medioDe(p, perezosa){
+  const carga = perezosa ? ' loading="lazy"' : "";
+  if(p.img) return `<img src="${esc(p.img)}" alt="${esc(p.nombre)}"${carga} decoding="async">`;
+  if(retratoDe[p.id]) return `<img class="retrato" src="${retratoDe[p.id]}" alt="${esc(p.nombre)}"${carga} decoding="async">`;
+  return PLANOS[PLANO_CAT[p.cat] || "trucks"];
 }
 
 const retardo = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 $("#buscador").addEventListener("input", retardo(e => { busqueda = e.target.value; pintarRejilla(); }, 170));
-$("#orden").addEventListener("change", e => { orden = e.target.value; pintarRejilla(); });
+$("#ordenes").addEventListener("click", e => {
+  const b = e.target.closest("[data-orden]");
+  if(!b) return;
+  orden = b.dataset.orden === orden ? "" : b.dataset.orden;   /* volver a picar lo apaga */
+  $("#ordenes").querySelectorAll("[data-orden]").forEach(x => x.setAttribute("aria-pressed", x.dataset.orden === orden));
+  pintarRejilla();
+});
 $("#filtros").addEventListener("click", e => {
   if(e.target.closest("#filtro-fav")){ soloFav = !soloFav; pintarFiltros(); pintarRejilla(); return; }
   const f = e.target.closest(".filtro[data-cat]");
@@ -1921,7 +2071,7 @@ $("#rejilla").addEventListener("click", e => {
   if(fav){
     const id = fav.dataset.fav;
     favs.has(id) ? favs.delete(id) : favs.add(id);
-    guardarFavs(); pintarRejilla(); return;
+    guardarFavs(); pintarFiltros(); pintarRejilla(); return;
   }
   const ver = e.target.closest("[data-ver]");
   if(ver){ abrirHoja(ver.dataset.ver); return; }
@@ -1963,9 +2113,19 @@ function abrirCatalogo(cat){
   if(cat){ catActiva = cat; soloFav = false; pintarFiltros(); pintarRejilla(); }
   quienAbrio = document.activeElement;
   cajaCatalogo.hidden = false;
-  requestAnimationFrame(() => cajaCatalogo.classList.add("abierto"));
   document.body.style.overflow = "hidden";
-  $("#cat-cerrar").focus();
+  requestAnimationFrame(() => {
+    cajaCatalogo.classList.add("abierto");
+    /* Enfocar antes de esto no servía: con visibility:hidden el
+       botón todavía no es enfocable y el foco se quedaba fuera. */
+    $("#cat-cerrar").focus();
+    /* Con la capa ya encima tapando la pantalla, la página se toma
+       las fotos de sus propias piezas, por tandas para no trabar
+       nada, y va repintando conforme salen. */
+    if(!retratosListos) requestAnimationFrame(() => {
+      try{ tomarRetratos(pintarRejilla); }catch(e){}
+    });
+  });
 }
 function cerrarCatalogo(){
   cajaCatalogo.classList.remove("abierto");
@@ -1991,9 +2151,7 @@ function abrirHoja(id){
   const p = PRODUCTOS.find(x => x.id === id);
   if(!p) return;
   hojaId = id; hojaCant = 1; hojaPrevio = document.activeElement;
-  $("#hoja-medio").innerHTML = p.img
-    ? `<img src="${esc(p.img)}" alt="${esc(p.nombre)}" decoding="async">`
-    : PLANOS[PLANO_CAT[p.cat] || "trucks"];
+  $("#hoja-medio").innerHTML = medioDe(p, false);
   const ins = $("#hoja-insignia");
   ins.textContent = p.stock === "tienda" ? "En tienda" : "Bajo pedido";
   ins.className = "insignia " + p.stock;
@@ -2159,7 +2317,11 @@ const anchoEje   = () => anchoTabla();
    que se lleva de paso el catálogo, las familias y el carrito. */
 let render = null;
 try{
-  render = new T.WebGLRenderer({ canvas:lienzo3d, antialias:true, alpha:true, powerPreference:"high-performance" });
+  /* preserveDrawingBuffer: el catálogo se toma sus propias fotos
+     leyendo el lienzo con toDataURL, y sin esto el buffer puede
+     venir vacío según el navegador. */
+  render = new T.WebGLRenderer({ canvas:lienzo3d, antialias:true, alpha:true,
+                                 preserveDrawingBuffer:true, powerPreference:"high-performance" });
   render.setPixelRatio(Math.min(devicePixelRatio, 2));
   render.shadowMap.enabled = true;
   render.shadowMap.type = T.PCFSoftShadowMap;
@@ -2361,6 +2523,8 @@ const matBuje = new T.MeshPhysicalMaterial({
   transmission:0.25, thickness:0.01, transparent:true, opacity:0.95,
 });
 const matPivote = new T.MeshStandardMaterial({ color:0x232329, roughness:0.7, metalness:0 });
+/* Papel de respaldo de la lija: kraft mate */
+const matPapel = new T.MeshStandardMaterial({ color:0xc8b08a, roughness:0.92, metalness:0 });
 /* Escudo del balero: acero mate. Si va de espejo se ve como un
    agujero negro en el centro de la rueda. */
 const matEscudo = new T.MeshStandardMaterial({ color:0xb4b9c2, roughness:0.42, metalness:0.45 });
@@ -2571,21 +2735,12 @@ const ruedasMesh = [];      /* para hacerlas rodar sin buscarlas cada cuadro */
 const _proy = new T.Vector3();   /* dónde cae la tabla en pantalla */
 const _lado = new T.Vector3();   /* el eje horizontal de la cámara */
 
-function construirPatineta(){
-  while(patineta3d.children.length) patineta3d.remove(patineta3d.children[0]);
-  ruedasMesh.length = 0;
+/* ── Piezas sueltas ───────────────────────────────────
+   Cada pieza se arma por su cuenta para poder usarla dos
+   veces: montada en la patineta del truco, y sola en el
+   retrato que ilustra su ficha del catálogo. */
 
-  const ancho = anchoTabla(), wd = diamRueda(), aw = anchoEje();
-  const tabla = ARCO.tabla.piezas[elegido.tabla];
-  const rueda = ARCO.ruedas.piezas[elegido.ruedas];
-  const lija  = ARCO.lija.piezas[elegido.lija];
-
-  matPanza.color.set(tabla.color || "#17171c");
-  matUretano.color.set(rueda.color || "#efe9da");
-  matGrip.color.set(lija.grip === "roja" ? 0x3a0d16 : lija.grip === "perf" ? 0x0a0a0d : 0x0d0d10);
-  matGrip.roughness = lija.grip === "perf" ? 0.93 : 0.99;
-
-  /* ── Tabla ── */
+function armarTabla(ancho){
   let geo = new T.ExtrudeGeometry(siluetaTabla(ancho, M.largo), {
     depth:M.grosor, bevelEnabled:true, bevelThickness:0.0014,
     bevelSize:0.0014, bevelSegments:2, curveSegments:26,
@@ -2605,143 +2760,252 @@ function construirPatineta(){
   geo.setAttribute("uv1", new T.BufferAttribute(u1, 2));
   moldear(geo, ancho, M.largo);
   geo = agruparPorCara(geo);
-  tablaMesh = new T.Mesh(geo, [matGrip, matPanza, matCanto]);
-  tablaMesh.castShadow = true; tablaMesh.receiveShadow = true;
-  patineta3d.add(tablaMesh);
+  const m = new T.Mesh(geo, [matGrip, matPanza, matCanto]);
+  m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
 
-  /* ── Trucks y ruedas ──
-     Un truck de verdad: placa atornillada a la panza, perno rey
-     en diagonal con sus dos bujes de uretano, hanger de aluminio
-     que adelgaza hacia las puntas y eje con tuercas.           */
+/* Rueda con sus dos baleros, su rondana y su tuerca. El grupo
+   viene tumbado: gira sobre su propio eje, no sobre el del mundo
+   —antes las cuatro caían encimadas en el centro. */
+function armarRueda(wd, conTuerca){
+  const soporte = new T.Group();
+  soporte.rotation.z = Math.PI / 2;
+
+  const r = new T.Mesh(geoRueda(wd, M.ruedaAncho), matUretano);
+  r.castShadow = true; r.receiveShadow = true;
+  soporte.add(r);
+  soporte.userData.uretano = r;
+
+  /* Baleros: el escudo metálico que se asoma por el núcleo */
+  [-1, 1].forEach(cara => {
+    const bal = new T.Mesh(new T.CylinderGeometry(0.0110, 0.0110, 0.0018, 20), matEscudo);
+    bal.position.y = cara * (M.ruedaAncho / 2 - 0.0012);
+    soporte.add(bal);
+    const nucleo = new T.Mesh(new T.CylinderGeometry(0.0044, 0.0044, 0.0022, 12), matNegro);
+    nucleo.position.y = cara * (M.ruedaAncho / 2 - 0.0006);
+    soporte.add(nucleo);
+  });
+
+  if(conTuerca !== false){
+    const rd = new T.Mesh(new T.CylinderGeometry(0.0072, 0.0072, 0.0012, 14), matAcero);
+    rd.position.y = M.ruedaAncho / 2 + 0.0010;
+    soporte.add(rd);
+    const tuerca = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0062, 0.0048, 6), matAcero);
+    tuerca.position.y = M.ruedaAncho / 2 + 0.0042;
+    tuerca.castShadow = true;
+    soporte.add(tuerca);
+  }
+  return soporte;
+}
+
+/* Balero suelto: pista exterior, escudo y núcleo. Sirve para su
+   ficha del catálogo, que si no se quedaba con un dibujito. */
+function armarBalero(){
+  const g = new T.Group();
+  const pista = new T.Mesh(new T.CylinderGeometry(0.011, 0.011, 0.007, 30), matAcero);
+  pista.castShadow = true;
+  g.add(pista);
+  [-1, 1].forEach(cara => {
+    const esc = new T.Mesh(new T.CylinderGeometry(0.0098, 0.0098, 0.0006, 30), matEscudo);
+    esc.position.y = cara * 0.0036;
+    g.add(esc);
+    const nu = new T.Mesh(new T.CylinderGeometry(0.0042, 0.0042, 0.0012, 18), matNegro);
+    nu.position.y = cara * 0.0040;
+    g.add(nu);
+  });
+  return g;
+}
+
+/* Un truck completo: placa atornillada a la panza, perno rey en
+   diagonal con sus dos bujes de uretano, hanger de aluminio que
+   adelgaza hacia las puntas y eje con tuercas. */
+function armarTruck(lado, ancho, wd, aw, ruedas, conRuedas){
+  const t = new T.Group();
+  const V = (x, y, z) => new T.Vector3(x, y, z);
   const medioHanger = Math.min(aw * 0.335, aw / 2 - M.ruedaAncho - 0.004);
 
+  /* Placa base */
+  const plato = new T.Mesh(cajaRedonda(0.0570, 0.0082, 0.0740, 0.0060), matAluminio);
+  plato.position.set(0, -0.0041, lado * 0.0020);
+  plato.castShadow = true; plato.receiveShadow = true;
+  t.add(plato);
+
+  /* Copa del pivote, hacia la punta de la tabla */
+  const copa = new T.Mesh(new T.CylinderGeometry(0.0088, 0.0100, 0.0090, 14), matAlumOscuro);
+  copa.position.set(0, -0.0086, lado * 0.0290);
+  copa.rotation.x = -lado * 0.30;
+  t.add(copa);
+
+  /* Tetón donde asienta la cabeza del perno rey, hacia el centro */
+  const teton = new T.Mesh(cajaRedonda(0.0230, 0.0100, 0.0175, 0.0035), matAluminio);
+  teton.position.set(0, -0.0110, -lado * 0.0245);
+  teton.rotation.x = lado * 0.42;
+  teton.castShadow = true;
+  t.add(teton);
+
+  /* Hanger: el cuerpo que envuelve el eje */
+  const hanger = new T.Mesh(geoHanger(medioHanger, 0.0172, 0.0150, 0.0074), matAluminio);
+  hanger.position.set(0, -M.cuelgue + 0.0074, 0);
+  hanger.castShadow = true; hanger.receiveShadow = true;
+  t.add(hanger);
+
+  /* Los dos brazos del hanger: al perno rey y a la copa */
+  const bocaPerno = V(0, -M.cuelgue + 0.0205, -lado * 0.0090);
+  const puntaPivote = V(0, -M.cuelgue + 0.0150, lado * 0.0250);
+  const yugo = varilla(0.0092, 0.0130, bocaPerno, V(0, -M.cuelgue + 0.002, -lado * 0.001), matAluminio, 14);
+  yugo.castShadow = true;
+  t.add(yugo);
+  const anillo = new T.Mesh(new T.CylinderGeometry(0.0105, 0.0105, 0.0090, 16), matAluminio);
+  anillo.position.copy(bocaPerno);
+  anillo.rotation.x = -lado * 0.72;
+  t.add(anillo);
+  const brazo = varilla(0.0042, 0.0092, puntaPivote, V(0, -M.cuelgue + 0.004, lado * 0.004), matAluminio, 12);
+  brazo.castShadow = true;
+  t.add(brazo);
+
+  /* Perno rey en diagonal, con sus bujes, rondanas y tuerca */
+  const cabeza = V(0, -0.0098, -lado * 0.0300);
+  const punta  = V(0, -M.cuelgue + 0.0335, lado * 0.0055);
+  const dir = new T.Vector3().subVectors(punta, cabeza).normalize();
+  const en = d => cabeza.clone().addScaledVector(dir, d);
+  const largoPerno = cabeza.distanceTo(punta);
+
+  t.add(varilla(0.0026, 0.0026, cabeza, punta, matAcero, 12));
+  const tornillo = new T.Mesh(new T.CylinderGeometry(0.0058, 0.0058, 0.0048, 6), matAcero);
+  tornillo.position.copy(en(-0.0016));
+  tornillo.quaternion.setFromUnitVectors(_Y, dir);
+  t.add(tornillo);
+
+  /* Buje de arriba (cónico) y de abajo, el sándwich del hanger */
+  const bujeAlto = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0104, 0.0100, 16), matBuje);
+  bujeAlto.position.copy(en(largoPerno * 0.36));
+  bujeAlto.quaternion.setFromUnitVectors(_Y, dir);
+  t.add(bujeAlto);
+  const bujeBajo = new T.Mesh(new T.CylinderGeometry(0.0104, 0.0068, 0.0092, 16), matBuje);
+  bujeBajo.position.copy(en(largoPerno * 0.74));
+  bujeBajo.quaternion.setFromUnitVectors(_Y, dir);
+  t.add(bujeBajo);
+  const rondana = new T.Mesh(new T.CylinderGeometry(0.0092, 0.0092, 0.0016, 16), matAcero);
+  rondana.position.copy(en(largoPerno * 0.815));
+  rondana.quaternion.setFromUnitVectors(_Y, dir);
+  t.add(rondana);
+  const tuercaRey = new T.Mesh(new T.CylinderGeometry(0.0060, 0.0060, 0.0048, 6), matAcero);
+  tuercaRey.position.copy(en(largoPerno - 0.0006));
+  tuercaRey.quaternion.setFromUnitVectors(_Y, dir);
+  t.add(tuercaRey);
+
+  /* Eje de acero de lado a lado */
+  const eje = new T.Mesh(new T.CylinderGeometry(0.0040, 0.0040, aw * 1.02, 14), matAcero);
+  eje.rotation.z = Math.PI / 2;
+  eje.position.y = -M.cuelgue;
+  eje.castShadow = true;
+  t.add(eje);
+
+  /* Tornillería: la cabeza asoma por el grip (se ve en la toma
+     de la lija) y la tuerca por debajo de la placa. */
+  [-1, 1].forEach(cx => [-1, 1].forEach(cz => {
+    const x = cx * 0.0207, z = cz * 0.0270 + lado * 0.0020;
+    const cab = new T.Mesh(new T.CylinderGeometry(0.0048, 0.0048, 0.0018, 10), matNegro);
+    cab.position.set(x, M.grosor + 0.0014, z);
+    t.add(cab);
+    const tca = new T.Mesh(new T.CylinderGeometry(0.0042, 0.0042, 0.0036, 6), matAcero);
+    tca.position.set(x, -0.0098, z);
+    t.add(tca);
+  }));
+
+  if(conRuedas !== false) [-1, 1].forEach(costado => {
+    const soporte = armarRueda(wd, true);
+    soporte.position.set(costado * (aw / 2 - M.ruedaAncho / 2 - 0.0055), -M.cuelgue, 0);
+    if(ruedas) ruedas.push(soporte.userData.uretano);
+    t.add(soporte);
+  });
+  return t;
+}
+
+/* Hoja de lija suelta, 9 x 33 pulgadas, con su papel de respaldo
+   asomando por debajo. Sin el papel es un rectángulo negro y no
+   se entiende que es una lija; con él se lee de inmediato. */
+function armarHoja(){
+  const g = new T.Group();
+  const papel = new T.Mesh(cajaRedonda(0.239, 0.0012, 0.848, 0.014), matPapel);
+  papel.position.set(0.006, -0.0016, -0.004);
+  papel.rotation.y = 0.035;
+  papel.receiveShadow = true;
+  g.add(papel);
+  const grip = new T.Mesh(cajaRedonda(0.229, 0.0016, 0.838, 0.012), matGrip);
+  grip.castShadow = true; grip.receiveShadow = true;
+  g.add(grip);
+  /* La esquina despegada, curioseando el papel de abajo */
+  const punta = new T.Mesh(cajaRedonda(0.086, 0.0014, 0.086, 0.010), matGrip);
+  punta.position.set(-0.070, 0.0130, 0.372);
+  punta.rotation.set(0.0, 0.30, -0.62);
+  punta.castShadow = true;
+  g.add(punta);
+  return g;
+}
+
+/* Juego de bujes y rondanas ensartados, como se venden */
+function armarBujes(){
+  const g = new T.Group();
+  const eje = new T.Mesh(new T.CylinderGeometry(0.0026, 0.0026, 0.046, 12), matAcero);
+  g.add(eje);
+  const alto = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0104, 0.0100, 18), matBuje);
+  alto.position.y = 0.009; g.add(alto);
+  const bajo = new T.Mesh(new T.CylinderGeometry(0.0104, 0.0068, 0.0092, 18), matBuje);
+  bajo.position.y = -0.007; g.add(bajo);
+  [0.0155, -0.0135].forEach(y => {
+    const r = new T.Mesh(new T.CylinderGeometry(0.0092, 0.0092, 0.0016, 18), matAcero);
+    r.position.y = y; g.add(r);
+  });
+  const tuerca = new T.Mesh(new T.CylinderGeometry(0.0060, 0.0060, 0.0048, 6), matAcero);
+  tuerca.position.y = -0.0195; g.add(tuerca);
+  g.rotation.z = 0.34;
+  return g;
+}
+
+/* Juego de tornillería: cuatro tornillos con su tuerca */
+function armarTornillos(){
+  const g = new T.Group();
+  [-1, 1].forEach(i => [-1, 1].forEach(j => {
+    const s = new T.Group();
+    s.position.set(i * 0.013, 0, j * 0.011);
+    s.rotation.z = i * 0.10; s.rotation.x = j * 0.08;
+    const cuerpo = new T.Mesh(new T.CylinderGeometry(0.0024, 0.0024, 0.0254, 12), matAcero);
+    s.add(cuerpo);
+    const cab = new T.Mesh(new T.CylinderGeometry(0.0050, 0.0050, 0.0022, 14), matNegro);
+    cab.position.y = 0.0138; s.add(cab);
+    const tca = new T.Mesh(new T.CylinderGeometry(0.0044, 0.0044, 0.0038, 6), matAcero);
+    tca.position.y = -0.0106; s.add(tca);
+    g.add(s);
+  }));
+  return g;
+}
+
+/* Pinta los materiales con la combinación elegida ahora mismo */
+function tenirPiezas(iTabla, iRueda, iLija){
+  const tabla = ARCO.tabla.piezas[iTabla];
+  const rueda = ARCO.ruedas.piezas[iRueda];
+  const lija  = ARCO.lija.piezas[iLija];
+  matPanza.color.set(tabla.color || "#17171c");
+  matUretano.color.set(rueda.color || "#efe9da");
+  matGrip.color.set(lija.grip === "roja" ? 0x3a0d16 : lija.grip === "perf" ? 0x0a0a0d : 0x16151a);
+  matGrip.roughness = lija.grip === "perf" ? 0.78 : 0.70;
+}
+
+function construirPatineta(){
+  while(patineta3d.children.length) patineta3d.remove(patineta3d.children[0]);
+  ruedasMesh.length = 0;
+
+  const ancho = anchoTabla(), wd = diamRueda(), aw = anchoEje();
+  tenirPiezas(elegido.tabla, elegido.ruedas, elegido.lija);
+
+  tablaMesh = armarTabla(ancho);
+  patineta3d.add(tablaMesh);
+
   [-1, 1].forEach(lado => {
-    const t = new T.Group();
+    const t = armarTruck(lado, ancho, wd, aw, ruedasMesh);
     t.position.set(0, -M.grosor / 2, lado * M.entreEjes / 2);
-    const V = (x, y, z) => new T.Vector3(x, y, z);
-
-    /* Placa base */
-    const plato = new T.Mesh(cajaRedonda(0.0570, 0.0082, 0.0740, 0.0060), matAluminio);
-    plato.position.set(0, -0.0041, lado * 0.0020);
-    plato.castShadow = true; plato.receiveShadow = true;
-    t.add(plato);
-
-    /* Copa del pivote, hacia la punta de la tabla */
-    const copa = new T.Mesh(new T.CylinderGeometry(0.0088, 0.0100, 0.0090, 14), matAlumOscuro);
-    copa.position.set(0, -0.0086, lado * 0.0290);
-    copa.rotation.x = -lado * 0.30;
-    t.add(copa);
-
-    /* Tetón donde asienta la cabeza del perno rey, hacia el centro */
-    const teton = new T.Mesh(cajaRedonda(0.0230, 0.0100, 0.0175, 0.0035), matAluminio);
-    teton.position.set(0, -0.0110, -lado * 0.0245);
-    teton.rotation.x = lado * 0.42;
-    teton.castShadow = true;
-    t.add(teton);
-
-    /* Hanger: el cuerpo que envuelve el eje */
-    const hanger = new T.Mesh(geoHanger(medioHanger, 0.0172, 0.0150, 0.0074), matAluminio);
-    hanger.position.set(0, -M.cuelgue + 0.0074, 0);
-    hanger.castShadow = true; hanger.receiveShadow = true;
-    t.add(hanger);
-
-    /* Los dos brazos del hanger: al perno rey y a la copa */
-    const bocaPerno = V(0, -M.cuelgue + 0.0205, -lado * 0.0090);
-    const puntaPivote = V(0, -M.cuelgue + 0.0150, lado * 0.0250);
-    const yugo = varilla(0.0092, 0.0130, bocaPerno, V(0, -M.cuelgue + 0.002, -lado * 0.001), matAluminio, 14);
-    yugo.castShadow = true;
-    t.add(yugo);
-    const anillo = new T.Mesh(new T.CylinderGeometry(0.0105, 0.0105, 0.0090, 16), matAluminio);
-    anillo.position.copy(bocaPerno);
-    anillo.rotation.x = -lado * 0.72;
-    t.add(anillo);
-    const brazo = varilla(0.0042, 0.0092, puntaPivote, V(0, -M.cuelgue + 0.004, lado * 0.004), matAluminio, 12);
-    brazo.castShadow = true;
-    t.add(brazo);
-
-    /* Perno rey en diagonal, con sus bujes, rondanas y tuerca */
-    const cabeza = V(0, -0.0098, -lado * 0.0300);
-    const punta  = V(0, -M.cuelgue + 0.0335, lado * 0.0055);
-    const dir = new T.Vector3().subVectors(punta, cabeza).normalize();
-    const en = d => cabeza.clone().addScaledVector(dir, d);
-    const largoPerno = cabeza.distanceTo(punta);
-
-    t.add(varilla(0.0026, 0.0026, cabeza, punta, matAcero, 12));
-    const tornillo = new T.Mesh(new T.CylinderGeometry(0.0058, 0.0058, 0.0048, 6), matAcero);
-    tornillo.position.copy(en(-0.0016));
-    tornillo.quaternion.setFromUnitVectors(_Y, dir);
-    t.add(tornillo);
-
-    /* Buje de arriba (cónico) y de abajo, el sándwich del hanger */
-    const bujeAlto = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0104, 0.0100, 16), matBuje);
-    bujeAlto.position.copy(en(largoPerno * 0.36));
-    bujeAlto.quaternion.setFromUnitVectors(_Y, dir);
-    t.add(bujeAlto);
-    const bujeBajo = new T.Mesh(new T.CylinderGeometry(0.0104, 0.0068, 0.0092, 16), matBuje);
-    bujeBajo.position.copy(en(largoPerno * 0.74));
-    bujeBajo.quaternion.setFromUnitVectors(_Y, dir);
-    t.add(bujeBajo);
-    const rondana = new T.Mesh(new T.CylinderGeometry(0.0092, 0.0092, 0.0016, 16), matAcero);
-    rondana.position.copy(en(largoPerno * 0.815));
-    rondana.quaternion.setFromUnitVectors(_Y, dir);
-    t.add(rondana);
-    const tuercaRey = new T.Mesh(new T.CylinderGeometry(0.0060, 0.0060, 0.0048, 6), matAcero);
-    tuercaRey.position.copy(en(largoPerno - 0.0006));
-    tuercaRey.quaternion.setFromUnitVectors(_Y, dir);
-    t.add(tuercaRey);
-
-    /* Eje de acero de lado a lado */
-    const eje = new T.Mesh(new T.CylinderGeometry(0.0040, 0.0040, aw * 1.02, 14), matAcero);
-    eje.rotation.z = Math.PI / 2;
-    eje.position.y = -M.cuelgue;
-    eje.castShadow = true;
-    t.add(eje);
-
-    /* Tornillería: la cabeza asoma por el grip (se ve en la toma
-       de la lija) y la tuerca por debajo de la placa. */
-    [-1, 1].forEach(cx => [-1, 1].forEach(cz => {
-      const x = cx * 0.0207, z = cz * 0.0270 + lado * 0.0020;
-      const cab = new T.Mesh(new T.CylinderGeometry(0.0048, 0.0048, 0.0018, 10), matNegro);
-      cab.position.set(x, M.grosor + 0.0014, z);
-      t.add(cab);
-      const tca = new T.Mesh(new T.CylinderGeometry(0.0042, 0.0042, 0.0036, 6), matAcero);
-      tca.position.set(x, -0.0098, z);
-      t.add(tca);
-    }));
-
-    /* Cada rueda cuelga de un grupo que la orienta, para que gire
-       sobre su propio eje y no sobre el del mundo. */
-    [-1, 1].forEach(costado => {
-      const soporte = new T.Group();
-      soporte.rotation.z = Math.PI / 2;
-      soporte.position.set(costado * (aw / 2 - M.ruedaAncho / 2 - 0.0055), -M.cuelgue, 0);
-
-      const r = new T.Mesh(geoRueda(wd, M.ruedaAncho), matUretano);
-      r.castShadow = true; r.receiveShadow = true;
-      soporte.add(r);
-      ruedasMesh.push(r);
-
-      /* Baleros: el escudo metálico que se asoma por el núcleo */
-      [-1, 1].forEach(cara => {
-        const bal = new T.Mesh(new T.CylinderGeometry(0.0110, 0.0110, 0.0018, 20), matEscudo);
-        bal.position.y = cara * (M.ruedaAncho / 2 - 0.0012);
-        soporte.add(bal);
-        const nucleo = new T.Mesh(new T.CylinderGeometry(0.0044, 0.0044, 0.0022, 12), matNegro);
-        nucleo.position.y = cara * (M.ruedaAncho / 2 - 0.0006);
-        soporte.add(nucleo);
-      });
-
-      /* Rondana de velocidad y tuerca de eje */
-      const rd = new T.Mesh(new T.CylinderGeometry(0.0072, 0.0072, 0.0012, 14), matAcero);
-      rd.position.y = M.ruedaAncho / 2 + 0.0010;
-      soporte.add(rd);
-      const tuerca = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0062, 0.0048, 6), matAcero);
-      tuerca.position.y = M.ruedaAncho / 2 + 0.0042;
-      tuerca.castShadow = true;
-      soporte.add(tuerca);
-
-      t.add(soporte);
-    });
     patineta3d.add(t);
   });
 
@@ -2752,6 +3016,178 @@ function construirPatineta(){
   sombraContacto.position.y = suelo + 0.0012;
 
   pedirCuadro();
+}
+
+/* ── Retratos del catálogo ────────────────────────────
+   Las fichas no traen foto, así que la página se las toma
+   sola: arma la pieza aparte, le pone luz, la encuadra y
+   guarda el render como imagen. Son exactamente las mismas
+   piezas que se ven en el truco, no un dibujo por separado. */
+const RETRATOS = {
+  t1:{ pieza:"tabla",  tabla:0 },
+  t2:{ pieza:"tabla",  tabla:1 },
+  t3:{ pieza:"tabla",  tabla:2 },
+  l1:{ pieza:"lija",   lija:0 },
+  l2:{ pieza:"lija",   lija:1 },
+  k1:{ pieza:"truck",  pulgadas:8.0 },
+  k2:{ pieza:"truck",  pulgadas:8.25 },
+  r1:{ pieza:"rueda",  rueda:0 },
+  r2:{ pieza:"rueda",  rueda:1 },
+  b1:{ pieza:"balero" },
+  b2:{ pieza:"balero" },
+  a1:{ pieza:"tornillos" },
+  a2:{ pieza:"bujes" },
+};
+/* Desde dónde se mira cada pieza y cuánto aire se le deja */
+const POSES = {
+  tabla:    { dir:[0.24, -0.92, 0.31], arriba:[0, 0, 1], aire:1.05 },
+  lija:     { dir:[0.20,  0.94, 0.27], arriba:[0, 0, 1], aire:1.05 },
+  truck:    { dir:[0.66, 0.20, 0.72], aire:1.22 },
+  rueda:    { dir:[0.62, 0.30, 0.72], aire:1.40 },
+  balero:   { dir:[0.46, 0.60, 0.66], aire:1.40 },
+  bujes:    { dir:[0.58, 0.32, 0.75], aire:1.35 },
+  tornillos:{ dir:[0.54, 0.42, 0.73], aire:1.40 },
+};
+const retratoDe = {};
+let retratosListos = false;
+
+function piezaSuelta(r){
+  const pul = r.pulgadas || 8.0, aw = pul * 0.0254;
+  if(r.pieza === "tabla"){
+    tenirPiezas(r.tabla, elegido.ruedas, 0);
+    const n = ARCO.tabla.piezas[r.tabla].n;
+    return armarTabla((/8\.25/.test(n) ? 8.25 : 8.0) * 0.0254);
+  }
+  if(r.pieza === "lija"){
+    tenirPiezas(elegido.tabla, elegido.ruedas, r.lija);
+    const g = new T.Group();
+    const hoja = armarHoja();
+    /* Recargada, no acostada: así la luz la barre de canto y se
+       ve el grano en lugar de un rectángulo negro. */
+    hoja.rotation.set(-0.34, 0.16, 0.05);
+    g.add(hoja);
+    return g;
+  }
+  if(r.pieza === "truck"){
+    const g = new T.Group();
+    const t = armarTruck(1, aw, 0.053, aw, null, false);
+    t.rotation.y = 0.62;
+    g.add(t);
+    return g;
+  }
+  if(r.pieza === "rueda"){
+    tenirPiezas(elegido.tabla, r.rueda, elegido.lija);
+    const n = ARCO.ruedas.piezas[r.rueda].n;
+    return armarRueda((/55/.test(n) ? 55 : 53) / 1000, false);
+  }
+  if(r.pieza === "balero") return armarBalero();
+  if(r.pieza === "bujes") return armarBujes();
+  if(r.pieza === "tornillos") return armarTornillos();
+  return null;
+}
+
+/* Encuadra la pieza entera dentro del retrato, sea del tamaño
+   que sea: se mide su esfera y se aleja la cámara lo justo. */
+const _cajaFoto = new T.Box3(), _esfFoto = new T.Sphere();
+const _dirFoto = new T.Vector3(), _pico = new T.Vector3();
+function encuadrarFoto(lente2, obj, pose){
+  obj.updateMatrixWorld(true);
+  _cajaFoto.setFromObject(obj).getBoundingSphere(_esfFoto);
+  _dirFoto.set(pose.dir[0], pose.dir[1], pose.dir[2]).normalize();
+  const fv = lente2.fov * Math.PI / 180;
+  const fh = 2 * Math.atan(Math.tan(fv / 2) * lente2.aspect);
+  let d = _esfFoto.radius / Math.sin(Math.min(fv, fh) / 2);
+  /* La esfera sobra para una pieza larga y angosta —una tabla
+     salía diminuta en su retrato. Así que se proyectan las ocho
+     esquinas de su caja y se acerca hasta que llenan el cuadro. */
+  const mn = _cajaFoto.min, mx = _cajaFoto.max;
+  if(pose.arriba) lente2.up.set(pose.arriba[0], pose.arriba[1], pose.arriba[2]);
+  else lente2.up.set(0, 1, 0);
+  for(let vuelta = 0; vuelta < 3; vuelta++){
+    lente2.position.copy(_esfFoto.center).addScaledVector(_dirFoto, d);
+    lente2.lookAt(_esfFoto.center);
+    lente2.near = Math.max(0.006, d - _esfFoto.radius * 2.4);
+    lente2.far = d + _esfFoto.radius * 3;
+    lente2.updateProjectionMatrix();
+    lente2.updateMatrixWorld(true);
+    lente2.matrixWorldInverse.copy(lente2.matrixWorld).invert();
+    let llena = 0;
+    for(let i = 0; i < 8; i++){
+      _pico.set(i & 1 ? mx.x : mn.x, i & 2 ? mx.y : mn.y, i & 4 ? mx.z : mn.z).project(lente2);
+      llena = Math.max(llena, Math.abs(_pico.x), Math.abs(_pico.y));
+    }
+    if(llena < 0.0001) break;
+    d *= llena * (pose.aire || 1.06);
+  }
+  return _esfFoto.center;
+}
+
+/* Se dispara una sola vez, con el catálogo ya encima tapando
+   la pantalla: el lienzo del truco parpadea sin que se vea.
+   Va por tandas, un puñado por cuadro, para que ni en un
+   teléfono lento se quede la página trabada mientras posa. */
+function tomarRetratos(alSalir){
+  if(retratosListos || !render) return;
+  retratosListos = true; tomandoFotos = true;
+
+  const anchoAntes = lienzo3d.width, altoAntes = lienzo3d.height;
+  const dprAntes = render.getPixelRatio(), focoAntes = foco.intensity;
+  const verTabla = patineta3d.visible, verPiso = piso3d.visible, verSombra = sombraContacto.visible;
+  const sombraAntes = clave.castShadow;
+  const A = 400, B = 500;
+  let lenteFoto = null, bolsa = null;
+  const ids = Object.keys(RETRATOS);
+  let i = 0;
+
+  function guardar(){
+    tomandoFotos = false;
+    if(bolsa) escena3d.remove(bolsa);
+    patineta3d.visible = verTabla; piso3d.visible = verPiso; sombraContacto.visible = verSombra;
+    clave.castShadow = sombraAntes;
+    foco.intensity = focoAntes;
+    render.setPixelRatio(dprAntes);
+    render.setSize(anchoAntes / dprAntes, altoAntes / dprAntes, false);
+    tenirPiezas(elegido.tabla, elegido.ruedas, elegido.lija);
+    medirLienzo();
+    if(alSalir) alSalir();
+  }
+
+  try{
+    patineta3d.visible = false; piso3d.visible = false; sombraContacto.visible = false;
+    /* La sombra proyectada no aporta nada en un retrato sin piso,
+       y volver a llenar un mapa de 2048 trece veces sí se siente. */
+    clave.castShadow = false;
+    render.setPixelRatio(1);
+    render.setSize(A, B, false);
+    lenteFoto = new T.PerspectiveCamera(34, A / B, 0.01, 8);
+    bolsa = new T.Group();
+    escena3d.add(bolsa);
+  }catch(e){ guardar(); return; }
+
+  function tanda(){
+    try{
+      const hasta = Math.min(ids.length, i + 2);
+      for(; i < hasta; i++){
+        const r = RETRATOS[ids[i]];
+        const pieza = piezaSuelta(r);
+        if(!pieza) continue;
+        bolsa.clear(); bolsa.add(pieza);
+        const centro = encuadrarFoto(lenteFoto, bolsa, POSES[r.pieza]);
+        foco.intensity = 1.9;
+        foco.position.copy(lenteFoto.position);
+        foco.target.position.copy(centro);
+        foco.target.updateMatrixWorld();
+        render.render(escena3d, lenteFoto);
+        retratoDe[ids[i]] = lienzo3d.toDataURL("image/webp", 0.86);
+      }
+    }catch(e){
+      /* Si algo truena se quedan los planos dibujados: nadie se entera */
+      i = ids.length;
+    }
+    if(i < ids.length){ if(alSalir) alSalir(); requestAnimationFrame(tanda); }
+    else guardar();
+  }
+  tanda();
 }
 
 /* Cada tramo del truco abre la pieza que la cámara está mirando */
@@ -2907,8 +3343,9 @@ escena.addEventListener("pointercancel", soltarOrbita);
 /* Arranca en visible: si el observador no llegara a disparar, la
    escena igual se dibuja. Antes se quedaba en negro para siempre. */
 let pendiente = false, visible = true;
+let tomandoFotos = false;      /* posando para el catálogo */
 function pedirCuadro(){
-  if(pendiente || !visible || !render) return;
+  if(pendiente || !visible || !render || tomandoFotos) return;
   pendiente = true;
   requestAnimationFrame(() => { pendiente = false; render.render(escena3d, lente); });
 }
