@@ -97,12 +97,31 @@ const PRODUCTOS = [
   { id:"p2", nombre:"Playera Matamoros",         cat:"Ropa",       precio:390,  stock:"tienda", nota:"Serigrafía a 1 tinta", img:"" },
 ];
 
-/* 6. Próximo evento. */
-const EVENTO = {
-  dia:"21", mes:"Junio", titulo:"Go Skate Day",
-  lugar:"Polideportivo Cuauhtémoc · 5:00 PM",
-  texto:"Distintas dinámicas, premios en efectivo, accesorios y patinetas. Llega con tu tabla."
-};
+/* 6. LA AGENDA. Escribe todos los del año de una vez: la página
+      sola pone al frente el que sigue y va pasando al siguiente
+      conforme se cumplen las fechas.
+      fecha: SIEMPRE con año, así — "AAAA-MM-DD". Es lo que le
+             permite a la página saber cuál viene y cuánto falta.
+      mapa:  lo que se busca en Google Maps al picarle a "cómo
+             llegar". Si lo dejas vacío se usa el lugar.
+      foto:  opcional, se pone de fondo del cartel.
+      Cuando ya pasaron todos, se queda el último en gris. */
+const EVENTOS = [
+  { fecha:"2026-06-21", hora:"5:00 PM", titulo:"Go Skate Day",
+    lugar:"Polideportivo Cuauhtémoc",
+    mapa:"Polideportivo Cuauhtémoc, Chihuahua", foto:"",
+    texto:"Distintas dinámicas, premios en efectivo, accesorios y patinetas. Llega con tu tabla." },
+
+  { fecha:"2026-10-31", hora:"6:00 PM", titulo:"Noche de Catrinas",
+    lugar:"Plaza Zaragoza",
+    mapa:"Plaza Zaragoza, Cuauhtémoc, Chihuahua", foto:"",
+    texto:"Sesión nocturna con disfraz. Premio a la mejor catrina y a la mejor línea de la noche." },
+
+  { fecha:"2026-12-13", hora:"4:00 PM", titulo:"Jam de fin de año",
+    lugar:"Polideportivo Cuauhtémoc",
+    mapa:"Polideportivo Cuauhtémoc, Chihuahua", foto:"",
+    texto:"Cierre de temporada: best trick, rifa de tabla armada y lo que sobre de cera para todos." },
+];
 
 /* 7. Preguntas frecuentes. */
 const FAQS = [
@@ -996,23 +1015,112 @@ a{color:inherit; text-decoration:none}
   .sumar{padding:11px 12px; font-size:.5625rem}
 }
 
-/* ── Evento ─────────────────────────────────────────── */
-.evento{
-  display:grid; gap:clamp(24px,4vw,48px); grid-template-columns:1fr;
-  border:1px solid var(--linea); border-radius:3px; padding:clamp(28px,4.5vw,52px);
-  background:linear-gradient(135deg, var(--noche) 0%, var(--void) 70%);
+/* ── Evento ───────────────────────────────────────────
+   El cartel que la tienda de verdad imprimiría: el día en
+   cifra enorme, la cuenta regresiva arriba y la calavera de
+   la casa de marca de agua. Abajo, lo que sigue. */
+.evento{position:relative; border:1px solid var(--linea); border-radius:3px; overflow:hidden}
+/* La foto del evento, si la pusiste, con su velo para que el
+   texto se siga leyendo encima. */
+.evento-foto{position:absolute; inset:0; z-index:0}
+.evento-foto img{width:100%; height:100%; object-fit:cover; opacity:.5}
+.evento-foto::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(105deg, rgba(8,8,10,.94) 0%, rgba(8,8,10,.72) 52%, rgba(8,8,10,.5) 100%);
 }
-@media(min-width:760px){ .evento{grid-template-columns:auto 1fr; align-items:center} }
-.calendario{
-  border:1px solid var(--linea-2); border-radius:3px; padding:20px 26px; text-align:center;
-  justify-self:start; align-self:start;
+.evento-fondo{
+  position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(62% 74% at 8% 22%, rgba(255,94,26,.16) 0%, transparent 70%),
+    linear-gradient(135deg, var(--noche) 0%, var(--void) 72%);
 }
-.calendario b{
-  display:block; font-family:var(--display); font-variation-settings:'wdth' 70,'wght' 800;
-  font-size:3.25rem; line-height:.86; color:var(--ember);
+/* La marca de agua: la misma calavera de la portada */
+.evento-sello{
+  position:absolute; right:-3%; bottom:-14%; width:min(300px,34%); z-index:1;
+  opacity:.13; filter:grayscale(.72); pointer-events:none;
 }
-.calendario span{font-family:var(--dato); font-size:.6875rem; text-transform:uppercase; letter-spacing:.2em; color:var(--mute)}
-.evento h3{font-family:var(--display); font-variation-settings:'wdth' 70,'wght' 800; text-transform:uppercase; font-size:clamp(1.75rem,4vw,2.75rem); margin:0 0 10px; line-height:.92}
+@media(max-width:759px){ .evento-sello{width:170px; right:-11%; bottom:-9%; opacity:.10} }
+
+.evento-barra{
+  position:relative; z-index:2; display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  padding:13px clamp(20px,3.4vw,38px); border-bottom:1px solid var(--linea);
+  font-family:var(--dato); font-size:.625rem; text-transform:uppercase; letter-spacing:.2em;
+  color:var(--mute-2);
+}
+.evento-cuenta{margin-left:auto; color:var(--ember); display:inline-flex; align-items:center; gap:8px}
+.evento-cuenta::before{content:""; width:5px; height:5px; border-radius:50%; background:var(--ember)}
+.evento-cuerpo{
+  position:relative; z-index:2; display:grid; gap:clamp(22px,3.6vw,46px);
+  grid-template-columns:1fr; align-items:start;
+  padding:clamp(28px,4.2vw,50px) clamp(20px,3.4vw,38px) clamp(30px,4.2vw,48px);
+}
+@media(min-width:760px){ .evento-cuerpo{grid-template-columns:auto 1fr} }
+
+/* El día, en cifra grande */
+.evento-dia{display:flex; flex-direction:column; gap:4px}
+.evento-dia b{
+  font-family:var(--display); font-variation-settings:'wdth' 68,'wght' 900;
+  font-size:clamp(4.5rem,11vw,8.5rem); line-height:.78; color:var(--ember);
+  letter-spacing:-.02em;
+}
+.evento-dia span{
+  font-family:var(--dato); font-size:.6875rem; text-transform:uppercase;
+  letter-spacing:.26em; color:var(--mute);
+}
+.evento h3{
+  font-family:var(--display); font-variation-settings:'wdth' 70,'wght' 800;
+  text-transform:uppercase; font-size:clamp(1.75rem,4.4vw,3rem); margin:0 0 12px; line-height:.92;
+}
+.evento-donde{
+  margin:0 0 16px; font-family:var(--dato); font-size:.75rem;
+  color:var(--mute); letter-spacing:.04em;
+}
+.evento-cuerpo .lectura{margin:0 0 24px; max-width:46ch}
+
+/* Cuando ya pasó: el mismo cartel, sin color y con su sello */
+.evento.paso .evento-fondo{background:linear-gradient(135deg, var(--noche) 0%, var(--void) 72%)}
+.evento.paso .evento-dia b{color:var(--mute)}
+.evento.paso .evento-cuenta{color:var(--mute-2)}
+.evento.paso .evento-cuenta::before{background:var(--mute-2)}
+.evento.paso .evento-sello{opacity:.06; filter:grayscale(1)}
+.evento.paso .evento-foto img{filter:grayscale(1); opacity:.32}
+/* A un evento que ya pasó no le hace falta el cómo llegar */
+.evento.paso a.btn{display:none}
+.agenda.paso .agenda-fecha{color:var(--mute-2)}
+
+/* ── Lo que sigue: renglones compactos ── */
+.agenda{margin-top:clamp(26px,3.4vw,40px)}
+.agenda-titulo{
+  font-family:var(--dato); font-size:.625rem; text-transform:uppercase;
+  letter-spacing:.24em; color:var(--mute-2); margin:0 0 4px;
+}
+.agenda-fila{
+  display:grid; grid-template-columns:auto 1fr auto; gap:8px 20px; align-items:baseline;
+  padding:17px 0; border-bottom:1px solid var(--linea);
+  color:var(--hueso); transition:color .22s;
+}
+.agenda-fila:hover,.agenda-fila:focus-visible{color:var(--ember)}
+.agenda-fecha{
+  font-family:var(--dato); font-size:.6875rem; text-transform:uppercase;
+  letter-spacing:.16em; color:var(--ember); min-width:6.5em;
+}
+.agenda-que{font-family:var(--display); font-variation-settings:'wdth' 82,'wght' 600; font-size:1.0625rem}
+.agenda-donde{
+  font-family:var(--dato); font-size:.625rem; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--mute-2); display:block; margin-top:3px;
+}
+.agenda-fila .flecha{color:var(--mute-2); transition:transform .25s var(--curva), color .22s}
+.agenda-fila:hover .flecha{color:var(--ember); transform:translateX(4px)}
+@media(max-width:559px){
+  .agenda-fila{grid-template-columns:1fr auto}
+  .agenda-fecha{grid-column:1/-1; min-width:0}
+}
+/* Sin nada en la agenda, mejor decirlo que dejar el hueco */
+.evento-vacio{
+  border:1px solid var(--linea); border-radius:3px;
+  padding:clamp(30px,4.5vw,52px); text-align:center;
+  background:linear-gradient(135deg, var(--noche) 0%, var(--void) 72%);
+}
 
 /* ── FAQ ────────────────────────────────────────────── */
 .faqs{max-width:760px; border-top:1px solid var(--linea)}
@@ -1233,7 +1341,9 @@ a{color:inherit; text-decoration:none}
         <circle cx="316" cy="352" r="3.5"/><circle cx="10" cy="180" r="3"/>
       </g>
 
-      <g class="gf-tag">
+      <!-- Con id, porque el cartel del evento la vuelve a usar
+           con <use> en lugar de repetir todos los trazos. -->
+      <g class="gf-tag" id="marca-casa">
         <!-- Cempasúchil: los pétalos son el trazo cortado de la lata -->
         <defs>
           <path id="gf-pet"  d="M200 16c14 18 18 46 9 70-5 9-13 9-18 0-9-24-5-52 9-70z"/>
@@ -1444,10 +1554,11 @@ a{color:inherit; text-decoration:none}
   <section class="seccion" id="evento">
     <div class="envoltorio">
       <div class="cabecera sube">
-        <p class="rotulo">Lo que viene</p>
-        <h2 class="titulo">Próxima partida</h2>
+        <p class="rotulo" id="evento-rotulo">Lo que viene</p>
+        <h2 class="titulo" id="evento-encabezado">Próxima partida</h2>
       </div>
-      <div class="evento sube" id="evento-caja"></div>
+      <div class="sube" id="evento-caja"></div>
+      <div class="sube d1" id="evento-agenda"></div>
     </div>
   </section>
 
@@ -1492,7 +1603,7 @@ a{color:inherit; text-decoration:none}
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-01c · 3D</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-01d · 3D</span>
     </div>
   </div>
 </footer>
@@ -3677,14 +3788,108 @@ function animarTruco(p){
 addEventListener("resize", medirLienzo);
 
 
-/* ── Evento y dudas ─────────────────────────────────── */
-$("#evento-caja").innerHTML = `
-  <div class="calendario"><b class="cifra">${esc(EVENTO.dia)}</b><span>${esc(EVENTO.mes)}</span></div>
-  <div>
-    <h3>${esc(EVENTO.titulo)}</h3>
-    <p class="dato" style="margin:0 0 12px">${esc(EVENTO.lugar)}</p>
-    <p class="lectura">${esc(EVENTO.texto)}</p>
-  </div>`;
+/* ── La agenda ────────────────────────────────────────
+   La página decide sola cuál evento va al frente. Antes la
+   fecha se escribía "21" y "Junio", sin año, así que el sitio
+   seguía anunciando como "lo que viene" algo que ya había
+   pasado y no había manera de que se diera cuenta. */
+const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
+               "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+/* Con la hora pegada la toma como hora local. Sin ella,
+   "2026-06-21" se lee en UTC y acá el evento cae un día antes. */
+function fechaDe(txt){
+  const d = new Date(String(txt) + "T00:00:00");
+  return isNaN(d) ? null : d;
+}
+function diasDeAqui(d){
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  return Math.round((d - hoy) / 86400000);
+}
+function cuantoFalta(dias){
+  if(dias < 0)  return dias === -1 ? "Fue ayer" : `Hace ${-dias} días`;
+  if(dias === 0) return "Es hoy";
+  if(dias === 1) return "Es mañana";
+  if(dias < 7)   return `Faltan ${dias} días`;
+  if(dias < 14)  return "Falta una semana";
+  if(dias < 60)  return `Faltan ${Math.round(dias / 7)} semanas`;
+  return `Faltan ${Math.round(dias / 30)} meses`;
+}
+const ligaMapa = e =>
+  "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(e.mapa || e.lugar || "");
+
+function pintarEventos(){
+  const caja = $("#evento-caja"), agenda = $("#evento-agenda");
+  if(!caja) return;
+
+  /* Las fechas mal escritas se caen aquí y no tumban la sección */
+  const lista = (typeof EVENTOS !== "undefined" ? EVENTOS : [])
+    .map(e => ({ ...e, d:fechaDe(e.fecha) }))
+    .filter(e => e.d);
+  const proximos = lista.filter(e => diasDeAqui(e.d) >= 0).sort((a, b) => a.d - b.d);
+  const pasados  = lista.filter(e => diasDeAqui(e.d) <  0).sort((a, b) => b.d - a.d);
+
+  if(!lista.length){
+    $("#evento-rotulo").textContent = "Lo que viene";
+    $("#evento-encabezado").textContent = "Próxima partida";
+    caja.className = "sube vista";
+    caja.innerHTML = `<div class="evento-vacio">
+      <p class="lectura" style="margin:0">Sin fecha por ahora. Pregúntanos por WhatsApp
+      y te avisamos en cuanto salga la siguiente.</p></div>`;
+    agenda.innerHTML = "";
+    return;
+  }
+
+  /* Si ya pasaron todos, se queda el último —en gris— en lugar
+     de dejar el hueco o seguir diciendo "próxima". */
+  const paso = !proximos.length;
+  const cartel = paso ? pasados[0] : proximos[0];
+  const siguen = paso ? pasados.slice(1, 4) : proximos.slice(1, 4);
+  const dias = diasDeAqui(cartel.d);
+
+  $("#evento-rotulo").textContent = paso ? "Lo que hubo" : "Lo que viene";
+  $("#evento-encabezado").textContent = paso ? "La última partida" : "Próxima partida";
+
+  caja.className = "evento sube vista" + (paso ? " paso" : "");
+  caja.innerHTML = `
+    ${cartel.foto
+      ? `<div class="evento-foto"><img src="${esc(cartel.foto)}" alt="" loading="lazy" decoding="async"></div>`
+      : `<div class="evento-fondo"></div>`}
+    <svg class="evento-sello" viewBox="0 0 400 400" aria-hidden="true"><use href="#marca-casa"/></svg>
+    <div class="evento-barra">
+      <span>${paso ? "Ya fue" : "Próximo"}</span>
+      <span class="evento-cuenta">${esc(cuantoFalta(dias))}</span>
+    </div>
+    <div class="evento-cuerpo">
+      <div class="evento-dia">
+        <b class="cifra">${cartel.d.getDate()}</b>
+        <span>${esc(MESES[cartel.d.getMonth()])} ${cartel.d.getFullYear()}</span>
+      </div>
+      <div>
+        <h3>${esc(cartel.titulo || "")}</h3>
+        <p class="evento-donde">${esc(cartel.lugar || "")}${cartel.hora ? " · " + esc(cartel.hora) : ""}</p>
+        <p class="lectura">${esc(cartel.texto || "")}</p>
+        <a class="btn btn--linea" href="${esc(ligaMapa(cartel))}" target="_blank" rel="noopener">
+          Cómo llegar <span class="flecha">→</span>
+        </a>
+      </div>
+    </div>`;
+
+  agenda.innerHTML = siguen.length ? `
+    <div class="agenda${paso ? " paso" : ""}">
+      <p class="agenda-titulo">${paso ? "Antes de ese" : "Y luego"}</p>
+      ${siguen.map(e => `
+        <a class="agenda-fila" href="${esc(ligaMapa(e))}" target="_blank" rel="noopener">
+          <span class="agenda-fecha">${e.d.getDate()} ${esc(MESES[e.d.getMonth()].slice(0, 3))}</span>
+          <span>
+            <span class="agenda-que">${esc(e.titulo || "")}</span>
+            <span class="agenda-donde">${esc(e.lugar || "")}${e.hora ? " · " + esc(e.hora) : ""}</span>
+          </span>
+          <span class="flecha">→</span>
+        </a>`).join("")}
+    </div>` : "";
+}
+pintarEventos();
 
 $("#faqs").innerHTML = FAQS.map(f => `
   <details class="faq"><summary>${esc(f.p)}</summary><p>${esc(f.r)}</p></details>`).join("");
