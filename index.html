@@ -511,6 +511,15 @@ a{color:inherit; text-decoration:none}
   box-shadow:0 30px 70px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(255,94,26,.18);
 }
 .orbe img{width:100%; height:100%; object-fit:cover}
+/* El retrato en 3D viene con fondo transparente y ya encuadrado al
+   milímetro: recortarlo sería tirar pieza. El aire de abajo lo deja
+   por encima del degradado del nombre. */
+/* El aire de abajo va en píxeles, no en porcentaje: el rótulo mide
+   siempre lo mismo, y en una caja baja —la de los trucks— un 13% no
+   alcanzaba a librarlo y la pieza le quedaba encima. */
+.orbe img.retrato{object-fit:contain; padding:4% 4% 30px}
+.orbe .llega{animation:asomar var(--medio) var(--sale) both}
+@keyframes asomar{from{opacity:0; transform:scale(.965)} to{opacity:1; transform:none}}
 .orbe svg{width:100%; height:100%; display:block}
 .orbe-nombre{
   position:absolute; left:0; right:0; bottom:0; padding:10px 12px;
@@ -1439,7 +1448,7 @@ a{color:inherit; text-decoration:none}
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-05 · un solo taller</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-06 · el arco en 3D</span>
     </div>
   </div>
 </footer>
@@ -1859,11 +1868,32 @@ const CLAVES = Object.keys(ARCO);              // tabla, trucks, ruedas
    Se miden contra el escenario, no contra la pantalla, para que nunca
    se salgan del cuadro por más ancho que sea el monitor. */
 const MEDIDAS = {
-  lija:   { ar:1.30, alto:.74 },
+  /* Los 'ar' salieron de medir el retrato en 3D: cada caja tiene la
+     proporción de su pieza, así que la pieza la llena en vez de nadar
+     entre márgenes. 'tope' es cuánto del ancho del escenario puede
+     ocupar, y por omisión es ANCHO_TOPE. */
+  lija:   { ar:2.05, alto:.80 },
   tabla:  { ar:3.55, alto:.92 },
-  trucks: { ar:0.62, alto:.50 },
+  /* Los trucks tenían la caja más chica de las cuatro y son la pieza
+     más difícil de leer de un vistazo. Como sólo son dos opciones,
+     caben más anchos sin que el arco se amontone. */
+  trucks: { ar:0.44, alto:.60, tope:.47, topeAngosto:.74 },
   ruedas: { ar:1,    alto:.64 },
 };
+/* Cada familia posa para su propio retrato en 3D, con un lienzo que
+   respeta su 'ar' —así el render llena la caja sin deformarse ni
+   sobrarle aire— y a ~2x el tamaño en pantalla, para retina.
+   Las poses vienen de las que ya se ven bien en las familias. */
+const ESTUDIO_ARCO = {
+  lija:   { a:560,  b:1148, pose:{ dir:[0.22, 0.92, 0.30], arriba:[0,0,1], aire:1.06, cenido:1, luz:3.4 } },
+  tabla:  { a:380,  b:1349, pose:{ dir:[0.26, 0.93, 0.26], arriba:[0,0,1], aire:1.05, cenido:1 } },
+  trucks: { a:1000, b:440,  pose:{ dir:[0.52, 0.30, 0.80], aire:1.08, cenido:1 } },
+  ruedas: { a:820,  b:820,  pose:{ dir:[0.58, 0.34, 0.74], aire:1.10, cenido:1 } },
+};
+/* clave del arco -> retrato en 3D por índice. Se llena al vuelo.
+   Se deriva de CLAVES por si algún día se agrega una familia. */
+const retratoArco = {};
+CLAVES.forEach(k => retratoArco[k] = []);
 const ANCHO_TOPE = .46;                         // fracción del escenario
 const PASO = 34;                                // grados entre piezas
 let claveActiva = CLAVES[0];
@@ -1892,7 +1922,12 @@ function vuelta(d, n){
 function medida(){
   const m = MEDIDAS[claveActiva];
   const alto = (escenario.clientHeight || 480) * m.alto;
-  const tope = (escenario.clientWidth || 860) * ANCHO_TOPE * m.ar;  // alto máximo según el ancho
+  const ancho = escenario.clientWidth || 860;
+  /* En una pantalla angosta el vecino se sale de cuadro de todos
+     modos, así que la pieza del frente puede llevarse más ancho.
+     Sin esto, un truck en el teléfono quedaba de 70 px de alto. */
+  const frac = (ancho < 560 && m.topeAngosto) || m.tope || ANCHO_TOPE;
+  const tope = ancho * frac * m.ar;               // alto máximo según el ancho
   const h = Math.round(Math.min(alto, tope));
   return { h, w: Math.round(h / m.ar) };
 }
@@ -1904,19 +1939,44 @@ function pintarPestanas(){
     </button>`).join("");
 }
 
+/* Qué se le pone adentro a una pieza del arco, en orden de
+   preferencia: la foto de verdad si la hay, el retrato en 3D si ya
+   se tomó, y si no el dibujo técnico. */
+function arteOrbe(clave, i, nuevo){
+  const pz = ARCO[clave].piezas[i];
+  const marca = nuevo ? " llega" : "";
+  if(pz.img) return `<img src="${esc(pz.img)}" alt="${esc(pz.n)}" loading="lazy" decoding="async">`;
+  const r = retratoArco[clave] && retratoArco[clave][i];
+  if(r) return `<img class="retrato${marca}" src="${r}" alt="${esc(pz.n)}" decoding="async">`;
+  return PLANOS[clave];
+}
+
 function pintarArco(){
   const piezas = ARCO[claveActiva].piezas;
   anillo.innerHTML = piezas.map((pz, i) => `
     <button class="orbe" data-i="${i}" role="option" aria-selected="false"
             style="--w:0px; --h:0px; --r:0px; --a:0; --e:1; --o:1">
       <span class="orbe-caja">
-        ${pz.img
-          ? `<img src="${esc(pz.img)}" alt="${esc(pz.n)}" loading="lazy" decoding="async">`
-          : PLANOS[claveActiva]}
+        ${arteOrbe(claveActiva, i)}
         <span class="orbe-nombre">${esc(pz.n)}</span>
       </span>
     </button>`).join("");
   colocarArco();
+}
+
+/* Cuando sale un retrato se cambia sólo su propio dibujo, no todo el
+   anillo: repintar completo mataría el giro a media vuelta y borraría
+   las variables de posición de cada pieza. */
+function refrescarOrbe(clave, i){
+  if(clave !== claveActiva) return;
+  const caja = anillo.querySelector(`.orbe[data-i="${i}"] .orbe-caja`);
+  if(!caja) return;
+  const viejo = caja.querySelector("img, svg");
+  if(!viejo) return;
+  const molde = document.createElement("div");
+  molde.innerHTML = arteOrbe(clave, i, true);
+  const nuevo = molde.firstElementChild;
+  if(nuevo) caja.replaceChild(nuevo, viejo);
 }
 
 function colocarArco(){
@@ -2729,28 +2789,39 @@ function cajaRedonda(ax, ay, az, r){
    un hanger: gordo al centro, adelgazando hacia las puntas.
    La sección va en sentido horario en el plano (z,y).  */
 function geoBarrido(seccion, estaciones){
-  const n = seccion.length, m = estaciones.length, pos = [];
+  const n = seccion.length, m = estaciones.length, pos = [], idx = [];
   const V3 = (i, j) => {
     const e = estaciones[j], p = seccion[i];
     return [e.x, p[1] * e.sy + e.dy, p[0] * e.sz];
   };
+  /* Indexado a propósito. Antes cada triángulo llevaba sus tres
+     vértices propios, y así computeVertexNormals sólo puede dar
+     normales planas: el hanger salía tallado en facetas, como un
+     diamante. Compartiendo los vértices las normales se promedian
+     y el aluminio vuelve a ser una pieza fundida. */
+  for(let j = 0; j < m; j++)
+    for(let i = 0; i < n; i++) pos.push(...V3(i, j));
   for(let j = 0; j < m - 1; j++){
     for(let i = 0; i < n; i++){
       const k = (i + 1) % n;
-      const a = V3(i, j), b = V3(k, j), c = V3(k, j+1), d = V3(i, j+1);
-      pos.push(...a, ...b, ...c, ...a, ...c, ...d);
+      const a = j * n + i, b = j * n + k, c = (j + 1) * n + k, d = (j + 1) * n + i;
+      idx.push(a, b, c, a, c, d);
     }
   }
+  /* Las tapas van con vértices aparte: si compartieran los del
+     tubo, el canto se redondearía hacia adentro. */
   for(let t = 0; t < 2; t++){
-    const j = t ? m - 1 : 0, e = estaciones[j], centro = [e.x, e.dy, 0];
+    const j = t ? m - 1 : 0, e = estaciones[j], base = pos.length / 3;
+    pos.push(e.x, e.dy, 0);
+    for(let i = 0; i < n; i++) pos.push(...V3(i, j));
     for(let i = 0; i < n; i++){
-      const k = (i + 1) % n, a = V3(i, j), b = V3(k, j);
-      if(t) pos.push(...centro, ...a, ...b);
-      else  pos.push(...centro, ...b, ...a);
+      const a = base + 1 + i, b = base + 1 + (i + 1) % n;
+      if(t) idx.push(base, a, b); else idx.push(base, b, a);
     }
   }
   const g = new T.BufferGeometry();
   g.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+  g.setIndex(idx);
   g.computeVertexNormals();
   return g;
 }
@@ -2762,10 +2833,22 @@ const SECCION_HANGER = [
   [-0.62, -0.70],[-0.90, -0.30],[-1.00,  0.16],[-0.94,  0.66],
   [-0.70,  0.93],[-0.34,  1.00],
 ];
+/* Con catorce puntos y las normales ya promediadas, el hanger se
+   ondulaba: el brillo hacía olas sobre lo que debería ser una pieza
+   lisa. Se resiembra la sección sobre una curva cerrada, que es lo
+   que se moldeaba desde el principio. */
+const SECCION_HANGER_FINA = (() => {
+  const c = new T.CatmullRomCurve3(
+    SECCION_HANGER.map(([a, b]) => new T.Vector3(a, b, 0)), true, "catmullrom", 0.5);
+  /* getPoints devuelve el primer punto repetido al final en una
+     curva cerrada, y geoBarrido ya cierra el anillo solo. */
+  return c.getPoints(42).slice(0, 42).map(v => [v.x, v.y]);
+})();
+
 /* Cuánto adelgaza el brazo del hanger de centro a punta */
 const AFILADO = [[0,1],[0.16,0.98],[0.34,0.90],[0.56,0.74],[0.80,0.58],[1,0.46]];
 function geoHanger(medio, alto, hondo, sube){
-  const est = [], N = 24, kFin = AFILADO[AFILADO.length - 1][1];
+  const est = [], N = 44, kFin = AFILADO[AFILADO.length - 1][1];
   for(let i = 0; i <= N; i++){
     const u = i / N * 2 - 1, k = escalaEn(AFILADO, Math.abs(u));
     /* el cuerpo va montado arriba del eje y los brazos bajan
@@ -2774,7 +2857,7 @@ function geoHanger(medio, alto, hondo, sube){
     est.push({ x:u * medio, sy:alto * k, sz:hondo * k,
                dy:-sube * (1 - k) / (1 - kFin) });
   }
-  return geoBarrido(SECCION_HANGER, est);
+  return geoBarrido(SECCION_HANGER_FINA, est);
 }
 function escalaEn(kf, p){
   for(let i = 0; i < kf.length - 1; i++){
@@ -2904,7 +2987,96 @@ const _lado = new T.Vector3();   /* el eje horizontal de la cámara */
    veces: montada en la patineta del truco, y sola en el
    retrato que ilustra su ficha del catálogo. */
 
+/* Parte cada triángulo en cuatro, tantas veces como se pida,
+   interpolando lo que traiga (posición, normal, UV). Se usa antes
+   de moldear una cara plana: sin vértices adentro no hay curva que
+   valga. Trabaja sin índice, que es como sale del extrusor. */
+function partirCaras(geo, veces){
+  let g = geo.index ? geo.toNonIndexed() : geo;
+  for(let v = 0; v < veces; v++){
+    const nombres = Object.keys(g.attributes);
+    const de = {}, a = {};
+    const caras = g.attributes.position.count / 3;
+    nombres.forEach(n => {
+      de[n] = g.attributes[n];
+      a[n] = new Float32Array(caras * 12 * de[n].itemSize);
+    });
+    let k = 0;
+    /* j < 0: copia el vértice i tal cual. Si no, el punto medio. */
+    const pon = (i, j) => {
+      for(const n of nombres){
+        const A = de[n].array, s = de[n].itemSize;
+        for(let c = 0; c < s; c++){
+          const va = A[i * s + c];
+          a[n][k * s + c] = j < 0 ? va : (va + A[j * s + c]) / 2;
+        }
+      }
+      k++;
+    };
+    for(let f = 0; f < caras; f++){
+      const p = f * 3, q = p + 1, r = p + 2;
+      pon(p, -1); pon(p, q); pon(r, p);
+      pon(p,  q); pon(q, -1); pon(q, r);
+      pon(r,  p); pon(q, r); pon(r, -1);
+      pon(p,  q); pon(q, r); pon(r, p);
+    }
+    const ng = new T.BufferGeometry();
+    nombres.forEach(n => ng.setAttribute(n, new T.BufferAttribute(a[n], de[n].itemSize)));
+    g = ng;
+  }
+  return g;
+}
+
+/* Promedia las normales de los vértices que caen en el mismo punto,
+   pero sólo entre las que apuntan parecido. Sin esto una malla sin
+   índice se sombrea a facetas: la panza de la tabla salía cortada a
+   navajazos. Con el límite de ángulo el canto conserva su arista. */
+function suavizarNormales(geo, grados){
+  const p = geo.attributes.position, n = geo.attributes.normal;
+  if(!p || !n) return geo;
+  const tope = Math.cos((grados || 40) * Math.PI / 180);
+  const cubos = new Map();
+  for(let i = 0; i < p.count; i++){
+    const k = Math.round(p.getX(i) * 1e4) + "," +
+              Math.round(p.getY(i) * 1e4) + "," +
+              Math.round(p.getZ(i) * 1e4);
+    const l = cubos.get(k);
+    if(l) l.push(i); else cubos.set(k, [i]);
+  }
+  const sal = new Float32Array(n.count * 3);
+  const na = n.array;
+  cubos.forEach(l => {
+    for(let u = 0; u < l.length; u++){
+      const i = l[u] * 3;
+      let ax = 0, ay = 0, az = 0;
+      for(let v = 0; v < l.length; v++){
+        const j = l[v] * 3;
+        if(na[i]*na[j] + na[i+1]*na[j+1] + na[i+2]*na[j+2] >= tope){
+          ax += na[j]; ay += na[j+1]; az += na[j+2];
+        }
+      }
+      const m = Math.hypot(ax, ay, az) || 1;
+      sal[i] = ax / m; sal[i+1] = ay / m; sal[i+2] = az / m;
+    }
+  });
+  na.set(sal);
+  n.needsUpdate = true;
+  return geo;
+}
+
+/* Armar una tabla cuesta lo suyo —partir la malla, moldearla,
+   separarla por caras—, y se piden muchas: tres en el arco, tres
+   en el catálogo, y otra cada vez que se cambia de pieza. La forma
+   sólo depende del ancho, así que se guarda: las tres tablas se
+   distinguen por el color, y ese va en el material. */
+const geoTabla = new Map();
 function armarTabla(ancho){
+  const guardada = geoTabla.get(ancho);
+  if(guardada){
+    const m0 = new T.Mesh(guardada, [matGrip, matPanza, matCanto]);
+    m0.castShadow = true; m0.receiveShadow = true;
+    return m0;
+  }
   let geo = new T.ExtrudeGeometry(siluetaTabla(ancho, M.largo), {
     depth:M.grosor, bevelEnabled:true, bevelThickness:0.0014,
     bevelSize:0.0014, bevelSegments:2, curveSegments:26,
@@ -2914,6 +3086,12 @@ function armarTabla(ancho){
      pegada a la panza y no colgando en el aire, que era el hueco
      raro que se veía entre la tabla y los trucks. */
   geo.translate(0, -M.grosor / 2, 0);
+  /* El extrusor tapa la cara con unos pocos triángulos larguísimos
+     que van de orilla a orilla: no hay un solo vértice en medio de
+     la tabla. Al darle el cóncavo y las patadas eso se convertía en
+     facetas del tamaño de la mano. Se parte la malla antes de
+     moldearla y el maple vuelve a curvarse parejo. */
+  geo = partirCaras(geo, 1);
   /* Segunda UV: 0 en la panza y 1 en el grip. Con ella el canto
      dibuja las siete capas de maple prensadas. */
   const pv = geo.attributes.position, u1 = new Float32Array(pv.count * 2);
@@ -2923,7 +3101,9 @@ function armarTabla(ancho){
   }
   geo.setAttribute("uv1", new T.BufferAttribute(u1, 2));
   moldear(geo, ancho, M.largo);
+  suavizarNormales(geo, 42);
   geo = agruparPorCara(geo);
+  geoTabla.set(ancho, geo);
   const m = new T.Mesh(geo, [matGrip, matPanza, matCanto]);
   m.castShadow = true; m.receiveShadow = true;
   return m;
@@ -2996,7 +3176,7 @@ function armarTruck(lado, ancho, wd, aw, ruedas, conRuedas){
   t.add(plato);
 
   /* Copa del pivote, hacia la punta de la tabla */
-  const copa = new T.Mesh(new T.CylinderGeometry(0.0088, 0.0100, 0.0090, 14), matAlumOscuro);
+  const copa = new T.Mesh(new T.CylinderGeometry(0.0088, 0.0100, 0.0090, 24), matAlumOscuro);
   copa.position.set(0, -0.0086, lado * 0.0290);
   copa.rotation.x = -lado * 0.30;
   t.add(copa);
@@ -3017,14 +3197,14 @@ function armarTruck(lado, ancho, wd, aw, ruedas, conRuedas){
   /* Los dos brazos del hanger: al perno rey y a la copa */
   const bocaPerno = V(0, -M.cuelgue + 0.0205, -lado * 0.0090);
   const puntaPivote = V(0, -M.cuelgue + 0.0150, lado * 0.0250);
-  const yugo = varilla(0.0092, 0.0130, bocaPerno, V(0, -M.cuelgue + 0.002, -lado * 0.001), matAluminio, 14);
+  const yugo = varilla(0.0092, 0.0130, bocaPerno, V(0, -M.cuelgue + 0.002, -lado * 0.001), matAluminio, 24);
   yugo.castShadow = true;
   t.add(yugo);
-  const anillo = new T.Mesh(new T.CylinderGeometry(0.0105, 0.0105, 0.0090, 16), matAluminio);
+  const anillo = new T.Mesh(new T.CylinderGeometry(0.0105, 0.0105, 0.0090, 26), matAluminio);
   anillo.position.copy(bocaPerno);
   anillo.rotation.x = -lado * 0.72;
   t.add(anillo);
-  const brazo = varilla(0.0042, 0.0092, puntaPivote, V(0, -M.cuelgue + 0.004, lado * 0.004), matAluminio, 12);
+  const brazo = varilla(0.0042, 0.0092, puntaPivote, V(0, -M.cuelgue + 0.004, lado * 0.004), matAluminio, 22);
   brazo.castShadow = true;
   t.add(brazo);
 
@@ -3035,22 +3215,22 @@ function armarTruck(lado, ancho, wd, aw, ruedas, conRuedas){
   const en = d => cabeza.clone().addScaledVector(dir, d);
   const largoPerno = cabeza.distanceTo(punta);
 
-  t.add(varilla(0.0026, 0.0026, cabeza, punta, matAcero, 12));
+  t.add(varilla(0.0026, 0.0026, cabeza, punta, matAcero, 18));
   const tornillo = new T.Mesh(new T.CylinderGeometry(0.0058, 0.0058, 0.0048, 6), matAcero);
   tornillo.position.copy(en(-0.0016));
   tornillo.quaternion.setFromUnitVectors(_Y, dir);
   t.add(tornillo);
 
   /* Buje de arriba (cónico) y de abajo, el sándwich del hanger */
-  const bujeAlto = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0104, 0.0100, 16), matBuje);
+  const bujeAlto = new T.Mesh(new T.CylinderGeometry(0.0062, 0.0104, 0.0100, 26), matBuje);
   bujeAlto.position.copy(en(largoPerno * 0.36));
   bujeAlto.quaternion.setFromUnitVectors(_Y, dir);
   t.add(bujeAlto);
-  const bujeBajo = new T.Mesh(new T.CylinderGeometry(0.0104, 0.0068, 0.0092, 16), matBuje);
+  const bujeBajo = new T.Mesh(new T.CylinderGeometry(0.0104, 0.0068, 0.0092, 26), matBuje);
   bujeBajo.position.copy(en(largoPerno * 0.74));
   bujeBajo.quaternion.setFromUnitVectors(_Y, dir);
   t.add(bujeBajo);
-  const rondana = new T.Mesh(new T.CylinderGeometry(0.0092, 0.0092, 0.0016, 16), matAcero);
+  const rondana = new T.Mesh(new T.CylinderGeometry(0.0092, 0.0092, 0.0016, 24), matAcero);
   rondana.position.copy(en(largoPerno * 0.815));
   rondana.quaternion.setFromUnitVectors(_Y, dir);
   t.add(rondana);
@@ -3060,7 +3240,7 @@ function armarTruck(lado, ancho, wd, aw, ruedas, conRuedas){
   t.add(tuercaRey);
 
   /* Eje de acero de lado a lado */
-  const eje = new T.Mesh(new T.CylinderGeometry(0.0040, 0.0040, aw * 1.02, 14), matAcero);
+  const eje = new T.Mesh(new T.CylinderGeometry(0.0040, 0.0040, aw * 1.02, 32), matAcero);
   eje.rotation.z = Math.PI / 2;
   eje.position.y = -M.cuelgue;
   eje.castShadow = true;
@@ -3072,6 +3252,10 @@ function armarTruck(lado, ancho, wd, aw, ruedas, conRuedas){
     const x = cx * 0.0207, z = cz * 0.0270 + lado * 0.0020;
     const cab = new T.Mesh(new T.CylinderGeometry(0.0048, 0.0048, 0.0018, 10), matNegro);
     cab.position.set(x, M.grosor + 0.0014, z);
+    /* Esta cabeza vive del otro lado de la tabla. Sin tabla se queda
+       flotando arriba del truck como una mosca: se marca para poder
+       quitarla en los retratos de la pieza suelta. */
+    cab.userData.montada = true;
     t.add(cab);
     const tca = new T.Mesh(new T.CylinderGeometry(0.0042, 0.0042, 0.0036, 6), matAcero);
     tca.position.set(x, -0.0098, z);
@@ -3213,6 +3397,14 @@ const POSES = {
 const retratoDe = {};
 let retratosListos = false;
 
+/* Quita lo que sólo tiene sentido con la tabla puesta */
+function quitarMontaje(o){
+  const fuera = [];
+  o.traverse(x => { if(x.userData && x.userData.montada) fuera.push(x); });
+  fuera.forEach(x => x.parent && x.parent.remove(x));
+  return o;
+}
+
 function piezaSuelta(r){
   const pul = r.pulgadas || 8.0, aw = pul * 0.0254;
   if(r.pieza === "tabla"){
@@ -3233,6 +3425,7 @@ function piezaSuelta(r){
   if(r.pieza === "truck"){
     const g = new T.Group();
     const t = armarTruck(1, aw, 0.053, aw, null, false);
+    quitarMontaje(t);
     t.rotation.y = 0.62;
     g.add(t);
     return g;
@@ -3252,6 +3445,7 @@ function piezaSuelta(r){
    que sea: se mide su esfera y se aleja la cámara lo justo. */
 const _cajaFoto = new T.Box3(), _esfFoto = new T.Sphere();
 const _dirFoto = new T.Vector3(), _pico = new T.Vector3();
+const _centroFoto = new T.Vector3(), _der = new T.Vector3(), _arr = new T.Vector3();
 function encuadrarFoto(lente2, obj, pose){
   obj.updateMatrixWorld(true);
   _cajaFoto.setFromObject(obj).getBoundingSphere(_esfFoto);
@@ -3265,23 +3459,67 @@ function encuadrarFoto(lente2, obj, pose){
   const mn = _cajaFoto.min, mx = _cajaFoto.max;
   if(pose.arriba) lente2.up.set(pose.arriba[0], pose.arriba[1], pose.arriba[2]);
   else lente2.up.set(0, 1, 0);
-  for(let vuelta = 0; vuelta < 3; vuelta++){
-    lente2.position.copy(_esfFoto.center).addScaledVector(_dirFoto, d);
-    lente2.lookAt(_esfFoto.center);
+  /* Con 'ceñido' no se mide la caja sino la silueta de verdad. Una
+     pieza girada —el par de trucks, la hoja de lija recargada— cabe
+     entera en una caja mucho más grande que ella, y encuadrando por
+     la caja acaba ocupando la mitad del cuadro. Además se recentra:
+     la silueta rara vez queda en medio de su propia caja. */
+  const puntos = pose.cenido ? nubeDe(obj, 500) : null;
+  const centro = _centroFoto.copy(_esfFoto.center);
+  for(let vuelta = 0, topa = puntos ? 6 : 3; vuelta < topa; vuelta++){
+    lente2.position.copy(centro).addScaledVector(_dirFoto, d);
+    lente2.lookAt(centro);
     lente2.near = Math.max(0.006, d - _esfFoto.radius * 2.4);
     lente2.far = d + _esfFoto.radius * 3;
     lente2.updateProjectionMatrix();
     lente2.updateMatrixWorld(true);
     lente2.matrixWorldInverse.copy(lente2.matrixWorld).invert();
     let llena = 0;
-    for(let i = 0; i < 8; i++){
-      _pico.set(i & 1 ? mx.x : mn.x, i & 2 ? mx.y : mn.y, i & 4 ? mx.z : mn.z).project(lente2);
-      llena = Math.max(llena, Math.abs(_pico.x), Math.abs(_pico.y));
+    if(puntos){
+      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      for(let i = 0; i < puntos.length; i++){
+        _pico.copy(puntos[i]).project(lente2);
+        if(_pico.x < x0) x0 = _pico.x;
+        if(_pico.x > x1) x1 = _pico.x;
+        if(_pico.y < y0) y0 = _pico.y;
+        if(_pico.y > y1) y1 = _pico.y;
+      }
+      /* Correr la mira hasta el centro de la silueta, en el plano de
+         la cámara: lo que en pantalla está de lado, al mundo se
+         traduce como un paso a la derecha y otro hacia arriba. */
+      const semiV = d * Math.tan(fv / 2), semiH = semiV * lente2.aspect;
+      _der.setFromMatrixColumn(lente2.matrixWorld, 0);
+      _arr.setFromMatrixColumn(lente2.matrixWorld, 1);
+      centro.addScaledVector(_der, (x0 + x1) / 2 * semiH)
+            .addScaledVector(_arr, (y0 + y1) / 2 * semiV);
+      llena = Math.max((x1 - x0) / 2, (y1 - y0) / 2);
+    } else {
+      for(let i = 0; i < 8; i++){
+        _pico.set(i & 1 ? mx.x : mn.x, i & 2 ? mx.y : mn.y, i & 4 ? mx.z : mn.z).project(lente2);
+        llena = Math.max(llena, Math.abs(_pico.x), Math.abs(_pico.y));
+      }
     }
     if(llena < 0.0001) break;
     d *= llena * (pose.aire || 1.06);
   }
-  return _esfFoto.center;
+  return centro;
+}
+
+/* Un muestreo de los vértices de la pieza, ya en coordenadas del
+   mundo. No hacen falta todos: con unos cientos por malla la silueta
+   ya queda medida, y salen baratos. */
+function nubeDe(obj, tope){
+  const pts = [];
+  obj.traverse(o => {
+    if(!o.isMesh || !o.geometry) return;
+    const pa = o.geometry.attributes && o.geometry.attributes.position;
+    if(!pa) return;
+    const paso = Math.max(1, Math.ceil(pa.count / tope));
+    for(let i = 0; i < pa.count; i += paso){
+      pts.push(new T.Vector3().fromBufferAttribute(pa, i).applyMatrix4(o.matrixWorld));
+    }
+  });
+  return pts.length ? pts : null;
 }
 
 /* ── El estudio ───────────────────────────────────────
@@ -3310,7 +3548,9 @@ function abrirEstudio(A, B){
     posar(pieza, pose, calidad){
       bolsa.clear(); bolsa.add(pieza);
       const centro = encuadrarFoto(lenteFoto, bolsa, pose);
-      foco.intensity = 1.9;
+      /* La lija negra contra un fondo negro se traga la luz: la
+         pose puede pedir más foco del normal. */
+      foco.intensity = pose.luz || 1.9;
       foco.position.copy(lenteFoto.position);
       foco.target.position.copy(centro);
       foco.target.updateMatrixWorld();
@@ -3336,6 +3576,10 @@ function abrirEstudio(A, B){
    teléfono lento se quede la página trabada mientras posa. */
 function tomarRetratos(alSalir){
   if(retratosListos || !render) return;
+  /* El estudio es uno solo. Si el arco todavía está posando sus
+     piezas, se espera al siguiente cuadro: abrir dos a la vez deja
+     el lienzo del tamaño equivocado y las fotos salen cortadas. */
+  if(tomandoFotos){ requestAnimationFrame(() => tomarRetratos(alSalir)); return; }
   retratosListos = true;
   const ids = Object.keys(RETRATOS);
   let i = 0, set = null;
@@ -3390,7 +3634,7 @@ function juegoDe(clave){
   if(clave === "trucks"){
     const aw = 8.25 * 0.0254;
     [[-0.056, 0.004, -0.040, 0.34], [0.062, -0.004, 0.046, 1.05]].forEach(([x, y, z, giro]) => {
-      const t = armarTruck(1, aw, 0.053, aw, null, false);
+      const t = quitarMontaje(armarTruck(1, aw, 0.053, aw, null, false));
       const cuna = new T.Group();
       cuna.add(t);
       cuna.position.set(x, y, z);
@@ -3435,7 +3679,83 @@ function tomarRetratoFamilia(clave){
   return retratoFamilia[clave];
 }
 
+/* ── El retrato de cada pieza del arco ────────────────
+   El arco mostraba dibujos técnicos. En la lija y la tabla
+   la silueta se entendía; el truck salía como un diagrama
+   gris sin volumen, justo donde hay que decidir. Aquí posa
+   cada pieza de verdad, con el mismo estudio del catálogo,
+   sin sumarle un solo KB al archivo. */
 
+function arteArco(clave, i){
+  if(clave === "trucks"){
+    /* Uno solo y grande. Probé también el par, como en la familia:
+       encimados no se entiende cuál es cuál —se lee una sola masa
+       de aluminio—. Girado casi de perfil se distinguen la placa,
+       el perno rey, el hanger y el eje, que es lo que hay que ver
+       para decidir. piezas[0] es para tablas 8.0" y piezas[1] 8.25". */
+    const g = new T.Group();
+    const t = quitarMontaje(armarTruck(1, (i ? 8.25 : 8.0) * 0.0254, 0.053,
+                                       (i ? 8.25 : 8.0) * 0.0254, null, false));
+    t.rotation.y = 0.90;
+    g.add(t);
+    return g;
+  }
+  if(clave === "tabla"){
+    const t = piezaSuelta({ pieza:"tabla", tabla:i });
+    /* La panza al frente: es el gráfico, y es lo que distingue
+       una tabla de otra. La lija es negra en las tres. */
+    if(t) t.rotation.set(0, 0, Math.PI);
+    return t;
+  }
+  if(clave === "lija")   return piezaSuelta({ pieza:"lija",  lija:i });
+  if(clave === "ruedas") return piezaSuelta({ pieza:"rueda", rueda:i });
+  return null;
+}
+
+/* Va de una pieza por cuadro —son renders grandes— y abre el
+   estudio una vez por familia, porque cada una necesita su
+   propio lienzo. Si el catálogo o una familia lo tiene ocupado,
+   espera al siguiente cuadro en lugar de rendirse. */
+let retratosArcoListos = false;
+function tomarRetratosArco(){
+  if(retratosArcoListos || !render) return;
+  retratosArcoListos = true;
+  const tareas = [];
+  CLAVES.forEach(k => {
+    if(!ESTUDIO_ARCO[k]) return;
+    ARCO[k].piezas.forEach((pz, i) => { if(!pz.img) tareas.push([k, i]); });
+  });
+
+  let n = 0, set = null, abierta = null;
+  function cerrar(){ if(set){ set.cerrar(); set = null; abierta = null; } }
+
+  function paso(){
+    if(n >= tareas.length){ cerrar(); return; }
+    /* El estudio es uno solo para toda la página */
+    if(tomandoFotos && !set){ requestAnimationFrame(paso); return; }
+    const [k, i] = tareas[n];
+    try{
+      if(abierta !== k){
+        cerrar();
+        const e = ESTUDIO_ARCO[k];
+        set = abrirEstudio(e.a, e.b);
+        abierta = k;
+      }
+      const pieza = arteArco(k, i);
+      if(pieza){
+        retratoArco[k][i] = set.posar(pieza, ESTUDIO_ARCO[k].pose, 0.86);
+        refrescarOrbe(k, i);
+      }
+    }catch(e){
+      /* Si truena se quedan los dibujos: nadie se entera */
+      cerrar();
+      return;
+    }
+    n++;
+    requestAnimationFrame(paso);
+  }
+  paso();
+}
 
 /* ── La agenda ────────────────────────────────────────
    La página decide sola cuál evento va al frente. Antes la
@@ -3629,6 +3949,33 @@ construirPatineta();
 pintarFiltros();
 pintarRejilla();
 pintarCarrito();
+
+/* Armar la malla de una tabla es lo único caro de todo esto —parte
+   los triángulos, moldea el cóncavo, promedia las normales—: unos
+   20 ms, y en un teléfono lento se sienten. Sólo hay dos anchos y la
+   forma no cambia, así que se dejan hechos en el primer rato muerto
+   y para cuando el arco los pide ya están guardados. */
+if(render){
+  const calentar = () => { try{ armarTabla(8.0 * 0.0254); armarTabla(8.25 * 0.0254); }catch(e){} };
+  if(window.requestIdleCallback) requestIdleCallback(calentar, { timeout:2500 });
+  else setTimeout(calentar, 1200);
+}
+
+/* Al llegar al taller, cada pieza del arco posa para su retrato en
+   3D. Esto no depende de 'quieto': con menos animación también se
+   merece ver la pieza de verdad; lo que se apaga es el movimiento. */
+if("IntersectionObserver" in window){
+  const foto = new IntersectionObserver((es, o) => {
+    es.forEach(e => {
+      if(!e.isIntersecting) return;
+      o.disconnect();
+      try{ tomarRetratosArco(); }catch(err){}
+    });
+  }, { rootMargin:"25% 0px" });
+  foto.observe(escenario);
+} else {
+  try{ tomarRetratosArco(); }catch(err){}
+}
 
 /* Entrada del arco: una sola vez, cuando aparece */
 if(!quieto && "IntersectionObserver" in window){
