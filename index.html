@@ -275,6 +275,11 @@ a{color:inherit; text-decoration:none}
 /* ── Estructura ─────────────────────────────────────── */
 .envoltorio{width:var(--ancho); margin-inline:auto}
 .seccion{padding:clamp(72px,11vw,150px) 0; position:relative}
+/* El relleno era el mismo en las seis y la página respiraba a
+   metrónomo. Una abre con mucho aire, otra se pega a la anterior:
+   el ritmo desparejo es lo que da tensión. */
+.seccion--aire{padding-top:clamp(110px,16vw,220px)}
+.seccion--pegada{padding-top:clamp(40px,6vw,80px)}
 /* Entre secciones no va una línea gris: va una rebanada del
    prensado, las mismas capas que se ven en el canto de la tabla. */
 .seccion + .seccion{border-top:none}
@@ -287,10 +292,80 @@ a{color:inherit; text-decoration:none}
   mask-image:linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
 }
 
+/* ── La malla ─────────────────────────────────────────
+   Para romper una retícula primero hay que tener una. Doce
+   columnas sobre el mismo ancho de siempre: los bloques se
+   paran en columnas concretas en vez de ocupar todo. Abajo
+   de 900px se desarma — la asimetría es de pantalla ancha;
+   en el teléfono sólo estorbaría. */
+.malla{
+  display:grid; grid-template-columns:repeat(12,1fr);
+  gap:0 clamp(16px,2.4vw,32px);
+}
+.c1-4{grid-column:1/5}   .c1-5{grid-column:1/6}   .c1-7{grid-column:1/8}
+.c1-8{grid-column:1/9}   .c1-9{grid-column:1/10}  .c1-12{grid-column:1/13}
+.c6-12{grid-column:6/13} .c7-12{grid-column:7/13} .c9-12{grid-column:9/13}
+@media(max-width:900px){
+  .malla{display:block}
+  .malla > *{grid-column:auto !important}
+}
+
+/* ── Las cabeceras ────────────────────────────────────
+   Seis secciones abrían con el mismo movimiento: rótulo,
+   título y párrafo, arriba a la izquierda, siempre. Ahora
+   cada una entra por su lado. Es lo que más se nota y lo
+   más barato de hacer. */
 .cabecera{
   display:flex; flex-direction:column; gap:14px;
   margin-bottom:clamp(36px,5vw,60px); max-width:52ch;
 }
+/* Corrida a la derecha: el bloque entero cruza la página */
+.cabecera--der{margin-left:auto; text-align:right; align-items:flex-end}
+.cabecera--der .lectura{margin-left:auto}
+/* Partida: el título arranca a la izquierda y el párrafo
+   entra tarde y adentrado. Ese desfase es el referente. */
+.cabecera--partida{max-width:none; display:grid; gap:0 clamp(16px,2.4vw,32px)}
+@media(min-width:901px){
+  .cabecera--partida{grid-template-columns:repeat(12,1fr); align-items:end}
+  .cabecera--partida .rotulo{grid-column:1/4; grid-row:1; align-self:start}
+  .cabecera--partida .titulo{grid-column:1/9; grid-row:2}
+  .cabecera--partida .lectura{grid-column:7/13; grid-row:3; margin-top:clamp(22px,3vw,40px)}
+}
+@media(max-width:900px){
+  .cabecera--der{margin-left:0; text-align:left; align-items:flex-start}
+  .cabecera--der .lectura{margin-left:0}
+  .cabecera--partida{display:flex; flex-direction:column; gap:14px; max-width:52ch}
+}
+
+/* ── La marca de sección ──────────────────────────────
+   El número grande con su raya ya existía en las familias
+   y era de lo mejor que tiene el sitio. Aquí se vuelve
+   pieza de todas las secciones. */
+.marca-seccion{
+  display:flex; align-items:center; gap:14px;
+  margin:0 0 clamp(18px,2.6vw,30px);
+}
+.marca-seccion .num{
+  font-family:var(--display); font-variation-settings:'wdth' 74,'wght' 800;
+  font-size:clamp(1.4rem,3.2vw,2.4rem); color:var(--ember); line-height:1;
+}
+.marca-seccion .raya{
+  flex:1; height:1px; max-width:200px;
+  background:linear-gradient(90deg, var(--ember), transparent);
+}
+.marca-seccion .de{
+  font-family:var(--dato); font-size:.625rem; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--mute-2);
+}
+/* Corrida a la derecha, la marca se voltea: la raya sale
+   hacia el margen en vez de hacia el centro. */
+@media(min-width:901px){
+  .marca-seccion--der{flex-direction:row-reverse}
+  .marca-seccion--der .raya{background:linear-gradient(270deg, var(--ember), transparent)}
+}
+/* En el teléfono la cabecera se endereza a la izquierda; si la
+   marca se quedaba volteada, el número y el título apuntaban a
+   lados distintos. */
 
 /* ── Navegación ─────────────────────────────────────── */
 .nav{
@@ -426,6 +501,13 @@ a{color:inherit; text-decoration:none}
   gap:32px; flex-wrap:wrap;
 }
 .portada-pie .lectura{max-width:38ch}
+/* La línea de arriba cruza las doce columnas y el pie sólo llega
+   a siete: dos medidas distintas cortando la misma portada, en
+   lugar de dos bloques del mismo ancho uno encima del otro. */
+@media(min-width:901px){
+  .portada-pie{width:calc(100% * 7 / 12); flex-direction:column; align-items:flex-start; gap:28px}
+  .portada-pie .lectura{max-width:34ch}
+}
 .acciones{display:flex; gap:12px; flex-wrap:wrap}
 
 /* ── Botones ────────────────────────────────────────── */
@@ -466,7 +548,18 @@ a{color:inherit; text-decoration:none}
 }
 #taller > .envoltorio{position:relative; z-index:1}
 .taller{display:grid; gap:clamp(28px,4vw,52px); grid-template-columns:1fr}
-@media(min-width:1000px){ .taller{grid-template-columns:1fr 330px; align-items:start} }
+/* Las dos columnas ya no arrancan parejas: el arco se queda con
+   ocho columnas a la izquierda y el panel entra por la derecha
+   pero más abajo. Arrancar al mismo nivel es lo que hacía que
+   se leyera como una tabla. */
+@media(min-width:1000px){
+  .taller{
+    grid-template-columns:repeat(12,1fr);
+    gap:0 clamp(16px,2.4vw,32px); align-items:start;
+  }
+  .taller > :first-child{grid-column:1/9}
+  .taller > :last-child{grid-column:9/13; margin-top:clamp(46px,7vw,110px)}
+}
 
 /* Pestañas de pieza */
 .pestanas{display:flex; gap:2px; border:1px solid var(--linea); border-radius:2px; padding:3px; width:max-content; max-width:100%; overflow-x:auto; scrollbar-width:none}
@@ -652,6 +745,29 @@ a{color:inherit; text-decoration:none}
 /* ── El escenario: palabra + producto + reflejo ── */
 .fam-escena{position:relative; display:grid; place-items:center;
   min-height:50vh; margin-bottom:clamp(20px,3vh,44px)}
+/* ── Sacar la escena del eje ──
+   Las seis familias tenían la palabra y la pieza clavadas al centro
+   exacto, una tras otra. Correrlas un poco no sirvió: sólo movía el
+   choque y se veía descuadrado, no compuesto. Lo que sí funciona es
+   el movimiento del referente — dejar que algo se salga del marco:
+   la palabra se pega a una orilla de la pantalla y se desborda por
+   la otra, y la pieza se va al lado contrario. Quedan dos bloques
+   en tensión en vez de dos cosas encimadas.
+
+   El eje es una variable porque la pieza, su reflejo y su sombra de
+   contacto tienen que moverse juntos o la pieza se despega del piso.
+   Alterna por familia para que no se vuelva un patrón. */
+.fam{--eje:50%}
+@media(min-width:901px){
+  /* La palabra se ancla a una orilla del contenedor —no de la
+     pantalla: jalarla hasta allá le cortaba la primera letra y
+     dejaba de leerse—. Si es más ancha que el contenedor, se
+     desborda sola por el otro lado, que es justo lo que se busca. */
+  .fam:nth-of-type(odd){--eje:73%}
+  .fam:nth-of-type(odd) .fam-capa--fondo{justify-self:start}
+  .fam:nth-of-type(even){--eje:27%}
+  .fam:nth-of-type(even) .fam-capa--fondo{justify-self:end}
+}
 /* Dos capas que se mueven a distinta velocidad con el scroll: la
    palabra al fondo, la pieza al frente. El transform va aquí y no
    en la palabra ni en la pieza, para no pelearse con la animación
@@ -670,7 +786,7 @@ a{color:inherit; text-decoration:none}
   transition:opacity .9s var(--curva), transform 1s cubic-bezier(.16,1.1,.3,1);
 }
 .fam-producto{
-  position:absolute; left:50%; top:50%; z-index:3; pointer-events:none;
+  position:absolute; left:var(--eje,50%); top:50%; z-index:3; pointer-events:none;
   height:var(--alto,30vh);
   transform:translate(-50%,-50%) rotate(var(--giro,0deg)) scale(.86);
   opacity:0;
@@ -695,7 +811,7 @@ a{color:inherit; text-decoration:none}
 .fam[data-con-foto="1"] .fam-contacto{display:none}
 /* Sombra de contacto: pegada y dura debajo, difusa alrededor */
 .fam-contacto{
-  position:absolute; left:50%; z-index:2; pointer-events:none;
+  position:absolute; left:var(--eje,50%); z-index:2; pointer-events:none;
   bottom:6%; width:var(--sombraW,42%); height:26px;
   transform:translateX(-50%) scaleX(.9);
   background:radial-gradient(ellipse at center, rgba(0,0,0,.85) 0%, rgba(0,0,0,.4) 42%, transparent 72%);
@@ -703,7 +819,7 @@ a{color:inherit; text-decoration:none}
 }
 /* Reflejo en el piso */
 .fam-reflejo{
-  position:absolute; left:50%; top:calc(50% + var(--alto,30vh) * .42); z-index:1;
+  position:absolute; left:var(--eje,50%); top:calc(50% + var(--alto,30vh) * .42); z-index:1;
   height:var(--alto,30vh); pointer-events:none;
   transform:translateX(-50%);
   -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.6) 0%, transparent 44%);
@@ -1073,6 +1189,17 @@ a{color:inherit; text-decoration:none}
 
 /* ── FAQ ────────────────────────────────────────────── */
 .faqs{max-width:760px; border-top:1px solid var(--linea)}
+/* Las dudas se corren a la derecha y la cabecera se queda
+   pegada a la izquierda mientras se leen. */
+@media(min-width:901px){
+  .dudas-malla{display:grid; grid-template-columns:repeat(12,1fr); gap:0 clamp(16px,2.4vw,32px); align-items:start}
+  .dudas-malla > .cabecera{grid-column:1/5; position:sticky; top:110px; margin-bottom:0}
+  .dudas-malla > .faqs{grid-column:6/13; max-width:none}
+  /* La tarjeta del evento se queda en ocho columnas y la agenda
+     cuelga en las cuatro de la derecha, arrancando más abajo. */
+  .evento-malla > #evento-caja{grid-column:1/9}
+  .evento-malla > #evento-agenda{grid-column:9/13; margin-top:clamp(40px,6vw,96px)}
+}
 .faq{border-bottom:1px solid var(--linea)}
 .faq summary{
   list-style:none; cursor:pointer; padding:20px 44px 20px 0; position:relative;
@@ -1304,11 +1431,15 @@ a{color:inherit; text-decoration:none}
   <div id="familias"></div>
 
   <!-- ═══ El taller: arco 3D ═══ -->
-  <section class="seccion" id="taller">
+  <section class="seccion seccion--aire" id="taller">
     <div class="taller-foto" id="taller-foto" aria-hidden="true"></div>
     <div class="envoltorio">
-      <div class="cabecera sube">
-        <p class="rotulo">El taller</p>
+      <div class="marca-seccion sube">
+        <span class="num">03</span><span class="raya"></span><span class="de">El taller</span>
+      </div>
+      <!-- Sin rótulo: la marca de arriba ya dice "El taller", y
+           repetirlo dos renglones abajo se leía como tartamudeo. -->
+      <div class="cabecera cabecera--partida sube">
         <h2 class="titulo">Gírala y elige</h2>
         <p class="lectura">Arrastra para girar el arco. La pieza que quede al frente es la que llevas — se suma sola a tu armado.</p>
       </div>
@@ -1404,20 +1535,29 @@ a{color:inherit; text-decoration:none}
   <!-- ═══ Evento ═══ -->
   <section class="seccion" id="evento">
     <div class="envoltorio">
-      <div class="cabecera sube">
+      <div class="marca-seccion marca-seccion--der sube">
+        <span class="num">04</span><span class="raya"></span><span class="de">Agenda</span>
+      </div>
+      <div class="cabecera cabecera--der sube">
         <p class="rotulo" id="evento-rotulo">Lo que viene</p>
         <h2 class="titulo" id="evento-encabezado">Próxima partida</h2>
       </div>
-      <div class="sube" id="evento-caja"></div>
-      <div class="sube d1" id="evento-agenda"></div>
+      <!-- La tarjeta se queda con ocho columnas y la agenda cuelga
+           en las cuatro de la derecha, más abajo. -->
+      <div class="malla evento-malla">
+        <div class="sube" id="evento-caja"></div>
+        <div class="sube d1" id="evento-agenda"></div>
+      </div>
     </div>
   </section>
 
   <!-- ═══ Dudas ═══ -->
-  <section class="seccion" id="dudas">
-    <div class="envoltorio">
+  <section class="seccion seccion--pegada" id="dudas">
+    <div class="envoltorio dudas-malla">
       <div class="cabecera sube">
-        <p class="rotulo">Dudas</p>
+        <div class="marca-seccion">
+          <span class="num">05</span><span class="raya"></span><span class="de">Dudas</span>
+        </div>
         <h2 class="titulo">Antes de pedir</h2>
       </div>
       <div class="faqs sube" id="faqs"></div>
@@ -1455,7 +1595,7 @@ a{color:inherit; text-decoration:none}
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-07 · la mitad de peso</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-08 · asimétrica</span>
     </div>
   </div>
 </footer>
