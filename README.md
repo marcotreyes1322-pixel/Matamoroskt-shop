@@ -35,6 +35,36 @@ no hay dependencias, no hay servidor: se abre y funciona.
 Sin WebGL (equipos viejos) el sitio no se rompe: las piezas caen a dibujos
 técnicos y lo demás sigue funcionando igual.
 
+## Los códigos de descuento
+
+Cuando alguien te manda un clip por WhatsApp y te gusta, le pasas uno de estos.
+La persona lo escribe en el carrito o en el panel del taller, ve su total ya
+rebajado, y el código se va escrito dentro del pedido que te llega — así sabes
+cuál usaste y a quién.
+
+**Ve tachando los que ya diste.** Si se acaban, se pueden hacer más.
+
+| 5% | 10% | 15% |
+|---|---|---|
+| `MATA5-RNY8` | `MATA10-RFYZ` | `MATA15-VJ6V` |
+| `MATA5-JN7Q` | `MATA10-XXYN` | `MATA15-JPC2` |
+| `MATA5-YSAQ` | `MATA10-BHNA` | `MATA15-JBVJ` |
+| `MATA5-M8HC` | `MATA10-LQT5` | `MATA15-5TG1` |
+| `MATA5-P45G` | `MATA10-VC78` | `MATA15-BPZ5` |
+| `MATA5-NQ40` | `MATA10-W7VG` | `MATA15-GAD3` |
+| `MATA5-4T3I` | `MATA10-8Z44` | `MATA15-J6ZB` |
+| `MATA5-FC4E` | `MATA10-NJWL` | `MATA15-462X` |
+| `MATA5-ET9H` | `MATA10-C5ML` | `MATA15-5MCW` |
+| `MATA5-MSDH` | `MATA10-C9P4` | `MATA15-YRD8` |
+| `MATA5-FHNF` | `MATA10-HY5E` | `MATA15-PYJ6` |
+| `MATA5-ZUZU` | `MATA10-S3HU` | `MATA15-F3NM` |
+
+> **Ojo con esto:** el sitio es un archivo que cualquiera puede abrir, así que la
+> regla de los códigos se puede deducir leyendo el código fuente. Sirve para que
+> nadie caiga en uno tecleando de casualidad, pero no es una caja fuerte. La
+> validación de verdad la haces tú: el pedido te llega por WhatsApp con el
+> código escrito, y tú sabes a quién se lo diste.
+
 ## Antes de enseñárselo a un cliente
 
 Hay tres cosas que todavía traen datos de relleno:
