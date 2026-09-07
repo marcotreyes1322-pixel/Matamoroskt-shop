@@ -1360,10 +1360,11 @@ a{color:inherit; text-decoration:none}
 .cupon-quita:hover,.cupon-quita:focus-visible{color:var(--ember)}
 
 /* En la barra del carrito el espacio es de lado, no de arriba */
-.cupon-caja--barra{margin:0; flex:1 1 190px; min-width:150px; max-width:320px}
-.cupon-caja--barra .cupon-error{position:absolute; margin-top:2px}
-/* Con descuento puesto, el total tachado no cabe en la barra: se
-   avisa con el renglón del cupón, que ya dice cuánto se ahorró. */
+/* position:relative es indispensable: sin él, el absolute del
+   error se anclaba a .carrito (que es fixed) y el mensaje caía
+   encima del campo en lugar de debajo. */
+.cupon-caja--barra{margin:0; flex:1 1 190px; min-width:150px; max-width:320px; position:relative}
+.cupon-caja--barra .cupon-error{position:absolute; top:100%; left:0; right:0; margin:3px 0 0}
 @media(max-width:700px){
   .cupon-caja--barra{flex-basis:100%; max-width:none; order:3}
   .carrito .total{margin-left:0}
@@ -1748,7 +1749,7 @@ a{color:inherit; text-decoration:none}
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-09 · manda tu clip</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-10 · cupón afinado</span>
     </div>
   </div>
 </footer>
@@ -2417,12 +2418,21 @@ function pintarClips(){
      Sólo se dibuja mientras la sección se ve — fuera de
      pantalla no tiene caso quemar batería. */
   const lonas = [...tira.querySelectorAll("canvas")];
-  const juegos = clips.map((c, i) => ({
-    imgs: c.cuadros.map(u => { const im = new Image(); im.src = u; return im; }),
-    ctx: lonas[i].getContext("2d"),
-    lona: lonas[i],
-    desfase: i * 0.33,
-  }));
+  /* Los treinta cuadros no se arman hasta que la sección entra a
+     cuadro. Antes se creaban al cargar la página y el navegador
+     se ponía a decodificar medio mega de clips que a lo mejor
+     nadie iba a ver. Sólo se hace una vez. */
+  let juegos = null;
+  function armar(){
+    if(juegos) return juegos;
+    juegos = clips.map((c, i) => ({
+      imgs: c.cuadros.map(u => { const im = new Image(); im.src = u; return im; }),
+      ctx: lonas[i].getContext("2d"),
+      lona: lonas[i],
+      desfase: i * 0.33,
+    }));
+    return juegos;
+  }
 
   let vivo = false, ultimo = 0, t = 0;
   function vuelta(ahora){
@@ -2430,7 +2440,7 @@ function pintarClips(){
     const dt = ultimo ? Math.min(90, ahora - ultimo) : 16.7;
     ultimo = ahora;
     t += dt / 1000;
-    juegos.forEach(j => {
+    armar().forEach(j => {
       const n = j.imgs.length;
       /* ~9 cuadros por segundo: se lee como video sin
          gastar los cuadros de más que no tenemos. */
@@ -2446,12 +2456,13 @@ function pintarClips(){
   function prender(si){
     if(si === vivo) return;
     vivo = si;
-    if(si){ ultimo = 0; requestAnimationFrame(vuelta); }
+    if(si){ armar(); ultimo = 0; requestAnimationFrame(vuelta); }
   }
 
-  if(quieto){
-    /* Con menos animación se deja el primer cuadro puesto */
-    juegos.forEach(j => {
+  /* Con menos animación se deja puesto el primer cuadro, y también
+     hasta llegar: aunque no se mueva, sigue siendo medio mega. */
+  function quietoPintar(){
+    armar().forEach(j => {
       const im = j.imgs[0];
       const pinta = () => {
         const L = j.lona, e = Math.max(L.width / im.naturalWidth, L.height / im.naturalHeight);
@@ -2461,12 +2472,16 @@ function pintarClips(){
       };
       im.complete && im.naturalWidth ? pinta() : im.addEventListener("load", pinta, { once:true });
     });
-    return;
   }
+
   if("IntersectionObserver" in window){
-    new IntersectionObserver(es => es.forEach(e => prender(e.isIntersecting)),
-      { threshold:.08 }).observe(tira);
-  } else prender(true);
+    const ob = new IntersectionObserver(es => es.forEach(e => {
+      if(!quieto) return prender(e.isIntersecting);
+      if(e.isIntersecting){ quietoPintar(); ob.disconnect(); }
+    }), { threshold:.08 });
+    ob.observe(tira);
+  } else if(quieto) quietoPintar();
+  else prender(true);
 }
 
 /* ── El código de descuento ───────────────────────────
@@ -2482,17 +2497,20 @@ function pintarClips(){
    cuando te llega el pedido por WhatsApp con el código
    escrito: tú sabes a quién se lo diste. */
 const ALFA = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+/* Dos caracteres de control, no uno. Con uno solo pasaba 1 de
+   cada 36 códigos al azar —casi el 3%—, y quien tenía el de 5%
+   sacaba el de 15% probando 36 veces. Con dos son 1 de 1296. */
 function controlDe(pct, base){
   let s = pct;
-  for(const c of base) s = (s * 31 + c.charCodeAt(0)) % 36;
-  return ALFA[s];
+  for(const c of base) s = (s * 31 + c.charCodeAt(0)) % 1296;
+  return ALFA[Math.floor(s / 36)] + ALFA[s % 36];
 }
 /* Devuelve el porcentaje si el código es bueno, o null */
 function leerCodigo(txt){
-  const m = /^MATA(5|10|15)-([0-9A-Z]{4})$/.exec(String(txt || "").trim().toUpperCase());
+  const m = /^MATA(5|10|15)-([0-9A-Z]{5})$/.exec(String(txt || "").trim().toUpperCase());
   if(!m) return null;
   const pct = Number(m[1]), cuerpo = m[2];
-  return controlDe(pct, cuerpo.slice(0, 3)) === cuerpo[3] ? pct : null;
+  return controlDe(pct, cuerpo.slice(0, 3)) === cuerpo.slice(3) ? pct : null;
 }
 
 let cupon = null;          /* { codigo, pct } o null */
@@ -2509,24 +2527,33 @@ try{
 function pintarCupon(sel, total){
   const caja = $(sel);
   if(!caja) return;
+  const modo = cupon ? "puesto" : "forma";
+
+  /* Sólo se rehace la caja cuando cambia de modo. Antes se
+     reasignaba el innerHTML en cada repintado, y como agregar
+     un producto llama a pintarCarrito(), escribir un código y
+     meter algo al carrito te borraba lo tecleado y el foco. */
+  if(caja.dataset.modo !== modo){
+    caja.dataset.modo = modo;
+    caja.innerHTML = cupon
+      ? `<div class="cupon-puesto">
+           <span class="cupon-pct">−${cupon.pct}%</span>
+           <span class="cupon-cod">${esc(cupon.codigo)}</span>
+           <span class="cupon-ahorro cifra"></span>
+           <button type="button" class="cupon-quita" data-quita-cupon aria-label="Quitar el código">✕</button>
+         </div>`
+      : `<form class="cupon-forma" data-cupon-forma>
+           <input class="cupon-campo" type="text" name="codigo" inputmode="latin"
+                  autocomplete="off" spellcheck="false" placeholder="¿Traes código? MATA10-…"
+                  aria-label="Código de descuento">
+           <button class="cupon-ok" type="submit">Aplicar</button>
+           <p class="cupon-error" role="status" aria-live="polite"></p>
+         </form>`;
+  }
+  /* Lo único que depende del total es el ahorro */
   if(cupon){
-    const d = conCupon(total);
-    caja.innerHTML = `
-      <div class="cupon-puesto">
-        <span class="cupon-pct">−${cupon.pct}%</span>
-        <span class="cupon-cod">${esc(cupon.codigo)}</span>
-        <span class="cupon-ahorro cifra">−${esc(pesos(d.ahorro))}</span>
-        <button type="button" class="cupon-quita" data-quita-cupon aria-label="Quitar el código">✕</button>
-      </div>`;
-  } else {
-    caja.innerHTML = `
-      <form class="cupon-forma" data-cupon-forma>
-        <input class="cupon-campo" type="text" name="codigo" inputmode="latin"
-               autocomplete="off" spellcheck="false" placeholder="¿Traes código? MATA10-…"
-               aria-label="Código de descuento">
-        <button class="cupon-ok" type="submit">Aplicar</button>
-        <p class="cupon-error" role="status" aria-live="polite"></p>
-      </form>`;
+    const n = caja.querySelector(".cupon-ahorro");
+    if(n) n.textContent = "−" + pesos(conCupon(total).ahorro);
   }
 }
 
@@ -2746,7 +2773,6 @@ function pintarCarrito(){
   $("#carrito-cuenta").textContent = txt;
   $("#carrito-total").textContent = pesos(dd.total);
   pintarCupon("#carrito-cupon", total);
-  $("#carrito").classList.toggle("con-cupon", !!cupon && piezas > 0);
   $("#carrito-wa").href = wa("Hola Matamoros, quiero pedir:\n\n" + lineas.join("\n") + lineasCupon(total));
   $("#aviso").textContent = piezas
     ? `${txt}, total ${pesos(dd.total)}` + (cupon ? `, con ${cupon.pct}% de descuento` : "")
