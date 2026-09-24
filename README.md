@@ -20,6 +20,13 @@ sin cuenta ni permisos. *(Falta prenderlo una vez — ver abajo.)*
 Es gratis porque el repo es público. Una vez prendido, cada vez que se suba un
 cambio el sitio se actualiza solo.
 
+**Y de pasada se arregla la vista previa.** Cuando pegas el enlace en WhatsApp,
+el chat muestra una tarjeta con foto. Esa foto es
+[`portada.jpg`](portada.jpg) — el Mapache en pleno truco, con el nombre encima,
+sacada de la portada real del sitio. Las etiquetas ya están puestas apuntando
+ahí, pero WhatsApp sólo puede ir a buscarla si el sitio está publicado: sin
+Pages prendido, el enlace se ve como un cuadro gris sin nada.
+
 ## Qué es
 
 Todo el sitio es **un solo archivo**, [`index.html`](index.html). No hay build,
