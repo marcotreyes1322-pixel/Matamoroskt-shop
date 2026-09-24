@@ -130,22 +130,16 @@ const PRODUCTOS = [
       mapa:  lo que se busca en Google Maps al picarle a "cómo
              llegar". Si lo dejas vacío se usa el lugar.
       foto:  opcional, se pone de fondo del cartel.
-      Cuando ya pasaron todos, se queda el último en gris. */
+      Cuando ya pasaron todos, se queda el último en gris.
+      Mientras esta lista esté vacía la sección de agenda NO se enseña:
+      ni el bloque ni su liga en el menú. Aparecen solas en cuanto pongas
+      una fecha. Copia el renglón de ejemplo, quítale las diagonales y
+      cámbiale los datos. */
 const EVENTOS = [
-  { fecha:"2026-06-21", hora:"5:00 PM", titulo:"Go Skate Day",
-    lugar:"Polideportivo Cuauhtémoc",
-    mapa:"Polideportivo Cuauhtémoc, Chihuahua", foto:MEDIOS.evento,
-    texto:"Distintas dinámicas, premios en efectivo, accesorios y patinetas. Llega con tu tabla." },
-
-  { fecha:"2026-10-31", hora:"6:00 PM", titulo:"Noche de Catrinas",
-    lugar:"Plaza Zaragoza",
-    mapa:"Plaza Zaragoza, Cuauhtémoc, Chihuahua", foto:"",
-    texto:"Sesión nocturna con disfraz. Premio a la mejor catrina y a la mejor línea de la noche." },
-
-  { fecha:"2026-12-13", hora:"4:00 PM", titulo:"Jam de fin de año",
-    lugar:"Polideportivo Cuauhtémoc",
-    mapa:"Polideportivo Cuauhtémoc, Chihuahua", foto:"",
-    texto:"Cierre de temporada: best trick, rifa de tabla armada y lo que sobre de cera para todos." },
+  // { fecha:"2026-10-31", hora:"6:00 PM", titulo:"Noche de Catrinas",
+  //   lugar:"Plaza Zaragoza",
+  //   mapa:"Plaza Zaragoza, Cuauhtémoc, Chihuahua", foto:MEDIOS.evento,
+  //   texto:"Sesión nocturna con disfraz. Premio a la mejor línea de la noche." },
 ];
 
 /* 7. Preguntas frecuentes. */
@@ -1759,7 +1753,7 @@ a{color:inherit; text-decoration:none}
     <div class="pie-marca">
       <span class="dato">Matamoros Skateshop</span>
       <span class="dato">Hecho en Cuauhtémoc</span>
-      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-24 · portada para compartir</span>
+      <span class="dato" id="sello-version" title="Versión del sitio">v2026-09-24 · sin fechas inventadas</span>
     </div>
   </div>
 </footer>
@@ -4320,6 +4314,28 @@ function cuantoFalta(dias){
 const ligaMapa = e =>
   "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(e.mapa || e.lugar || "");
 
+/* Las familias se numeran solas (01..06); las otras cuatro marcas venían
+   fijas en el HTML. Si una se esconde, el conteo quedaría con hueco
+   —07, 09, 10—, así que se recalcula sobre las que sí se ven. */
+function renumerarSecciones(){
+  /* Se cuenta del dato y no del DOM: las familias se pintan después
+     de esto y contarlas en pantalla daba cero. */
+  let n = (typeof FAMILIAS !== "undefined" ? FAMILIAS.length : 6);
+  document.querySelectorAll("section.seccion").forEach(sec => {
+    const num = sec.querySelector(".marca-seccion .num");
+    if(!num || sec.style.display === "none") return;
+    num.textContent = String(++n).padStart(2, "0");
+  });
+}
+
+function verAgenda(si){
+  const sec = document.getElementById("evento");
+  if(sec) sec.style.display = si ? "" : "none";
+  document.querySelectorAll('a[href="#evento"]')
+    .forEach(a => a.style.display = si ? "" : "none");
+  renumerarSecciones();
+}
+
 function pintarEventos(){
   const caja = $("#evento-caja"), agenda = $("#evento-agenda");
   if(!caja) return;
@@ -4331,16 +4347,11 @@ function pintarEventos(){
   const proximos = lista.filter(e => diasDeAqui(e.d) >= 0).sort((a, b) => a.d - b.d);
   const pasados  = lista.filter(e => diasDeAqui(e.d) <  0).sort((a, b) => b.d - a.d);
 
-  if(!lista.length){
-    $("#evento-rotulo").textContent = "Lo que viene";
-    $("#evento-encabezado").textContent = "Próxima partida";
-    caja.className = "sube vista";
-    caja.innerHTML = `<div class="evento-vacio">
-      <p class="lectura" style="margin:0">Sin fecha por ahora. Pregúntanos por WhatsApp
-      y te avisamos en cuanto salga la siguiente.</p></div>`;
-    agenda.innerHTML = "";
-    return;
-  }
+  /* Sin fechas reales no se enseña una agenda vacía —y mucho menos una
+     inventada—: se esconden la sección entera y su liga del menú. Vuelven
+     solas en cuanto EVENTOS tenga algo. */
+  verAgenda(lista.length > 0);
+  if(!lista.length){ caja.innerHTML = ""; agenda.innerHTML = ""; return; }
 
   /* Si ya pasaron todos, se queda el último —en gris— en lugar
      de dejar el hueco o seguir diciendo "próxima". */

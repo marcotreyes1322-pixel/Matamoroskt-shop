@@ -80,7 +80,11 @@ Hay tres cosas que todavía traen datos de relleno:
 - [ ] **El WhatsApp** (`WHATSAPP` en `index.html`) está en `521625XXXXXXX`. Los
       tres botones de pedido no llevan a ningún lado hasta que se ponga el
       número real.
-- [ ] **Los tres eventos** de la agenda son de ejemplo, no son reales.
+- [x] ~~**Los tres eventos** de la agenda son de ejemplo~~ — ya se quitaron. La
+      sección de agenda está escondida (y su liga del menú también) mientras no
+      haya fechas reales. Para que vuelva, descomenta el renglón de ejemplo en
+      `EVENTOS` y cámbiale los datos: reaparece sola, con su cuenta regresiva y
+      su botón de "cómo llegar".
 - [ ] **Precios y disponibilidad** del catálogo, sin confirmar.
 
 Todo eso se edita en el bloque marcado `EDITA AQUÍ`, arriba del archivo.
